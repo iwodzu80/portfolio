@@ -36,29 +36,49 @@ const Index = () => {
       console.log("Fetching profile data for user:", user.id);
       
       // Fetch profile data from Supabase
-      const { data: profileData, error } = await supabase
+      const { data: profileData, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
-        .single();
+        .eq('id', user.id);
         
-      if (error) {
-        console.error("Error fetching profile:", error);
-        throw error;
+      if (fetchError) {
+        console.error("Error fetching profile:", fetchError);
+        throw fetchError;
       }
       
       console.log("Retrieved profile data:", profileData);
       
-      if (profileData) {
+      // Check if profile exists
+      if (profileData && profileData.length > 0) {
         setProfileData({
-          name: profileData.name || "",
-          photo: profileData.photo || "",
-          email: profileData.email || user.email || "",
-          location: profileData.location || "",
-          tagline: profileData.tagline || ""
+          name: profileData[0].name || "",
+          photo: profileData[0].photo || "",
+          email: profileData[0].email || user.email || "",
+          location: profileData[0].location || "",
+          tagline: profileData[0].tagline || ""
         });
       } else {
-        console.warn("No profile data found for user:", user.id);
+        console.log("No profile found, creating one...");
+        // Create a profile if one doesn't exist
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email
+          });
+          
+        if (insertError) {
+          console.error("Error creating profile:", insertError);
+        } else {
+          console.log("Profile created successfully");
+          setProfileData({
+            name: "",
+            photo: "",
+            email: user.email || "",
+            location: "",
+            tagline: ""
+          });
+        }
       }
       
       // Load sections from localStorage (not migrated to Supabase yet)
