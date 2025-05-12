@@ -14,8 +14,11 @@ interface SectionContainerProps {
 const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate }) => {
   const [isEditingMode, setIsEditingMode] = useState(false);
   
+  // Ensure sections is never undefined
+  const safeSections = Array.isArray(sections) ? sections : [];
+  
   const handleUpdateSection = (sectionId: string, title: string) => {
-    const updatedSections = sections.map(section => 
+    const updatedSections = safeSections.map(section => 
       section.id === sectionId ? { ...section, title } : section
     );
     saveSections(updatedSections);
@@ -24,12 +27,12 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate 
   };
   
   const handleDeleteSection = (sectionId: string) => {
-    if (sections.length <= 1) {
+    if (safeSections.length <= 1) {
       toast.error("You must have at least one section");
       return;
     }
     
-    const updatedSections = sections.filter(section => section.id !== sectionId);
+    const updatedSections = safeSections.filter(section => section.id !== sectionId);
     saveSections(updatedSections);
     onUpdate();
     toast.success("Section deleted");
@@ -42,7 +45,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate 
       projects: []
     };
     
-    const updatedSections = [...sections, newSection];
+    const updatedSections = [...safeSections, newSection];
     saveSections(updatedSections);
     onUpdate();
     toast.success("New section added");
@@ -50,7 +53,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate 
   
   return (
     <div className="pb-20">
-      {sections.map((section) => (
+      {safeSections.map((section) => (
         <div key={section.id} className="mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
             <EditableField

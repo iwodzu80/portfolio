@@ -23,7 +23,8 @@ const Index = () => {
   const loadPortfolioData = () => {
     const data = loadData();
     setProfileData(data.profile);
-    setSections(data.sections);
+    // Ensure we always have an array for sections
+    setSections(Array.isArray(data.sections) ? data.sections : []);
   };
 
   return (
