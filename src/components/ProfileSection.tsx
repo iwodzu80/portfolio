@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import EditableImage from "./EditableImage";
 import EditableField from "./EditableField";
 import { saveProfile } from "../utils/localStorage";
@@ -23,6 +23,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   onUpdate,
   isEditingMode = true
 }) => {
+  // Set document title when name changes
+  useEffect(() => {
+    if (name) {
+      document.title = `${name}'s Portfolio`;
+    } else {
+      document.title = "Portfolio";
+    }
+  }, [name]);
+
   const handleProfileUpdate = (field: string, value: string) => {
     saveProfile({
       name: field === "name" ? value : name,
