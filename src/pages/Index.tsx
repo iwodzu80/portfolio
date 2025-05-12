@@ -5,7 +5,8 @@ import SectionContainer from "@/components/SectionContainer";
 import { loadData, SectionData } from "@/utils/localStorage";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Pencil, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [profileData, setProfileData] = useState({
@@ -17,6 +18,7 @@ const Index = () => {
   });
   const [sections, setSections] = useState<SectionData[]>([]);
   const [isEditingMode, setIsEditingMode] = useState(false);
+  const { user, signOut } = useAuth();
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -35,24 +37,37 @@ const Index = () => {
       <Toaster position="top-center" />
       
       <div className="container mx-auto pt-10">
-        <div className="flex justify-end mb-4">
-          <Button
-            onClick={() => setIsEditingMode(!isEditingMode)}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            {isEditingMode ? (
-              <>
-                <Eye size={18} />
-                View Mode
-              </>
-            ) : (
-              <>
-                <Pencil size={18} />
-                Edit Mode
-              </>
-            )}
-          </Button>
+        <div className="flex justify-between items-center mb-4">
+          <div className="text-sm text-gray-500">
+            Logged in as: {user?.email}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setIsEditingMode(!isEditingMode)}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              {isEditingMode ? (
+                <>
+                  <Eye size={18} />
+                  View Mode
+                </>
+              ) : (
+                <>
+                  <Pencil size={18} />
+                  Edit Mode
+                </>
+              )}
+            </Button>
+            <Button 
+              onClick={signOut}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <LogOut size={18} />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         <ProfileSection
