@@ -43,29 +43,32 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     }
     
     try {
+      console.log(`Updating profile field ${field} for user ${user.id} with value:`, value);
+      
       // Create data object for update
       const updateData = {
         [field]: value,
         updated_at: new Date().toISOString()
       };
       
-      console.log(`Updating profile field ${field} for user ${user.id} with value:`, value);
-      
       // Check if profile exists first
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .single();
       
-      if (checkError) {
+      if (checkError && checkError.code !== 'PGRST116') {
+        // PGRST116 means no rows returned, which is fine
         console.error("Error checking profile existence:", checkError);
         throw checkError;
       }
       
       let error;
       
-      if (!existingProfile || existingProfile.length === 0) {
+      if (!existingProfile) {
         // Create profile if it doesn't exist
+        console.log("Profile doesn't exist, creating new profile");
         const { error: insertError } = await supabase
           .from('profiles')
           .insert({
@@ -74,13 +77,22 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             [field]: value
           });
         error = insertError;
+        
+        if (!insertError) {
+          console.log("Profile created successfully with field:", field);
+        }
       } else {
         // Update existing profile
+        console.log("Profile exists, updating field:", field);
         const { error: updateError } = await supabase
           .from('profiles')
           .update(updateData)
           .eq('id', user.id);
         error = updateError;
+        
+        if (!updateError) {
+          console.log("Profile updated successfully with field:", field);
+        }
       }
         
       if (error) {
@@ -89,7 +101,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       }
       
       toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
-      setTimeout(() => onUpdate(), 500); // Call the onUpdate with slight delay to ensure state is updated
+      
+      // Call onUpdate after a short delay to ensure state is updated in Supabase
+      setTimeout(() => onUpdate(), 500);
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);

@@ -39,9 +39,11 @@ const Index = () => {
       const { data: profileData, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .maybeSingle();
         
-      if (fetchError) {
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        // PGRST116 means no rows returned, which is fine
         console.error("Error fetching profile:", fetchError);
         throw fetchError;
       }
@@ -49,13 +51,13 @@ const Index = () => {
       console.log("Retrieved profile data:", profileData);
       
       // Check if profile exists
-      if (profileData && profileData.length > 0) {
+      if (profileData) {
         setProfileData({
-          name: profileData[0].name || "",
-          photo: profileData[0].photo || "",
-          email: profileData[0].email || user.email || "",
-          location: profileData[0].location || "",
-          tagline: profileData[0].tagline || ""
+          name: profileData.name || "",
+          photo: profileData.photo || "",
+          email: profileData.email || user.email || "",
+          location: profileData.location || "",
+          tagline: profileData.tagline || ""
         });
       } else {
         console.log("No profile found, creating one...");
