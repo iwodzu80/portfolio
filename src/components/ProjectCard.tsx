@@ -14,6 +14,7 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmLastLinkDelete, setConfirmLastLinkDelete] = useState(false);
   
   const updateField = (field: keyof ProjectData, value: string | LinkData[]) => {
     onUpdate({ ...project, [field]: value });
@@ -38,9 +39,21 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete }
   
   const deleteLink = (linkId: string) => {
     if (project.links.length <= 1) {
-      toast.error("Project must have at least one link");
+      // Instead of preventing deletion, ask for confirmation
+      if (confirmLastLinkDelete) {
+        const updatedLinks = project.links.filter(link => link.id !== linkId);
+        updateField("links", updatedLinks);
+        toast.success("Link removed");
+        setConfirmLastLinkDelete(false);
+      } else {
+        setConfirmLastLinkDelete(true);
+        // Reset confirmation after 3 seconds
+        setTimeout(() => setConfirmLastLinkDelete(false), 3000);
+        toast.warning("Click again to remove last link");
+      }
       return;
     }
+    
     const updatedLinks = project.links.filter(link => link.id !== linkId);
     updateField("links", updatedLinks);
     toast.success("Link removed");
@@ -117,7 +130,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete }
                 />
                 <button
                   onClick={() => deleteLink(link.id)}
-                  className="text-portfolio-muted hover:text-red-500 transition-colors"
+                  className={`transition-colors ${
+                    confirmLastLinkDelete && project.links.length <= 1 ? 'text-red-500' : 'text-portfolio-muted hover:text-red-500'
+                  }`}
                 >
                   <X size={14} />
                 </button>
