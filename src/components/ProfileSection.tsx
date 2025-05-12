@@ -1,8 +1,10 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import EditableImage from "./EditableImage";
 import EditableField from "./EditableField";
-import { saveProfile } from "../utils/localStorage";
+import { supabase } from "../integrations/supabase/client";
+import { useAuth } from "../contexts/AuthContext";
 
 interface ProfileSectionProps {
   name: string;
@@ -23,6 +25,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   onUpdate,
   isEditingMode = true
 }) => {
+  const { user } = useAuth();
+  
   // Set document title when name changes
   useEffect(() => {
     if (name) {
@@ -32,15 +36,30 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     }
   }, [name]);
 
-  const handleProfileUpdate = (field: string, value: string) => {
-    saveProfile({
-      name: field === "name" ? value : name,
-      photo: field === "photo" ? value : photo,
-      email: field === "email" ? value : email,
-      location: field === "location" ? value : location,
-      tagline: field === "tagline" ? value : tagline,
-    });
-    onUpdate();
+  const handleProfileUpdate = async (field: string, value: string) => {
+    if (!user) {
+      toast.error("You must be logged in to update your profile");
+      return;
+    }
+    
+    try {
+      const updateData = {
+        [field]: value,
+        updated_at: new Date().toISOString()
+      };
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update(updateData)
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
+      onUpdate();
+    } catch (error: any) {
+      toast.error(`Error updating profile: ${error.message}`);
+    }
   };
 
   if (!isEditingMode) {

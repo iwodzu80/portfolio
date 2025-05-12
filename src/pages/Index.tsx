@@ -7,6 +7,8 @@ import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [profileData, setProfileData] = useState({
@@ -18,19 +20,62 @@ const Index = () => {
   });
   const [sections, setSections] = useState<SectionData[]>([]);
   const [isEditingMode, setIsEditingMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
-  // Load data from localStorage on component mount
-  useEffect(() => {
-    loadPortfolioData();
-  }, []);
+  // Load data from Supabase for the current user's profile
+  const loadProfileData = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
 
-  const loadPortfolioData = () => {
-    const data = loadData();
-    setProfileData(data.profile);
-    // Ensure we always have an array for sections
-    setSections(Array.isArray(data.sections) ? data.sections : []);
+    setIsLoading(true);
+    try {
+      // Fetch profile data from Supabase
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error) {
+        throw error;
+      }
+      
+      if (profileData) {
+        setProfileData({
+          name: profileData.name || "",
+          photo: profileData.photo || "",
+          email: profileData.email || user.email || "",
+          location: profileData.location || "",
+          tagline: profileData.tagline || ""
+        });
+      }
+      
+      // Load sections from localStorage (not migrated to Supabase yet)
+      const data = loadData();
+      setSections(Array.isArray(data.sections) ? data.sections : []);
+    } catch (error: any) {
+      console.error("Error loading profile data:", error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  // Load data when component mounts or user changes
+  useEffect(() => {
+    loadProfileData();
+  }, [user]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
@@ -76,7 +121,7 @@ const Index = () => {
           email={profileData.email}
           location={profileData.location}
           tagline={profileData.tagline}
-          onUpdate={loadPortfolioData}
+          onUpdate={loadProfileData}
           isEditingMode={isEditingMode}
         />
         
@@ -84,7 +129,7 @@ const Index = () => {
         
         <SectionContainer
           sections={sections}
-          onUpdate={loadPortfolioData}
+          onUpdate={loadProfileData}
           isEditingMode={isEditingMode}
         />
       </div>
