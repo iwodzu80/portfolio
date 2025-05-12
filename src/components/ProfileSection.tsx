@@ -43,27 +43,35 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     }
     
     try {
+      // Create data object for update
       const updateData = {
         [field]: value,
         updated_at: new Date().toISOString()
       };
       
+      console.log(`Updating profile field ${field} for user ${user.id} with value:`, value);
+      
+      // Update profile in Supabase
       const { error } = await supabase
         .from('profiles')
         .update(updateData)
         .eq('id', user.id);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase update error:", error);
+        throw error;
+      }
       
       toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
-      onUpdate();
+      onUpdate(); // Call the onUpdate function to refresh profile data
     } catch (error: any) {
+      console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);
     }
   };
 
+  // Read-only mode
   if (!isEditingMode) {
-    // Read-only mode
     return (
       <section className="flex flex-col items-center max-w-md mx-auto mb-8 p-6">
         {photo && (

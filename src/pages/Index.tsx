@@ -33,6 +33,8 @@ const Index = () => {
 
     setIsLoading(true);
     try {
+      console.log("Fetching profile data for user:", user.id);
+      
       // Fetch profile data from Supabase
       const { data: profileData, error } = await supabase
         .from('profiles')
@@ -41,8 +43,11 @@ const Index = () => {
         .single();
         
       if (error) {
+        console.error("Error fetching profile:", error);
         throw error;
       }
+      
+      console.log("Retrieved profile data:", profileData);
       
       if (profileData) {
         setProfileData({
@@ -52,6 +57,8 @@ const Index = () => {
           location: profileData.location || "",
           tagline: profileData.tagline || ""
         });
+      } else {
+        console.warn("No profile data found for user:", user.id);
       }
       
       // Load sections from localStorage (not migrated to Supabase yet)
@@ -66,7 +73,9 @@ const Index = () => {
 
   // Load data when component mounts or user changes
   useEffect(() => {
-    loadProfileData();
+    if (user) {
+      loadProfileData();
+    }
   }, [user]);
 
   if (isLoading) {
