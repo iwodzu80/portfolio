@@ -9,9 +9,10 @@ interface ProjectCardProps {
   project: ProjectData;
   onUpdate: (updatedProject: ProjectData) => void;
   onDelete: (id: string) => void;
+  isEditingMode?: boolean;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, isEditingMode = true }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmLastLinkDelete, setConfirmLastLinkDelete] = useState(false);
@@ -69,6 +70,31 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete }
     }
   };
   
+  // Read-only mode (view mode)
+  if (!isEditingMode) {
+    return (
+      <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
+        <h2 className="font-bold text-xl mb-3">{project.title}</h2>
+        <p className="text-portfolio-muted mb-4 text-sm">{project.description}</p>
+        
+        <div className="links flex flex-wrap gap-2">
+          {project.links.map((link) => (
+            <a
+              key={link.id}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors"
+            >
+              {link.title}
+            </a>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  
+  // Edit mode
   return (
     <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
       <div className="flex justify-between items-start mb-3">

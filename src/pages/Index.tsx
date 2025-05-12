@@ -4,6 +4,8 @@ import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
 import { loadData, SectionData } from "@/utils/localStorage";
 import { Toaster } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Eye, Pencil } from "lucide-react";
 
 const Index = () => {
   const [profileData, setProfileData] = useState({
@@ -14,6 +16,7 @@ const Index = () => {
     tagline: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
+  const [isEditingMode, setIsEditingMode] = useState(false);
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -32,6 +35,26 @@ const Index = () => {
       <Toaster position="top-center" />
       
       <div className="container mx-auto pt-10">
+        <div className="flex justify-end mb-4">
+          <Button
+            onClick={() => setIsEditingMode(!isEditingMode)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            {isEditingMode ? (
+              <>
+                <Eye size={18} />
+                View Mode
+              </>
+            ) : (
+              <>
+                <Pencil size={18} />
+                Edit Mode
+              </>
+            )}
+          </Button>
+        </div>
+
         <ProfileSection
           name={profileData.name}
           photo={profileData.photo}
@@ -39,6 +62,7 @@ const Index = () => {
           location={profileData.location}
           tagline={profileData.tagline}
           onUpdate={loadPortfolioData}
+          isEditingMode={isEditingMode}
         />
         
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
@@ -46,6 +70,7 @@ const Index = () => {
         <SectionContainer
           sections={sections}
           onUpdate={loadPortfolioData}
+          isEditingMode={isEditingMode}
         />
       </div>
     </div>

@@ -11,6 +11,7 @@ interface ProfileSectionProps {
   location: string;
   tagline: string;
   onUpdate: () => void;
+  isEditingMode?: boolean;
 }
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({
@@ -19,7 +20,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   email,
   location,
   tagline,
-  onUpdate
+  onUpdate,
+  isEditingMode = true
 }) => {
   const handleProfileUpdate = (field: string, value: string) => {
     saveProfile({
@@ -32,6 +34,33 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     onUpdate();
   };
 
+  if (!isEditingMode) {
+    // Read-only mode
+    return (
+      <section className="flex flex-col items-center max-w-md mx-auto mb-8 p-6">
+        {photo && (
+          <img
+            src={photo}
+            alt={name}
+            className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-white rounded-full object-cover"
+          />
+        )}
+        
+        <div className="mt-6 w-full text-center">
+          <h1 className="font-bold text-2xl md:text-3xl mb-2">{name || "Your Name"}</h1>
+          <p className="text-portfolio-muted mb-4">{tagline || "Your tagline"}</p>
+          
+          <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
+            {email && <span className="text-portfolio-blue">{email}</span>}
+            {email && location && <span className="mx-1">•</span>}
+            {location && <span>{location}</span>}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Edit mode
   return (
     <section className="flex flex-col items-center max-w-md mx-auto mb-8 p-6">
       <EditableImage

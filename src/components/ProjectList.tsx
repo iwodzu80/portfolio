@@ -8,9 +8,15 @@ interface ProjectListProps {
   sectionId: string;
   projects: ProjectData[];
   onUpdate: () => void;
+  isEditingMode?: boolean;
 }
 
-const ProjectList: React.FC<ProjectListProps> = ({ sectionId, projects, onUpdate }) => {
+const ProjectList: React.FC<ProjectListProps> = ({ 
+  sectionId, 
+  projects, 
+  onUpdate,
+  isEditingMode = true
+}) => {
   const handleUpdateProject = (updatedProject: ProjectData) => {
     const updatedProjects = projects.map(project => 
       project.id === updatedProject.id ? updatedProject : project
@@ -39,12 +45,15 @@ const ProjectList: React.FC<ProjectListProps> = ({ sectionId, projects, onUpdate
           project={project}
           onUpdate={handleUpdateProject}
           onDelete={handleDeleteProject}
+          isEditingMode={isEditingMode}
         />
       ))}
       
-      <div className="mt-6">
-        <AddProjectButton onAdd={handleAddProject} />
-      </div>
+      {isEditingMode && (
+        <div className="mt-6">
+          <AddProjectButton onAdd={handleAddProject} />
+        </div>
+      )}
     </section>
   );
 };
