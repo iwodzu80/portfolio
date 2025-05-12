@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
 import ProfileSection from "@/components/ProfileSection";
-import ProjectList from "@/components/ProjectList";
-import { loadData, ProjectData } from "@/utils/localStorage";
+import SectionContainer from "@/components/SectionContainer";
+import { loadData, SectionData } from "@/utils/localStorage";
 import { Toaster } from "sonner";
 
 const Index = () => {
@@ -13,7 +13,7 @@ const Index = () => {
     location: "",
     tagline: ""
   });
-  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [sections, setSections] = useState<SectionData[]>([]);
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -23,7 +23,7 @@ const Index = () => {
   const loadPortfolioData = () => {
     const data = loadData();
     setProfileData(data.profile);
-    setProjects(data.projects);
+    setSections(data.sections);
   };
 
   return (
@@ -42,8 +42,8 @@ const Index = () => {
         
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
         
-        <ProjectList
-          projects={projects}
+        <SectionContainer
+          sections={sections}
           onUpdate={loadPortfolioData}
         />
       </div>
