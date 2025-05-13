@@ -9,6 +9,7 @@ import { Eye, Pencil, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import SharePortfolioDialog from "@/components/SharePortfolioDialog";
 
 const Index = () => {
   const [profileData, setProfileData] = useState({
@@ -118,6 +119,7 @@ const Index = () => {
             Logged in as: {user?.email}
           </div>
           <div className="flex gap-2">
+            <SharePortfolioDialog />
             <Button
               onClick={() => setIsEditingMode(!isEditingMode)}
               variant="outline"
