@@ -7,6 +7,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { SectionData } from "@/utils/localStorage";
 import { toast } from "sonner";
 
+interface ShareData {
+  id?: string;
+  user_id: string;
+  share_id: string;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 const SharedPortfolio = () => {
   const { shareId } = useParams();
   const [profileData, setProfileData] = useState({
@@ -36,7 +45,10 @@ const SharedPortfolio = () => {
           .from('portfolio_shares')
           .select('user_id, active')
           .eq('share_id', shareId)
-          .maybeSingle();
+          .maybeSingle() as unknown as {
+            data: ShareData | null;
+            error: any;
+          };
           
         if (shareError || !shareData || !shareData.active) {
           console.error("Share not found or inactive:", shareError || "No data");

@@ -18,6 +18,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Share2, Copy, RotateCw } from "lucide-react";
 
+interface ShareData {
+  id?: string;
+  user_id: string;
+  share_id: string;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 const SharePortfolioDialog = () => {
   const { user } = useAuth();
   const [shareLink, setShareLink] = useState("");
@@ -33,11 +42,15 @@ const SharePortfolioDialog = () => {
     
     setIsLoading(true);
     try {
+      // Using a type cast to deal with the missing type definition
       const { data, error } = await supabase
         .from('portfolio_shares')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .maybeSingle() as unknown as {
+          data: ShareData | null;
+          error: any;
+        };
         
       if (error && error.code !== 'PGRST116') {
         console.error("Error loading share data:", error);
@@ -77,7 +90,10 @@ const SharePortfolioDialog = () => {
         .from('portfolio_shares')
         .select('share_id')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .maybeSingle() as unknown as {
+          data: ShareData | null;
+          error: any;
+        };
       
       let error;
       
@@ -90,7 +106,9 @@ const SharePortfolioDialog = () => {
             active: true,
             updated_at: new Date().toISOString()
           })
-          .eq('user_id', user.id);
+          .eq('user_id', user.id) as unknown as {
+            error: any;
+          };
           
         error = updateError;
       } else {
@@ -101,7 +119,9 @@ const SharePortfolioDialog = () => {
             user_id: user.id,
             share_id: newShareId,
             active: true
-          });
+          }) as unknown as {
+            error: any;
+          };
           
         error = insertError;
       }
@@ -135,7 +155,9 @@ const SharePortfolioDialog = () => {
           active,
           updated_at: new Date().toISOString() 
         })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id) as unknown as {
+          error: any;
+        };
         
       if (error) {
         console.error("Error updating share status:", error);
