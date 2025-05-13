@@ -87,6 +87,11 @@ export function loadData(): PortfolioData {
   return defaultData;
 }
 
+// Add the getPortfolioData function that's being imported in SharedPortfolio.tsx
+export function getPortfolioData(): PortfolioData {
+  return loadData();
+}
+
 export function saveProfile(profile: ProfileData): void {
   const data = loadData();
   data.profile = profile;
