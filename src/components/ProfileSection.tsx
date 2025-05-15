@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
@@ -126,11 +125,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       
       toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
       
-      // Only call onUpdate when necessary, and with a delay to avoid UI jank
-      setTimeout(() => {
-        // This no longer forces full page refresh since we update local state first
-        onUpdate();
-      }, 500);
+      // Don't call onUpdate() here to avoid page refreshes
+      // The local state is already updated for UI responsiveness
+      
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);
