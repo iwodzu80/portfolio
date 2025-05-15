@@ -26,21 +26,45 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   isEditingMode = true
 }) => {
   const { user } = useAuth();
+  const [localState, setLocalState] = useState({
+    name,
+    photo,
+    email,
+    location,
+    tagline
+  });
+  
+  // Update local state when props change (e.g., on initial load)
+  useEffect(() => {
+    setLocalState({
+      name,
+      photo,
+      email,
+      location,
+      tagline
+    });
+  }, [name, photo, email, location, tagline]);
   
   // Set document title when name changes
   useEffect(() => {
-    if (name) {
-      document.title = `${name}'s Portfolio`;
+    if (localState.name) {
+      document.title = `${localState.name}'s Portfolio`;
     } else {
       document.title = "Portfolio";
     }
-  }, [name]);
+  }, [localState.name]);
 
   const handleProfileUpdate = async (field: string, value: string) => {
     if (!user) {
       toast.error("You must be logged in to update your profile");
       return;
     }
+    
+    // Update local state immediately for a responsive UI
+    setLocalState(prevState => ({
+      ...prevState,
+      [field]: value
+    }));
     
     try {
       console.log(`Updating profile field ${field} for user ${user.id} with value:`, value);
@@ -102,11 +126,23 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       
       toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
       
-      // Call onUpdate after a short delay to ensure state is updated in Supabase
-      setTimeout(() => onUpdate(), 500);
+      // Only call onUpdate when necessary, and with a delay to avoid UI jank
+      setTimeout(() => {
+        // This no longer forces full page refresh since we update local state first
+        onUpdate();
+      }, 500);
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);
+      
+      // Revert local state on error
+      setLocalState({
+        name,
+        photo,
+        email,
+        location,
+        tagline
+      });
     }
   };
 
@@ -114,22 +150,22 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   if (!isEditingMode) {
     return (
       <section className="flex flex-col items-center max-w-md mx-auto mb-8 p-6">
-        {photo && (
+        {localState.photo && (
           <img
-            src={photo}
-            alt={name}
+            src={localState.photo}
+            alt={localState.name}
             className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-white rounded-full object-cover"
           />
         )}
         
         <div className="mt-6 w-full text-center">
-          <h1 className="font-bold text-2xl md:text-3xl mb-2">{name || "Your Name"}</h1>
-          <p className="text-portfolio-muted mb-4">{tagline || "Your tagline"}</p>
+          <h1 className="font-bold text-2xl md:text-3xl mb-2">{localState.name || "Your Name"}</h1>
+          <p className="text-portfolio-muted mb-4">{localState.tagline || "Your tagline"}</p>
           
           <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
-            {email && <span className="text-portfolio-blue">{email}</span>}
-            {email && location && <span className="mx-1">•</span>}
-            {location && <span>{location}</span>}
+            {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
+            {localState.email && localState.location && <span className="mx-1">•</span>}
+            {localState.location && <span>{localState.location}</span>}
           </div>
         </div>
       </section>
@@ -140,15 +176,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   return (
     <section className="flex flex-col items-center max-w-md mx-auto mb-8 p-6">
       <EditableImage
-        src={photo}
-        alt={name}
+        src={localState.photo}
+        alt={localState.name}
         onChange={(value) => handleProfileUpdate("photo", value)}
         className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-white"
       />
       
       <div className="mt-6 w-full text-center">
         <EditableField
-          value={name}
+          value={localState.name}
           onChange={(value) => handleProfileUpdate("name", value)}
           tag="h1"
           className="font-bold text-2xl md:text-3xl mb-2"
@@ -156,7 +192,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         />
         
         <EditableField
-          value={tagline}
+          value={localState.tagline}
           onChange={(value) => handleProfileUpdate("tagline", value)}
           tag="p"
           className="text-portfolio-muted mb-4"
@@ -166,7 +202,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         
         <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
           <EditableField
-            value={email}
+            value={localState.email}
             onChange={(value) => handleProfileUpdate("email", value)}
             tag="span"
             placeholder="Email"
@@ -174,7 +210,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           />
           <span className="mx-1">•</span>
           <EditableField
-            value={location}
+            value={localState.location}
             onChange={(value) => handleProfileUpdate("location", value)}
             tag="span"
             placeholder="Location"

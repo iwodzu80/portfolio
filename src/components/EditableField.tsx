@@ -23,11 +23,15 @@ const EditableField: React.FC<EditableFieldProps> = ({
   const [text, setText] = useState(value);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const scrollPosRef = useRef<number>(0);
+  const localValueRef = useRef<string>(value);
   
+  // Update internal state when prop value changes
   useEffect(() => {
     setText(value);
+    localValueRef.current = value;
   }, [value]);
   
+  // Focus input when entering edit mode
   useEffect(() => {
     if (editing && inputRef.current) {
       inputRef.current.focus();
@@ -58,8 +62,10 @@ const EditableField: React.FC<EditableFieldProps> = ({
   const handleBlur = () => {
     captureScrollPosition();
     setEditing(false);
-    if (text !== value) {
-      // Prevent full page refresh by directly updating the component's state
+    
+    // Only trigger onChange if the value actually changed
+    if (text !== localValueRef.current) {
+      localValueRef.current = text;
       onChange(text);
     }
   };
@@ -68,16 +74,22 @@ const EditableField: React.FC<EditableFieldProps> = ({
     if (e.key === "Enter" && !multiline) {
       captureScrollPosition();
       setEditing(false);
-      onChange(text);
+      
+      // Only trigger onChange if the value actually changed
+      if (text !== localValueRef.current) {
+        localValueRef.current = text;
+        onChange(text);
+      }
     } else if (e.key === "Escape") {
       captureScrollPosition();
-      setText(value);
+      setText(localValueRef.current); // Restore to last committed value
       setEditing(false);
     }
   };
 
   const Tag = tag as keyof JSX.IntrinsicElements;
 
+  // Separate rendering logic for edit mode vs display mode
   if (editing) {
     return multiline ? (
       <textarea
@@ -104,10 +116,11 @@ const EditableField: React.FC<EditableFieldProps> = ({
     );
   }
 
+  // Display mode
   return (
     <div className="editable-field relative group">
       <Tag className={`pr-5 ${className}`} onClick={handleClick}>
-        {value || <span className="text-gray-400">{placeholder}</span>}
+        {localValueRef.current || <span className="text-gray-400">{placeholder}</span>}
       </Tag>
       <span className="editable-field-indicator absolute top-0 right-0">
         <Pencil size={14} />
