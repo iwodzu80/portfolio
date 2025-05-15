@@ -34,7 +34,11 @@ const EditableField: React.FC<EditableFieldProps> = ({
   }, [editing]);
 
   const handleClick = () => {
+    // Save scroll position before entering edit mode
+    const scrollPosition = window.scrollY;
     setEditing(true);
+    // Restore scroll position after state update
+    setTimeout(() => window.scrollTo(0, scrollPosition), 0);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -42,19 +46,31 @@ const EditableField: React.FC<EditableFieldProps> = ({
   };
 
   const handleBlur = () => {
+    // Save scroll position before exiting edit mode
+    const scrollPosition = window.scrollY;
     setEditing(false);
     if (text !== value) {
       onChange(text);
     }
+    // Restore scroll position after state updates
+    setTimeout(() => window.scrollTo(0, scrollPosition), 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !multiline) {
+      // Save scroll position before exiting edit mode
+      const scrollPosition = window.scrollY;
       setEditing(false);
       onChange(text);
+      // Restore scroll position after state updates
+      setTimeout(() => window.scrollTo(0, scrollPosition), 0);
     } else if (e.key === "Escape") {
+      // Save scroll position before exiting edit mode
+      const scrollPosition = window.scrollY;
       setText(value);
       setEditing(false);
+      // Restore scroll position after state updates
+      setTimeout(() => window.scrollTo(0, scrollPosition), 0);
     }
   };
 
