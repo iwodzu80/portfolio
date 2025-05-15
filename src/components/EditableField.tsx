@@ -34,19 +34,20 @@ const EditableField: React.FC<EditableFieldProps> = ({
     }
   }, [editing]);
 
-  // Use layout effect to restore scroll position after state updates
+  // Capture scroll position before any state changes
+  const captureScrollPosition = () => {
+    scrollPosRef.current = window.scrollY;
+  };
+  
+  // Restore scroll position after render
   useLayoutEffect(() => {
     if (scrollPosRef.current > 0) {
       window.scrollTo(0, scrollPosRef.current);
     }
-  }, [editing]);
-
-  const saveScrollPosition = () => {
-    scrollPosRef.current = window.scrollY;
-  };
+  }, [editing, text]);
   
   const handleClick = () => {
-    saveScrollPosition();
+    captureScrollPosition();
     setEditing(true);
   };
 
@@ -55,20 +56,21 @@ const EditableField: React.FC<EditableFieldProps> = ({
   };
 
   const handleBlur = () => {
-    saveScrollPosition();
+    captureScrollPosition();
     setEditing(false);
     if (text !== value) {
+      // Prevent full page refresh by directly updating the component's state
       onChange(text);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !multiline) {
-      saveScrollPosition();
+      captureScrollPosition();
       setEditing(false);
       onChange(text);
     } else if (e.key === "Escape") {
-      saveScrollPosition();
+      captureScrollPosition();
       setText(value);
       setEditing(false);
     }
