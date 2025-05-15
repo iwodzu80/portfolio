@@ -88,10 +88,10 @@ const EditableField: React.FC<EditableFieldProps> = ({
 
   return (
     <div className="editable-field relative group">
-      <Tag className={`relative ${className}`} onClick={handleClick}>
+      <Tag className={`pr-5 ${className}`} onClick={handleClick}>
         {value || <span className="text-gray-400">{placeholder}</span>}
       </Tag>
-      <span className="editable-field-indicator absolute right-0 top-0">
+      <span className="editable-field-indicator absolute top-0 right-0">
         <Pencil size={14} />
       </span>
     </div>
