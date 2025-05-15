@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Pencil } from "lucide-react";
 
 interface EditableFieldProps {
@@ -22,6 +22,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(value);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const scrollPosRef = useRef<number>(0);
   
   useEffect(() => {
     setText(value);
@@ -33,12 +34,20 @@ const EditableField: React.FC<EditableFieldProps> = ({
     }
   }, [editing]);
 
+  // Use layout effect to restore scroll position after state updates
+  useLayoutEffect(() => {
+    if (scrollPosRef.current > 0) {
+      window.scrollTo(0, scrollPosRef.current);
+    }
+  }, [editing]);
+
+  const saveScrollPosition = () => {
+    scrollPosRef.current = window.scrollY;
+  };
+  
   const handleClick = () => {
-    // Save scroll position before entering edit mode
-    const scrollPosition = window.scrollY;
+    saveScrollPosition();
     setEditing(true);
-    // Restore scroll position after state update
-    setTimeout(() => window.scrollTo(0, scrollPosition), 0);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -46,31 +55,22 @@ const EditableField: React.FC<EditableFieldProps> = ({
   };
 
   const handleBlur = () => {
-    // Save scroll position before exiting edit mode
-    const scrollPosition = window.scrollY;
+    saveScrollPosition();
     setEditing(false);
     if (text !== value) {
       onChange(text);
     }
-    // Restore scroll position after state updates
-    setTimeout(() => window.scrollTo(0, scrollPosition), 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !multiline) {
-      // Save scroll position before exiting edit mode
-      const scrollPosition = window.scrollY;
+      saveScrollPosition();
       setEditing(false);
       onChange(text);
-      // Restore scroll position after state updates
-      setTimeout(() => window.scrollTo(0, scrollPosition), 0);
     } else if (e.key === "Escape") {
-      // Save scroll position before exiting edit mode
-      const scrollPosition = window.scrollY;
+      saveScrollPosition();
       setText(value);
       setEditing(false);
-      // Restore scroll position after state updates
-      setTimeout(() => window.scrollTo(0, scrollPosition), 0);
     }
   };
 
