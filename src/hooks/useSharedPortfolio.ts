@@ -46,7 +46,9 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           
         if (shareError) {
           console.error("Error fetching share data:", shareError);
-          throw shareError;
+          setNotFound(true);
+          setIsLoading(false);
+          return;
         }
         
         if (!shareData || !shareData.active) {
@@ -87,93 +89,89 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           }
         }
         
-        // Log before fetching sections to ensure the function is reaching this point
-        console.log(`Starting to fetch sections for user ID: ${userId}`);
-        
-        // Fetch sections with their projects and links
-        const { data: sectionsData, error: sectionsError } = await supabase
+        // Direct fetch of sections with projects and links in a single query
+        const { data: sectionsRaw, error: sectionsError } = await supabase
           .from('sections')
           .select(`
             id, 
             title,
-            projects:projects(
+            projects (
               id, 
               title, 
               description,
-              links:links(
+              links (
                 id, 
                 title, 
                 url
               )
             )
           `)
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .order('created_at', { ascending: true });
           
         if (sectionsError) {
-          console.error("Error fetching shared sections:", sectionsError);
+          console.error("Error fetching sections:", sectionsError);
           throw sectionsError;
         }
-
-        console.log("Raw sections data:", JSON.stringify(sectionsData, null, 2));
-        console.log("Number of sections found:", sectionsData?.length || 0);
         
-        if (!sectionsData || sectionsData.length === 0) {
-          console.log("No sections found for user");
+        console.log("Raw sections data from database:", sectionsRaw);
+        
+        // Process and validate the sections data
+        if (!sectionsRaw || !Array.isArray(sectionsRaw) || sectionsRaw.length === 0) {
+          console.log("No sections found or invalid sections format", sectionsRaw);
           setSections([]);
           setIsLoading(false);
           return;
         }
         
-        // Process the sections data to ensure we have the correct structure
-        const processedSections: SectionData[] = sectionsData.map((section: any) => {
-          console.log(`Processing section ${section.id}: ${section.title}`);
-          console.log(`Projects in section:`, section.projects);
-          
-          if (!section.projects) {
-            console.log(`No projects found in section ${section.id}`);
+        // Transform the raw data to match our expected format
+        const formattedSections: SectionData[] = sectionsRaw.map(section => {
+          // Ensure section has the expected structure
+          if (!section || typeof section !== 'object') {
+            console.error("Invalid section object:", section);
             return {
-              id: section.id,
-              title: section.title,
+              id: "invalid-section",
+              title: "Invalid Section",
               projects: []
             };
           }
           
-          const processedProjects: ProjectData[] = section.projects.map((project: any) => {
-            console.log(`Processing project ${project.id}: ${project.title}`);
-            console.log(`Links in project:`, project.links);
-            
-            if (!project.links) {
-              console.log(`No links found in project ${project.id}`);
-              return {
-                id: project.id,
-                title: project.title,
-                description: project.description || "",
-                links: []
-              };
-            }
-            
-            return {
-              id: project.id,
-              title: project.title,
-              description: project.description || "",
-              links: project.links || []
-            };
-          });
+          // Process projects if they exist
+          const projects = Array.isArray(section.projects) 
+            ? section.projects.map(project => {
+                if (!project) return null;
+                
+                // Process links if they exist
+                const links = Array.isArray(project.links) 
+                  ? project.links.map(link => ({
+                      id: link.id || `temp-${Math.random().toString(36)}`,
+                      title: link.title || "",
+                      url: link.url || ""
+                    }))
+                  : [];
+                
+                return {
+                  id: project.id || `temp-${Math.random().toString(36)}`,
+                  title: project.title || "Untitled Project",
+                  description: project.description || "",
+                  links
+                };
+              }).filter(Boolean) as ProjectData[]
+            : [];
           
           return {
-            id: section.id,
-            title: section.title,
-            projects: processedProjects
+            id: section.id || `temp-${Math.random().toString(36)}`,
+            title: section.title || "Untitled Section",
+            projects
           };
         });
         
-        console.log("Final processed sections:", JSON.stringify(processedSections, null, 2));
-        setSections(processedSections);
+        console.log("Formatted sections after processing:", formattedSections);
+        setSections(formattedSections);
         
       } catch (error: any) {
-        console.error("Error fetching shared portfolio:", error);
+        console.error("Error in fetchSharedPortfolio:", error);
         toast.error("Failed to load shared portfolio");
-        setNotFound(true);
       } finally {
         setIsLoading(false);
       }

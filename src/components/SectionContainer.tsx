@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import ProjectList from "./ProjectList";
 import { SectionData } from "../utils/localStorage";
@@ -20,7 +21,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
   
   // Update localSections when props change (e.g., on initial load)
   useEffect(() => {
-    console.log("SectionContainer received sections:", JSON.stringify(sections, null, 2));
+    console.log("SectionContainer received sections:", sections);
     console.log("Number of sections in SectionContainer:", sections?.length || 0);
     
     if (Array.isArray(sections)) {
@@ -35,6 +36,11 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
   const safeSections = Array.isArray(localSections) ? localSections : [];
   
   console.log("SectionContainer rendering with safeSections:", safeSections.length);
+  if (safeSections.length > 0) {
+    safeSections.forEach((section, index) => {
+      console.log(`Section ${index + 1}: ${section.title} with ${section.projects?.length || 0} projects`);
+    });
+  }
   
   const handleUpdateSection = async (sectionId: string, title: string) => {
     try {
@@ -126,8 +132,8 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
   return (
     <div className="pb-20">
       {safeSections.length > 0 ? (
-        safeSections.map((section) => (
-          <div key={section.id} className="mb-12">
+        safeSections.map((section, index) => (
+          <div key={section.id || `section-${index}`} className="mb-12">
             <div className="flex items-center justify-center gap-2 mb-4">
               {isEditingMode ? (
                 <>
@@ -150,7 +156,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
                   )}
                 </>
               ) : (
-                <h2 className="text-xl font-semibold text-center">{section.title}</h2>
+                <h2 className="text-xl font-semibold text-center">{section.title || "Untitled Section"}</h2>
               )}
             </div>
             

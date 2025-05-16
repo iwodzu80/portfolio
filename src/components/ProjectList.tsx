@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import ProjectCard from "./ProjectCard";
 import AddProjectButton from "./AddProjectButton";
@@ -22,7 +23,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
   
   // Update local state when props change
   useEffect(() => {
-    console.log(`ProjectList for section ${sectionId} received projects:`, JSON.stringify(projects, null, 2));
+    console.log(`ProjectList for section ${sectionId} received projects:`, projects);
     console.log(`Number of projects in section ${sectionId}:`, projects?.length || 0);
     
     if (Array.isArray(projects)) {
@@ -36,7 +37,13 @@ const ProjectList: React.FC<ProjectListProps> = ({
   const safeProjects = Array.isArray(localProjects) ? localProjects : [];
   
   console.log(`ProjectList for section ${sectionId} rendering with safeProjects:`, safeProjects.length);
-
+  
+  if (safeProjects.length > 0) {
+    safeProjects.forEach((project, index) => {
+      console.log(`Project ${index + 1} in section ${sectionId}: ${project.title} with ${project.links?.length || 0} links`);
+    });
+  }
+  
   const handleUpdateProject = async (updatedProject: ProjectData) => {
     try {
       // Update project in Supabase
@@ -174,9 +181,9 @@ const ProjectList: React.FC<ProjectListProps> = ({
   return (
     <section className="max-w-md mx-auto px-6">
       {safeProjects.length > 0 ? (
-        safeProjects.map(project => (
+        safeProjects.map((project, index) => (
           <ProjectCard
-            key={project.id}
+            key={project.id || `project-${sectionId}-${index}`}
             project={project}
             onUpdate={handleUpdateProject}
             onDelete={handleDeleteProject}

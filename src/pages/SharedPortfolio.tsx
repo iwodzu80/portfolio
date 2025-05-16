@@ -14,25 +14,34 @@ const SharedPortfolio = () => {
   const { profileData, sections, isLoading, notFound } = useSharedPortfolio(shareId);
 
   useEffect(() => {
-    console.log("SharedPortfolio component mounted with shareId:", shareId);
-    console.log("Sections received in component:", JSON.stringify(sections, null, 2));
+    console.log("SharedPortfolio component with shareId:", shareId);
+    console.log("profileData:", profileData);
+    console.log("sections:", sections);
     console.log("Number of sections:", sections?.length || 0);
-  }, [shareId, sections]);
+  }, [shareId, sections, profileData]);
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (notFound) {
     return <SharedPortfolioNotFound />;
   }
 
-  console.log("Rendering SharedPortfolio component with sections:", JSON.stringify(sections, null, 2));
-  console.log("Number of sections to render:", sections?.length || 0);
-  
   // Check if sections is properly initialized
   const hasValidSections = Array.isArray(sections) && sections.length > 0;
   console.log("Has valid sections to render:", hasValidSections);
+  
+  // Log projects count if sections exist
+  if (hasValidSections) {
+    const totalProjects = sections.reduce((count, section) => 
+      count + (Array.isArray(section.projects) ? section.projects.length : 0), 0);
+    console.log(`Total projects across all sections: ${totalProjects}`);
+  }
 
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
@@ -57,7 +66,8 @@ const SharedPortfolio = () => {
             <div className="text-center mb-8">
               <p className="text-sm text-portfolio-muted">
                 Found {sections.length} {sections.length === 1 ? 'section' : 'sections'} 
-                with {sections.reduce((count, section) => count + section.projects.length, 0)} projects
+                with {sections.reduce((count, section) => 
+                  count + (Array.isArray(section.projects) ? section.projects.length : 0), 0)} projects
               </p>
             </div>
             <SectionContainer
