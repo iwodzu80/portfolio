@@ -56,7 +56,6 @@ const ProjectList: React.FC<ProjectListProps> = ({
       // Add updated links
       if (updatedProject.links.length > 0) {
         const linksToInsert = updatedProject.links.map(link => ({
-          id: link.id,
           project_id: updatedProject.id,
           title: link.title,
           url: link.url
@@ -76,6 +75,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
         project.id === updatedProject.id ? updatedProject : project
       );
       setLocalProjects(updatedProjects);
+      
+      toast.success("Project updated");
     } catch (error: any) {
       console.error("Error updating project:", error.message);
       toast.error("Failed to update project");
@@ -143,7 +144,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
       const insertedProject: ProjectData = {
         id: projectData.id,
         title: projectData.title,
-        description: projectData.description,
+        description: projectData.description || "",
         links: newProject.links.map((link, idx) => ({
           ...link,
           id: `${projectData.id}-link-${idx}`  // Temporary ID until we fetch from Supabase
