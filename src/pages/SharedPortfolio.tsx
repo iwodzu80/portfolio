@@ -40,6 +40,7 @@ const SharedPortfolio = () => {
 
       try {
         setIsLoading(true);
+        console.log(`Fetching shared portfolio with ID: ${shareId}`);
         
         // Fetch the share record
         const { data: shareData, error: shareError } = await supabase
@@ -48,14 +49,20 @@ const SharedPortfolio = () => {
           .eq('share_id', shareId)
           .maybeSingle();
           
-        if (shareError || !shareData || !shareData.active) {
-          console.error("Share not found or inactive:", shareError || "No data");
+        if (shareError) {
+          console.error("Error fetching share data:", shareError);
+          throw shareError;
+        }
+        
+        if (!shareData || !shareData.active) {
+          console.error("Share not found or inactive");
           setNotFound(true);
           setIsLoading(false);
           return;
         }
         
         const userId = shareData.user_id;
+        console.log(`Found share for user ID: ${userId}`);
         
         // Fetch user profile
         const { data: profileData, error: profileError } = await supabase
@@ -70,6 +77,7 @@ const SharedPortfolio = () => {
         }
         
         if (profileData) {
+          console.log("Profile data retrieved:", profileData);
           setProfileData({
             name: profileData.name || "",
             photo: profileData.photo || "",
@@ -109,6 +117,8 @@ const SharedPortfolio = () => {
           throw sectionsError;
         }
         
+        console.log("Sections data retrieved:", sectionsData);
+        
         if (sectionsData && sectionsData.length > 0) {
           // Transform data to match the expected structure
           const transformedSections: SectionData[] = sectionsData.map(section => ({
@@ -126,7 +136,11 @@ const SharedPortfolio = () => {
             }))
           }));
           
+          console.log("Transformed sections:", transformedSections);
           setSections(transformedSections);
+        } else {
+          console.log("No sections found for this user");
+          setSections([]);
         }
       } catch (error: any) {
         console.error("Error fetching shared portfolio:", error);
@@ -178,11 +192,17 @@ const SharedPortfolio = () => {
         
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
         
-        <SectionContainer
-          sections={sections}
-          onUpdate={() => {}}
-          isEditingMode={false}
-        />
+        {sections.length > 0 ? (
+          <SectionContainer
+            sections={sections}
+            onUpdate={() => {}}
+            isEditingMode={false}
+          />
+        ) : (
+          <div className="text-center py-10">
+            <p className="text-muted-foreground">No projects to display</p>
+          </div>
+        )}
       </div>
     </div>
   );
