@@ -23,7 +23,6 @@ const SharedPortfolio = () => {
   const [sections, setSections] = useState<SectionData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const isReadOnly = true;
 
   useEffect(() => {
     const fetchSharedPortfolio = async () => {
@@ -143,7 +142,7 @@ const SharedPortfolio = () => {
           tagline={profileData.tagline}
           onUpdate={() => {}}
           isEditingMode={false}
-          isReadOnly={isReadOnly}
+          isReadOnly={true}
         />
         
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
@@ -152,7 +151,7 @@ const SharedPortfolio = () => {
           sections={sections}
           onUpdate={() => {}}
           isEditingMode={false}
-          isReadOnly={isReadOnly}
+          isReadOnly={true}
         />
       </div>
     </div>

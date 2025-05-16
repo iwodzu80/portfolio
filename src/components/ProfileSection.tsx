@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
@@ -14,6 +13,7 @@ interface ProfileSectionProps {
   tagline: string;
   onUpdate: () => void;
   isEditingMode?: boolean;
+  isReadOnly?: boolean;
 }
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({
@@ -23,7 +23,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   telephone,
   tagline,
   onUpdate,
-  isEditingMode = true
+  isEditingMode = true,
+  isReadOnly = false
 }) => {
   const { user } = useAuth();
   const [localState, setLocalState] = useState({

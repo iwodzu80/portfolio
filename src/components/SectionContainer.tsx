@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import ProjectList from "./ProjectList";
 import { SectionData } from "../utils/localStorage";
@@ -12,9 +11,10 @@ interface SectionContainerProps {
   sections: SectionData[];
   onUpdate: () => void;
   isEditingMode?: boolean;
+  isReadOnly?: boolean;
 }
 
-const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate, isEditingMode = true }) => {
+const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate, isEditingMode = true, isReadOnly = false }) => {
   const [isEditingSections, setIsEditingSections] = useState(false);
   const [localSections, setLocalSections] = useState<SectionData[]>(sections);
   const { user } = useAuth();
