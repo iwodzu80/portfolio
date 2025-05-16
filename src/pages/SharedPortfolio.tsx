@@ -11,7 +11,7 @@ import { Toaster } from "sonner";
 
 const SharedPortfolio = () => {
   const { shareId } = useParams();
-  const { profileData, sections, isLoading, notFound } = useSharedPortfolio(shareId);
+  const { profileData, sections, isLoading, notFound, ownerName } = useSharedPortfolio(shareId);
 
   useEffect(() => {
     console.log("SharedPortfolio component with shareId:", shareId);
@@ -47,7 +47,7 @@ const SharedPortfolio = () => {
     <div className="min-h-screen bg-portfolio-bg pb-12">
       <Toaster position="top-center" />
       <div className="container mx-auto pt-10 px-4">
-        <SharedPortfolioHeader />
+        <SharedPortfolioHeader ownerName={ownerName} />
 
         <ProfileSection
           name={profileData.name}

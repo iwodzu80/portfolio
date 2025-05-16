@@ -23,6 +23,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
   const [sections, setSections] = useState<SectionData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [ownerName, setOwnerName] = useState<string>("");
 
   useEffect(() => {
     const fetchSharedPortfolio = async () => {
@@ -82,6 +83,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             telephone: profileData.telephone || "",
             tagline: profileData.tagline || ""
           });
+          
+          setOwnerName(profileData.name || "Portfolio Owner");
           
           // Set document title
           if (profileData.name) {
@@ -180,5 +183,5 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
     fetchSharedPortfolio();
   }, [shareId]);
 
-  return { profileData, sections, isLoading, notFound };
+  return { profileData, sections, isLoading, notFound, ownerName };
 };
