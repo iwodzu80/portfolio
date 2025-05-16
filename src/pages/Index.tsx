@@ -1,271 +1,224 @@
+
 import React, { useState, useEffect } from "react";
-import ProfileSection from "@/components/ProfileSection";
-import SectionContainer from "@/components/SectionContainer";
-import { SectionData } from "@/utils/localStorage";
-import { Toaster } from "sonner";
+import ProfileSection from "../components/ProfileSection";
+import SectionContainer from "../components/SectionContainer";
+import { SectionData } from "../utils/localStorage";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, LogOut } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { Share2 } from "lucide-react";
+import SharePortfolioDialog from "@/components/SharePortfolioDialog";
 
 const Index = () => {
-  const [profileData, setProfileData] = useState({
+  const [profile, setProfile] = useState({
     name: "",
     photo: "",
     email: "",
     telephone: "",
-    tagline: ""
+    tagline: "",
   });
   const [sections, setSections] = useState<SectionData[]>([]);
-  const [isEditingMode, setIsEditingMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-
-  // Load data from Supabase for the current user's profile and sections
-  const loadData = async () => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-
-    setIsLoading(true);
+  const [loading, setLoading] = useState(true);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const { user } = useAuth();
+  
+  const fetchPortfolioData = async () => {
+    if (!user) return;
+    
     try {
-      console.log("Fetching data for user:", user.id);
+      setLoading(true);
       
-      // Fetch profile data from Supabase
-      const { data: profileData, error: fetchError } = await supabase
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .maybeSingle();
-        
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error("Error fetching profile:", fetchError);
-        throw fetchError;
+        .single();
+      
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        toast.error("Failed to load your profile data");
+        return;
       }
       
-      // Check if profile exists
-      if (profileData) {
-        setProfileData({
-          name: profileData.name || "",
-          photo: profileData.photo || "",
-          email: profileData.email || user.email || "",
-          telephone: profileData.telephone || "",
-          tagline: profileData.tagline || ""
-        });
-      } else {
-        console.log("No profile found, creating one...");
-        // Create a profile if one doesn't exist
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email
-          });
-          
-        if (insertError) {
-          console.error("Error creating profile:", insertError);
-        } else {
-          console.log("Profile created successfully");
-          setProfileData({
-            name: "",
-            photo: "",
-            email: user.email || "",
-            telephone: "",
-            tagline: ""
-          });
-        }
-      }
-      
-      // Fetch sections from Supabase
+      // Get sections with projects and links
       const { data: sectionsData, error: sectionsError } = await supabase
         .from('sections')
-        .select(`
-          id,
-          title,
-          projects:projects(
-            id,
-            title,
-            description,
-            links:links(
-              id,
-              title,
-              url
-            )
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: true });
-      
+        .select('*')
+        .eq('user_id', user.id);
+        
       if (sectionsError) {
         console.error("Error fetching sections:", sectionsError);
-        throw sectionsError;
+        toast.error("Failed to load your sections");
+        return;
       }
       
-      if (sectionsData && sectionsData.length > 0) {
-        // Transform data to match the expected structure
-        const transformedSections: SectionData[] = sectionsData.map(section => ({
+      // If no sections exist yet, create a default one
+      if (sectionsData.length === 0) {
+        const { data: newSection, error: newSectionError } = await supabase
+          .from('sections')
+          .insert({
+            title: "My Projects",
+            user_id: user.id
+          })
+          .select()
+          .single();
+          
+        if (newSectionError) {
+          console.error("Error creating default section:", newSectionError);
+          toast.error("Failed to create default section");
+          return;
+        }
+        
+        sectionsData.push(newSection);
+      }
+      
+      // Get all projects for these sections
+      const allSectionIds = sectionsData.map(section => section.id);
+      const { data: projectsData, error: projectsError } = await supabase
+        .from('projects')
+        .select('*')
+        .in('section_id', allSectionIds);
+        
+      if (projectsError) {
+        console.error("Error fetching projects:", projectsError);
+        toast.error("Failed to load your projects");
+        return;
+      }
+      
+      // Get all links for these projects
+      const allProjectIds = projectsData.map(project => project.id);
+      const { data: linksData, error: linksError } = await supabase
+        .from('links')
+        .select('*')
+        .in('project_id', allProjectIds.length ? allProjectIds : ['no_projects']);
+        
+      if (linksError && allProjectIds.length > 0) {
+        console.error("Error fetching links:", linksError);
+        toast.error("Failed to load your project links");
+        return;
+      }
+      
+      // Build the sections data structure with projects and links
+      const formattedSections: SectionData[] = sectionsData.map(section => {
+        const sectionProjects = projectsData
+          .filter(project => project.section_id === section.id)
+          .map(project => {
+            const projectLinks = linksData
+              ? linksData
+                  .filter(link => link.project_id === project.id)
+                  .map(link => ({
+                    id: link.id,
+                    title: link.title,
+                    url: link.url
+                  }))
+              : [];
+              
+            return {
+              id: project.id,
+              title: project.title,
+              description: project.description || "",
+              links: projectLinks
+            };
+          });
+          
+        return {
           id: section.id,
           title: section.title,
-          projects: section.projects.map(project => ({
-            id: project.id,
-            title: project.title,
-            description: project.description || "",
-            links: project.links.map(link => ({
-              id: link.id,
-              title: link.title,
-              url: link.url
-            }))
-          }))
-        }));
-        
-        setSections(transformedSections);
-      } else {
-        // If no sections found, create a default section
-        await createDefaultSection(user.id);
-      }
-    } catch (error: any) {
-      console.error("Error loading data:", error.message);
-    } finally {
-      setIsLoading(false);
+          projects: sectionProjects
+        };
+      });
+      
+      // Update state with fetched data
+      setProfile({
+        name: profileData?.name || "",
+        photo: profileData?.photo || "",
+        email: profileData?.email || "",
+        telephone: profileData?.telephone || "",
+        tagline: profileData?.tagline || ""
+      });
+      
+      setSections(formattedSections);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching portfolio data:", error);
+      toast.error("Failed to load your portfolio data");
+      setLoading(false);
     }
   };
   
-  // Create a default section when a new user signs up
-  const createDefaultSection = async (userId: string) => {
-    try {
-      // Insert default section
-      const { data: sectionData, error: sectionError } = await supabase
-        .from('sections')
-        .insert({
-          user_id: userId,
-          title: "My Projects"
-        })
-        .select('id')
-        .single();
-        
-      if (sectionError) {
-        console.error("Error creating default section:", sectionError);
-        return;
-      }
-      
-      // Insert default project
-      const { data: projectData, error: projectError } = await supabase
-        .from('projects')
-        .insert({
-          section_id: sectionData.id,
-          title: "Personal Portfolio",
-          description: "A responsive portfolio website built with React and TailwindCSS."
-        })
-        .select('id')
-        .single();
-        
-      if (projectError) {
-        console.error("Error creating default project:", projectError);
-        return;
-      }
-      
-      // Insert default links
-      const links = [
-        { project_id: projectData.id, title: "GitHub", url: "https://github.com" },
-        { project_id: projectData.id, title: "Live Site", url: "https://example.com" }
-      ];
-      
-      const { error: linksError } = await supabase
-        .from('links')
-        .insert(links);
-        
-      if (linksError) {
-        console.error("Error creating default links:", linksError);
-        return;
-      }
-      
-      // Reload data after creating defaults
-      loadData();
-    } catch (error: any) {
-      console.error("Error in createDefaultSection:", error.message);
-    }
-  };
-
-  // This function is passed to child components
-  const handleUpdate = () => {
-    // Reload data from Supabase
-    loadData();
-  };
-
-  // Load data when component mounts or user changes
   useEffect(() => {
     if (user) {
-      loadData();
+      fetchPortfolioData();
     }
   }, [user]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-portfolio-bg pb-12">
-      <Toaster position="top-center" />
+  
+  const handleProfileUpdate = async (updatedProfile: any) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: updatedProfile.name,
+          photo: updatedProfile.photo,
+          email: updatedProfile.email,
+          telephone: updatedProfile.telephone,
+          tagline: updatedProfile.tagline,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+        
+      if (error) throw error;
       
-      <div className="container mx-auto pt-10">
-        <div className="flex justify-between items-center mb-4">
-          <div className="text-sm text-gray-500">
-            Logged in as: {user?.email}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setIsEditingMode(!isEditingMode)}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              {isEditingMode ? (
-                <>
-                  <Eye size={18} />
-                  View Mode
-                </>
-              ) : (
-                <>
-                  <Pencil size={18} />
-                  Edit Mode
-                </>
-              )}
-            </Button>
-            <Button 
-              onClick={signOut}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <LogOut size={18} />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-
-        <ProfileSection
-          name={profileData.name}
-          photo={profileData.photo}
-          email={profileData.email}
-          telephone={profileData.telephone}
-          tagline={profileData.tagline}
-          onUpdate={handleUpdate}
-          isEditingMode={isEditingMode}
-        />
-        
-        <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
-        
-        <SectionContainer
-          sections={sections}
-          onUpdate={handleUpdate}
-          isEditingMode={isEditingMode}
-        />
+      setProfile(updatedProfile);
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile");
+    }
+  };
+  
+  const handleSectionsUpdate = () => {
+    fetchPortfolioData();
+  };
+  
+  if (loading && !user) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+  
+  return (
+    <div className="relative">
+      <div className="flex justify-end px-4 py-2">
+        <Button 
+          variant="outline" 
+          className="gap-2"
+          onClick={() => setShareDialogOpen(true)}
+        >
+          <Share2 className="h-4 w-4" />
+          Share Portfolio
+        </Button>
       </div>
+      
+      <ProfileSection
+        name={profile.name}
+        photo={profile.photo}
+        email={profile.email}
+        telephone={profile.telephone}
+        tagline={profile.tagline}
+        onUpdate={handleProfileUpdate}
+      />
+      
+      <SectionContainer
+        sections={sections}
+        onUpdate={handleSectionsUpdate}
+      />
+      
+      <SharePortfolioDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+      />
     </div>
   );
 };
