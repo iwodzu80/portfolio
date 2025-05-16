@@ -101,6 +101,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         }
         
         console.log("Raw sections data:", sectionsData);
+        console.log("Number of sections found:", sectionsData?.length || 0);
         
         if (!sectionsData || sectionsData.length === 0) {
           console.log("No sections found for user");
@@ -113,6 +114,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         const processedSections: SectionData[] = [];
         
         for (const section of sectionsData) {
+          console.log(`Processing section: ${section.id} - ${section.title}`);
           // Fetch projects for this section
           const { data: projectsData, error: projectsError } = await supabase
             .from('projects')
@@ -125,11 +127,13 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           }
           
           console.log(`Projects for section ${section.id}:`, projectsData);
+          console.log(`Number of projects for section ${section.id}:`, projectsData?.length || 0);
           
           const projects: ProjectData[] = [];
           
           // For each project, fetch its links
           for (const project of (projectsData || [])) {
+            console.log(`Processing project: ${project.id} - ${project.title}`);
             const { data: linksData, error: linksError } = await supabase
               .from('links')
               .select('id, title, url')
@@ -141,6 +145,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             }
             
             console.log(`Links for project ${project.id}:`, linksData);
+            console.log(`Number of links for project ${project.id}:`, linksData?.length || 0);
             
             projects.push({
               id: project.id,
@@ -158,6 +163,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         }
         
         console.log("Processed sections data:", processedSections);
+        console.log("Final number of sections with projects:", processedSections.length);
         setSections(processedSections);
         
       } catch (error: any) {

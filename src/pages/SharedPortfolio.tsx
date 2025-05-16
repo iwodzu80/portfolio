@@ -21,6 +21,9 @@ const SharedPortfolio = () => {
     return <SharedPortfolioNotFound />;
   }
 
+  console.log("Rendering SharedPortfolio with sections:", sections);
+  console.log("Number of sections to render:", sections.length);
+
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
       <Toaster position="top-center" />
@@ -40,11 +43,13 @@ const SharedPortfolio = () => {
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
         
         {sections.length > 0 ? (
-          <SectionContainer
-            sections={sections}
-            onUpdate={() => {}}
-            isEditingMode={false}
-          />
+          <>
+            <SectionContainer
+              sections={sections}
+              onUpdate={() => {}}
+              isEditingMode={false}
+            />
+          </>
         ) : (
           <div className="text-center py-10">
             <p className="text-muted-foreground">No projects to display</p>
