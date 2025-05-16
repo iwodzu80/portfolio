@@ -151,13 +151,9 @@ const ProjectList: React.FC<ProjectListProps> = ({
         }))
       };
       
-      // Update local state
-      const updatedProjects = [...localProjects, insertedProject];
-      setLocalProjects(updatedProjects);
+      // Update local state immediately without calling onUpdate
+      setLocalProjects(prevProjects => [...prevProjects, insertedProject]);
       toast.success("Project added");
-      
-      // Optionally refresh to get proper link IDs
-      onUpdate();
     } catch (error: any) {
       console.error("Error adding project:", error.message);
       toast.error("Failed to add project");

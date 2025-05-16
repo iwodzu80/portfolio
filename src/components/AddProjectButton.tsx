@@ -2,7 +2,6 @@
 import React from "react";
 import { Plus } from "lucide-react";
 import { ProjectData } from "../utils/localStorage";
-import { toast } from "sonner";
 
 interface AddProjectButtonProps {
   onAdd: (project: ProjectData) => void;
@@ -20,7 +19,6 @@ const AddProjectButton: React.FC<AddProjectButtonProps> = ({ onAdd }) => {
     };
     
     onAdd(newProject);
-    toast.success("New project added");
   };
 
   return (
