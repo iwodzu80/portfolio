@@ -1,10 +1,12 @@
 
 import React, { useState } from "react";
 import ProjectList from "./ProjectList";
-import { SectionData, saveSections } from "../utils/localStorage";
+import { SectionData } from "../utils/localStorage";
 import EditableField from "./EditableField";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SectionContainerProps {
   sections: SectionData[];
@@ -15,6 +17,7 @@ interface SectionContainerProps {
 const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate, isEditingMode = true }) => {
   const [isEditingSections, setIsEditingSections] = useState(false);
   const [localSections, setLocalSections] = useState<SectionData[]>(sections);
+  const { user } = useAuth();
   
   // Update localSections when props change (e.g., on initial load)
   React.useEffect(() => {
@@ -24,48 +27,91 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
   // Ensure sections is never undefined
   const safeSections = Array.isArray(localSections) ? localSections : [];
   
-  const handleUpdateSection = (sectionId: string, title: string) => {
-    // Update local state immediately for responsive UI
-    const updatedSections = safeSections.map(section => 
-      section.id === sectionId ? { ...section, title } : section
-    );
-    
-    setLocalSections(updatedSections);
-    
-    // Update localStorage in the background
-    saveSections(updatedSections);
-    toast.success("Section updated");
-    
-    // Don't call onUpdate() to avoid page refresh
+  const handleUpdateSection = async (sectionId: string, title: string) => {
+    try {
+      // Update section in Supabase
+      const { error } = await supabase
+        .from('sections')
+        .update({ title, updated_at: new Date().toISOString() })
+        .eq('id', sectionId)
+        .eq('user_id', user?.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Update local state immediately for responsive UI
+      const updatedSections = safeSections.map(section => 
+        section.id === sectionId ? { ...section, title } : section
+      );
+      
+      setLocalSections(updatedSections);
+      toast.success("Section updated");
+    } catch (error: any) {
+      console.error("Error updating section:", error.message);
+      toast.error("Failed to update section");
+    }
   };
   
-  const handleDeleteSection = (sectionId: string) => {
+  const handleDeleteSection = async (sectionId: string) => {
     if (safeSections.length <= 1) {
       toast.error("You must have at least one section");
       return;
     }
     
-    const updatedSections = safeSections.filter(section => section.id !== sectionId);
-    setLocalSections(updatedSections);
-    saveSections(updatedSections);
-    toast.success("Section deleted");
-    
-    // Don't call onUpdate() to avoid page refresh
+    try {
+      // Delete section in Supabase (cascade will handle related projects and links)
+      const { error } = await supabase
+        .from('sections')
+        .delete()
+        .eq('id', sectionId)
+        .eq('user_id', user?.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Update local state
+      const updatedSections = safeSections.filter(section => section.id !== sectionId);
+      setLocalSections(updatedSections);
+      toast.success("Section deleted");
+    } catch (error: any) {
+      console.error("Error deleting section:", error.message);
+      toast.error("Failed to delete section");
+    }
   };
   
-  const handleAddSection = () => {
-    const newSection: SectionData = {
-      id: `section-${Date.now()}`,
-      title: "New Section",
-      projects: []
-    };
-    
-    const updatedSections = [...safeSections, newSection];
-    setLocalSections(updatedSections);
-    saveSections(updatedSections);
-    toast.success("New section added");
-    
-    // Don't call onUpdate() to avoid page refresh
+  const handleAddSection = async () => {
+    try {
+      // Insert new section in Supabase
+      const { data, error } = await supabase
+        .from('sections')
+        .insert({
+          user_id: user?.id,
+          title: "New Section"
+        })
+        .select()
+        .single();
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Create new section with empty projects array
+      const newSection: SectionData = {
+        id: data.id,
+        title: data.title,
+        projects: []
+      };
+      
+      // Update local state
+      const updatedSections = [...safeSections, newSection];
+      setLocalSections(updatedSections);
+      toast.success("New section added");
+    } catch (error: any) {
+      console.error("Error adding section:", error.message);
+      toast.error("Failed to add section");
+    }
   };
   
   return (
@@ -101,7 +147,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
           <ProjectList
             sectionId={section.id}
             projects={section.projects}
-            onUpdate={() => {}}  // Empty function to avoid page refreshes
+            onUpdate={onUpdate}
             isEditingMode={isEditingMode}
           />
         </div>

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
 import { supabase } from "@/integrations/supabase/client";
-import { SectionData, getPortfolioData } from "@/utils/localStorage";
+import { SectionData } from "@/utils/localStorage";
 import { toast } from "sonner";
 
 interface ShareData {
@@ -86,21 +86,49 @@ const SharedPortfolio = () => {
           }
         }
         
-        // For sections data, use localStorage for now since we don't have those tables in Supabase yet
-        // We'll use the user's ID to request the data from the owner's perspective
-        // This is temporary until we migrate sections/projects data to Supabase
-        try {
-          // In a real implementation, we would fetch this data from Supabase tables
-          // For now, we'll use mock data that resembles what would come from localStorage
-          // In a future update, this should be replaced with actual Supabase queries
+        // Fetch the user's sections and related data from Supabase
+        const { data: sectionsData, error: sectionsError } = await supabase
+          .from('sections')
+          .select(`
+            id,
+            title,
+            projects:projects(
+              id,
+              title,
+              description,
+              links:links(
+                id,
+                title,
+                url
+              )
+            )
+          `)
+          .eq('user_id', userId)
+          .order('created_at', { ascending: true });
           
-          // Get data from localStorage (this will be empty or from the current user, not the shared portfolio)
-          // In production, this would come from Supabase tables related to the userId
-          const portfolioData = getPortfolioData();
-          setSections(portfolioData.sections || []);
-        } catch (error) {
-          console.error("Error processing sections data:", error);
-          setSections([]);
+        if (sectionsError) {
+          console.error("Error fetching shared sections:", sectionsError);
+          throw sectionsError;
+        }
+        
+        if (sectionsData && sectionsData.length > 0) {
+          // Transform data to match the expected structure
+          const transformedSections: SectionData[] = sectionsData.map(section => ({
+            id: section.id,
+            title: section.title,
+            projects: section.projects.map(project => ({
+              id: project.id,
+              title: project.title,
+              description: project.description || "",
+              links: project.links.map(link => ({
+                id: link.id,
+                title: link.title,
+                url: link.url
+              }))
+            }))
+          }));
+          
+          setSections(transformedSections);
         }
       } catch (error: any) {
         console.error("Error fetching shared portfolio:", error);

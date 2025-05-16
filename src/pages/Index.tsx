@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
-import { loadData, SectionData } from "@/utils/localStorage";
+import { SectionData } from "@/utils/localStorage";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, LogOut } from "lucide-react";
@@ -25,8 +25,8 @@ const Index = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  // Load data from Supabase for the current user's profile
-  const loadProfileData = async () => {
+  // Load data from Supabase for the current user's profile and sections
+  const loadData = async () => {
     if (!user) {
       navigate("/auth");
       return;
@@ -34,7 +34,7 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      console.log("Fetching profile data for user:", user.id);
+      console.log("Fetching data for user:", user.id);
       
       // Fetch profile data from Supabase
       const { data: profileData, error: fetchError } = await supabase
@@ -44,12 +44,9 @@ const Index = () => {
         .maybeSingle();
         
       if (fetchError && fetchError.code !== 'PGRST116') {
-        // PGRST116 means no rows returned, which is fine
         console.error("Error fetching profile:", fetchError);
         throw fetchError;
       }
-      
-      console.log("Retrieved profile data:", profileData);
       
       // Check if profile exists
       if (profileData) {
@@ -84,26 +81,126 @@ const Index = () => {
         }
       }
       
-      // Load sections from localStorage (not migrated to Supabase yet)
-      const data = loadData();
-      setSections(Array.isArray(data.sections) ? data.sections : []);
+      // Fetch sections from Supabase
+      const { data: sectionsData, error: sectionsError } = await supabase
+        .from('sections')
+        .select(`
+          id,
+          title,
+          projects:projects(
+            id,
+            title,
+            description,
+            links:links(
+              id,
+              title,
+              url
+            )
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+      
+      if (sectionsError) {
+        console.error("Error fetching sections:", sectionsError);
+        throw sectionsError;
+      }
+      
+      if (sectionsData && sectionsData.length > 0) {
+        // Transform data to match the expected structure
+        const transformedSections: SectionData[] = sectionsData.map(section => ({
+          id: section.id,
+          title: section.title,
+          projects: section.projects.map(project => ({
+            id: project.id,
+            title: project.title,
+            description: project.description || "",
+            links: project.links.map(link => ({
+              id: link.id,
+              title: link.title,
+              url: link.url
+            }))
+          }))
+        }));
+        
+        setSections(transformedSections);
+      } else {
+        // If no sections found, create a default section
+        await createDefaultSection(user.id);
+      }
     } catch (error: any) {
-      console.error("Error loading profile data:", error.message);
+      console.error("Error loading data:", error.message);
     } finally {
       setIsLoading(false);
     }
   };
+  
+  // Create a default section when a new user signs up
+  const createDefaultSection = async (userId: string) => {
+    try {
+      // Insert default section
+      const { data: sectionData, error: sectionError } = await supabase
+        .from('sections')
+        .insert({
+          user_id: userId,
+          title: "My Projects"
+        })
+        .select('id')
+        .single();
+        
+      if (sectionError) {
+        console.error("Error creating default section:", sectionError);
+        return;
+      }
+      
+      // Insert default project
+      const { data: projectData, error: projectError } = await supabase
+        .from('projects')
+        .insert({
+          section_id: sectionData.id,
+          title: "Personal Portfolio",
+          description: "A responsive portfolio website built with React and TailwindCSS."
+        })
+        .select('id')
+        .single();
+        
+      if (projectError) {
+        console.error("Error creating default project:", projectError);
+        return;
+      }
+      
+      // Insert default links
+      const links = [
+        { project_id: projectData.id, title: "GitHub", url: "https://github.com" },
+        { project_id: projectData.id, title: "Live Site", url: "https://example.com" }
+      ];
+      
+      const { error: linksError } = await supabase
+        .from('links')
+        .insert(links);
+        
+      if (linksError) {
+        console.error("Error creating default links:", linksError);
+        return;
+      }
+      
+      // Reload data after creating defaults
+      loadData();
+    } catch (error: any) {
+      console.error("Error in createDefaultSection:", error.message);
+    }
+  };
 
-  // This function is passed to child components but won't trigger full refreshes anymore
-  const handleUpdateWithoutRefresh = () => {
-    // Do nothing - child components handle their own state updates
-    console.log("Update triggered without refresh");
+  // This function is passed to child components
+  const handleUpdate = () => {
+    // Reload data from Supabase
+    loadData();
   };
 
   // Load data when component mounts or user changes
   useEffect(() => {
     if (user) {
-      loadProfileData();
+      loadData();
     }
   }, [user]);
 
@@ -160,7 +257,7 @@ const Index = () => {
           email={profileData.email}
           telephone={profileData.telephone}
           tagline={profileData.tagline}
-          onUpdate={handleUpdateWithoutRefresh}
+          onUpdate={handleUpdate}
           isEditingMode={isEditingMode}
         />
         
@@ -168,7 +265,7 @@ const Index = () => {
         
         <SectionContainer
           sections={sections}
-          onUpdate={handleUpdateWithoutRefresh}
+          onUpdate={handleUpdate}
           isEditingMode={isEditingMode}
         />
       </div>
