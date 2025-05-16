@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { X, Plus, Pencil } from "lucide-react";
+import { X, Plus, Pencil, ExternalLink } from "lucide-react";
 import EditableField from "./EditableField";
 import { LinkData, ProjectData } from "../utils/localStorage";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
 
 interface ProjectCardProps {
   project: ProjectData;
@@ -98,9 +99,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors"
+              className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors inline-flex items-center gap-1"
             >
               {link.title}
+              <ExternalLink size={14} />
             </a>
           ))}
         </div>
@@ -151,16 +153,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
             key={link.id} 
             className="flex items-center gap-2 mb-2"
           >
-            <EditableField
-              value={link.title}
-              onChange={(value) => updateLink(link.id, "title", value)}
-              tag="span"
-              className={`text-sm ${isEditing ? "w-1/3" : "w-auto"}`}
-              placeholder="Link Title"
-            />
-            
-            {isEditing && (
+            {isEditing ? (
               <>
+                <EditableField
+                  value={link.title}
+                  onChange={(value) => updateLink(link.id, "title", value)}
+                  tag="span"
+                  className="text-sm w-1/3"
+                  placeholder="Link Title"
+                />
+                
                 <EditableField
                   value={link.url}
                   onChange={(value) => updateLink(link.id, "url", value)}
@@ -177,17 +179,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
                   <X size={14} />
                 </button>
               </>
-            )}
-            
-            {!isEditing && (
-              <a
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors"
+            ) : (
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="bg-portfolio-blue hover:bg-portfolio-light-blue text-white rounded-full px-4 py-1 h-auto text-sm inline-flex items-center gap-1 w-auto"
+                asChild
               >
-                {link.title}
-              </a>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {link.title}
+                  <ExternalLink size={14} />
+                </a>
+              </Button>
             )}
           </div>
         ))}
