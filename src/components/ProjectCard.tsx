@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Plus, Pencil } from "lucide-react";
 import EditableField from "./EditableField";
 import { LinkData, ProjectData } from "../utils/localStorage";
@@ -16,33 +16,46 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmLastLinkDelete, setConfirmLastLinkDelete] = useState(false);
+  const [localProject, setLocalProject] = useState<ProjectData>(project);
+  
+  // Update local state when props change
+  useEffect(() => {
+    setLocalProject(project);
+  }, [project]);
   
   const updateField = (field: keyof ProjectData, value: string | LinkData[]) => {
-    onUpdate({ ...project, [field]: value });
+    const updatedProject = { ...localProject, [field]: value };
+    setLocalProject(updatedProject);
+    onUpdate(updatedProject);
   };
   
   const addLink = () => {
     const newLink: LinkData = {
-      id: `${project.id}-${Date.now()}`,
+      id: `${localProject.id}-${Date.now()}`,
       title: "New Link",
       url: "https://"
     };
-    updateField("links", [...project.links, newLink]);
+    
+    const updatedLinks = [...localProject.links, newLink];
+    setLocalProject(prev => ({ ...prev, links: updatedLinks }));
+    updateField("links", updatedLinks);
     toast.success("Link added");
   };
   
   const updateLink = (linkId: string, field: keyof LinkData, value: string) => {
-    const updatedLinks = project.links.map(link => 
+    const updatedLinks = localProject.links.map(link => 
       link.id === linkId ? { ...link, [field]: value } : link
     );
+    setLocalProject(prev => ({ ...prev, links: updatedLinks }));
     updateField("links", updatedLinks);
   };
   
   const deleteLink = (linkId: string) => {
-    if (project.links.length <= 1) {
+    if (localProject.links.length <= 1) {
       // Instead of preventing deletion, ask for confirmation
       if (confirmLastLinkDelete) {
-        const updatedLinks = project.links.filter(link => link.id !== linkId);
+        const updatedLinks = localProject.links.filter(link => link.id !== linkId);
+        setLocalProject(prev => ({ ...prev, links: updatedLinks }));
         updateField("links", updatedLinks);
         toast.success("Link removed");
         setConfirmLastLinkDelete(false);
@@ -55,14 +68,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
       return;
     }
     
-    const updatedLinks = project.links.filter(link => link.id !== linkId);
+    const updatedLinks = localProject.links.filter(link => link.id !== linkId);
+    setLocalProject(prev => ({ ...prev, links: updatedLinks }));
     updateField("links", updatedLinks);
     toast.success("Link removed");
   };
 
   const handleDeleteProject = () => {
     if (confirmDelete) {
-      onDelete(project.id);
+      onDelete(localProject.id);
       toast.success("Project deleted");
     } else {
       setConfirmDelete(true);
@@ -74,11 +88,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   if (!isEditingMode) {
     return (
       <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
-        <h2 className="font-bold text-xl mb-3">{project.title}</h2>
-        <p className="text-portfolio-muted mb-4 text-sm">{project.description}</p>
+        <h2 className="font-bold text-xl mb-3">{localProject.title}</h2>
+        <p className="text-portfolio-muted mb-4 text-sm">{localProject.description}</p>
         
         <div className="links flex flex-wrap gap-2">
-          {project.links.map((link) => (
+          {localProject.links.map((link) => (
             <a
               key={link.id}
               href={link.url}
@@ -99,7 +113,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
       <div className="flex justify-between items-start mb-3">
         <EditableField
-          value={project.title}
+          value={localProject.title}
           onChange={(value) => updateField("title", value)}
           tag="h2"
           className="font-bold text-xl"
@@ -123,7 +137,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
       </div>
       
       <EditableField
-        value={project.description}
+        value={localProject.description}
         onChange={(value) => updateField("description", value)}
         tag="p"
         className="text-portfolio-muted mb-4 text-sm"
@@ -132,7 +146,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
       />
       
       <div className="links">
-        {project.links.map((link) => (
+        {localProject.links.map((link) => (
           <div 
             key={link.id} 
             className="flex items-center gap-2 mb-2"
@@ -157,7 +171,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
                 <button
                   onClick={() => deleteLink(link.id)}
                   className={`transition-colors ${
-                    confirmLastLinkDelete && project.links.length <= 1 ? 'text-red-500' : 'text-portfolio-muted hover:text-red-500'
+                    confirmLastLinkDelete && localProject.links.length <= 1 ? 'text-red-500' : 'text-portfolio-muted hover:text-red-500'
                   }`}
                 >
                   <X size={14} />

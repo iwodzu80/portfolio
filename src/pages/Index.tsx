@@ -94,6 +94,12 @@ const Index = () => {
     }
   };
 
+  // This function is passed to child components but won't trigger full refreshes anymore
+  const handleUpdateWithoutRefresh = () => {
+    // Do nothing - child components handle their own state updates
+    console.log("Update triggered without refresh");
+  };
+
   // Load data when component mounts or user changes
   useEffect(() => {
     if (user) {
@@ -154,7 +160,7 @@ const Index = () => {
           email={profileData.email}
           location={profileData.location}
           tagline={profileData.tagline}
-          onUpdate={loadProfileData}
+          onUpdate={handleUpdateWithoutRefresh}
           isEditingMode={isEditingMode}
         />
         
@@ -162,7 +168,7 @@ const Index = () => {
         
         <SectionContainer
           sections={sections}
-          onUpdate={loadProfileData}
+          onUpdate={handleUpdateWithoutRefresh}
           isEditingMode={isEditingMode}
         />
       </div>

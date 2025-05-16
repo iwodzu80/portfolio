@@ -14,17 +14,29 @@ interface SectionContainerProps {
 
 const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate, isEditingMode = true }) => {
   const [isEditingSections, setIsEditingSections] = useState(false);
+  const [localSections, setLocalSections] = useState<SectionData[]>(sections);
+  
+  // Update localSections when props change (e.g., on initial load)
+  React.useEffect(() => {
+    setLocalSections(sections);
+  }, [sections]);
   
   // Ensure sections is never undefined
-  const safeSections = Array.isArray(sections) ? sections : [];
+  const safeSections = Array.isArray(localSections) ? localSections : [];
   
   const handleUpdateSection = (sectionId: string, title: string) => {
+    // Update local state immediately for responsive UI
     const updatedSections = safeSections.map(section => 
       section.id === sectionId ? { ...section, title } : section
     );
+    
+    setLocalSections(updatedSections);
+    
+    // Update localStorage in the background
     saveSections(updatedSections);
-    onUpdate();
     toast.success("Section updated");
+    
+    // Don't call onUpdate() to avoid page refresh
   };
   
   const handleDeleteSection = (sectionId: string) => {
@@ -34,9 +46,11 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
     }
     
     const updatedSections = safeSections.filter(section => section.id !== sectionId);
+    setLocalSections(updatedSections);
     saveSections(updatedSections);
-    onUpdate();
     toast.success("Section deleted");
+    
+    // Don't call onUpdate() to avoid page refresh
   };
   
   const handleAddSection = () => {
@@ -47,9 +61,11 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
     };
     
     const updatedSections = [...safeSections, newSection];
+    setLocalSections(updatedSections);
     saveSections(updatedSections);
-    onUpdate();
     toast.success("New section added");
+    
+    // Don't call onUpdate() to avoid page refresh
   };
   
   return (
@@ -85,7 +101,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
           <ProjectList
             sectionId={section.id}
             projects={section.projects}
-            onUpdate={onUpdate}
+            onUpdate={() => {}}  // Empty function to avoid page refreshes
             isEditingMode={isEditingMode}
           />
         </div>
