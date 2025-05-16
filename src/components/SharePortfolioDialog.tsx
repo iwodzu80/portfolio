@@ -1,189 +1,251 @@
+
 import React, { useState, useEffect } from "react";
-import { 
-  Dialog, DialogContent, DialogHeader, 
-  DialogTitle, DialogDescription 
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Copy, Link, Share2, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { Share2, Copy, RotateCw } from "lucide-react";
 
-interface SharePortfolioDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+interface ShareData {
+  id: string;
+  user_id: string;
+  share_id: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
-const SharePortfolioDialog: React.FC<SharePortfolioDialogProps> = ({
-  open,
-  onOpenChange,
-}) => {
+const SharePortfolioDialog = () => {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [shares, setShares] = useState<any[]>([]);
+  const [shareLink, setShareLink] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [shareId, setShareId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const fetchShares = async () => {
+  const baseUrl = window.location.origin;
+  
+  const loadShareData = async () => {
     if (!user) return;
     
+    setIsLoading(true);
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from('portfolio_shares')
         .select('*')
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      setShares(data || []);
-    } catch (error) {
-      console.error('Error fetching shares:', error);
-      toast.error('Failed to load share links');
+        .eq('user_id', user.id)
+        .maybeSingle();
+        
+      if (error && error.code !== 'PGRST116') {
+        console.error("Error loading share data:", error);
+        throw error;
+      }
+      
+      if (data) {
+        setShareId(data.share_id);
+        setIsActive(data.active);
+        setShareLink(`${baseUrl}/shared/${data.share_id}`);
+      }
+    } catch (error: any) {
+      console.error("Error fetching share data:", error);
+      toast.error("Failed to load sharing settings");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     if (open) {
-      fetchShares();
+      loadShareData();
     }
-  }, [open, user]);
-
-  const createShareLink = async () => {
+  }, [user, open]);
+  
+  const generateNewShareId = async () => {
     if (!user) return;
     
     try {
-      setLoading(true);
-      // Generate a UUID for the share_id
-      const shareId = crypto.randomUUID();
+      setIsLoading(true);
       
-      const { data, error } = await supabase
+      // Generate a new random share ID
+      const newShareId = crypto.randomUUID();
+      
+      // Check if a share record already exists
+      const { data: existingShare } = await supabase
         .from('portfolio_shares')
-        .insert({
-          user_id: user.id,
-          share_id: shareId // Add the required share_id field
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setShares([...shares, data]);
-      toast.success('Share link created');
-    } catch (error) {
-      console.error('Error creating share:', error);
-      toast.error('Failed to create share link');
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      let error;
+      
+      if (existingShare) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('portfolio_shares')
+          .update({ 
+            share_id: newShareId,
+            active: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+          
+        error = updateError;
+      } else {
+        // Create new record
+        const { error: insertError } = await supabase
+          .from('portfolio_shares')
+          .insert({
+            user_id: user.id,
+            share_id: newShareId,
+            active: true
+          });
+          
+        error = insertError;
+      }
+      
+      if (error) {
+        console.error("Error generating share link:", error);
+        throw error;
+      }
+      
+      setShareId(newShareId);
+      setShareLink(`${baseUrl}/shared/${newShareId}`);
+      setIsActive(true);
+      toast.success("New share link generated");
+    } catch (error: any) {
+      console.error("Error generating share ID:", error);
+      toast.error("Failed to generate share link");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
-  const toggleShareStatus = async (id: string, currentStatus: boolean) => {
+  
+  const toggleShareActive = async (active: boolean) => {
+    if (!user || !shareId) return;
+    
     try {
+      setIsLoading(true);
+      
       const { error } = await supabase
         .from('portfolio_shares')
-        .update({ active: !currentStatus })
-        .eq('id', id)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      setShares(
-        shares.map(share => 
-          share.id === id ? { ...share, active: !currentStatus } : share
-        )
-      );
+        .update({ 
+          active,
+          updated_at: new Date().toISOString() 
+        })
+        .eq('user_id', user.id);
+        
+      if (error) {
+        console.error("Error updating share status:", error);
+        throw error;
+      }
       
-      toast.success(currentStatus ? 'Share link disabled' : 'Share link enabled');
-    } catch (error) {
-      console.error('Error toggling share status:', error);
-      toast.error('Failed to update share link');
+      setIsActive(active);
+      toast.success(active ? "Share link activated" : "Share link deactivated");
+    } catch (error: any) {
+      console.error("Error toggling share status:", error);
+      toast.error("Failed to update sharing status");
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const copyToClipboard = (shareId: string) => {
-    const url = `${window.location.origin}/shared/${shareId}`;
-    navigator.clipboard.writeText(url);
-    toast.success('Share link copied to clipboard');
+  
+  const copyToClipboard = () => {
+    try {
+      navigator.clipboard.writeText(shareLink);
+      toast.success("Share link copied to clipboard");
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      toast.error("Failed to copy link");
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="flex items-center gap-2">
+          <Share2 size={18} />
+          Share Portfolio
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Share Your Portfolio</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500 mt-1">
-            Create links to share your portfolio with others
+          <DialogTitle>Share Portfolio</DialogTitle>
+          <DialogDescription>
+            Create a public link to share your portfolio in read-only mode.
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 my-4">
-          {shares.length === 0 ? (
-            <div className="text-center py-6 border rounded-lg border-dashed border-gray-300 bg-gray-50">
-              <p className="text-gray-500">No share links yet</p>
-              <p className="text-sm text-gray-400 mt-1">Create one to share your portfolio</p>
+        <div className="space-y-4 py-4">
+          {isLoading ? (
+            <div className="flex justify-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : (
-            <div className="space-y-3">
-              {shares.map((share) => (
-                <Card key={share.id} className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <p className="text-xs text-gray-500 font-medium mb-1">Share Link:</p>
-                      <div className="flex items-center border rounded-md px-2 py-1 bg-gray-50">
-                        <Link className="h-4 w-4 text-gray-400 mr-2" />
-                        <p className="text-sm text-gray-700 truncate">
-                          {`${window.location.origin}/shared/${share.share_id}`}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center ml-2">
-                      <Button
-                        onClick={() => copyToClipboard(share.share_id)}
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-2"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button
-                        onClick={() => toggleShareStatus(share.id, share.active)}
-                        size="sm"
-                        variant={share.active ? "outline" : "default"}
-                        className="h-8 ml-1"
-                      >
-                        {share.active ? 'Disable' : 'Enable'}
-                      </Button>
-                    </div>
+            <>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="share-active">Active</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {isActive ? "Your portfolio is publicly accessible" : "Share link is disabled"}
+                  </p>
+                </div>
+                <Switch
+                  id="share-active"
+                  checked={isActive}
+                  onCheckedChange={toggleShareActive}
+                  disabled={!shareId || isLoading}
+                />
+              </div>
+              
+              {shareId && (
+                <div className="space-y-2">
+                  <Label htmlFor="share-link">Share Link</Label>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="share-link"
+                      value={shareLink}
+                      readOnly
+                      className="flex-1"
+                    />
+                    <Button 
+                      size="icon" 
+                      variant="outline" 
+                      onClick={copyToClipboard} 
+                      title="Copy to clipboard"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
                   </div>
-                </Card>
-              ))}
-            </div>
+                </div>
+              )}
+              
+              <div className="pt-2">
+                <Button 
+                  variant="secondary" 
+                  onClick={generateNewShareId} 
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center"
+                >
+                  <RotateCw size={16} className="mr-2" />
+                  {shareId ? "Generate New Link" : "Create Share Link"}
+                </Button>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  This will invalidate any previous share links.
+                </p>
+              </div>
+            </>
           )}
-        </div>
-
-        <div className="flex justify-between items-center mt-4 pt-4 border-t">
-          <Button
-            variant="default"
-            onClick={createShareLink}
-            disabled={loading}
-            className="gap-2"
-          >
-            <Share2 className="h-4 w-4" />
-            Create Share Link
-          </Button>
-          
-          <Button
-            variant="ghost"
-            onClick={() => onOpenChange(false)}
-            className="gap-2"
-          >
-            <X className="h-4 w-4" />
-            Close
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -12,9 +12,8 @@ interface ProfileSectionProps {
   email: string;
   telephone: string;
   tagline: string;
-  onUpdate: (updatedProfile?: any) => void;
+  onUpdate: () => void;
   isEditingMode?: boolean;
-  isReadOnly?: boolean;
 }
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({
@@ -24,8 +23,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   telephone,
   tagline,
   onUpdate,
-  isEditingMode = true,
-  isReadOnly = false
+  isEditingMode = true
 }) => {
   const { user } = useAuth();
   const [localState, setLocalState] = useState({
@@ -147,7 +145,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   };
 
   // Read-only mode
-  if (!isEditingMode || isReadOnly) {
+  if (!isEditingMode) {
     return (
       <section className="flex flex-col items-center max-w-md mx-auto mb-8 p-6">
         {localState.photo && (
