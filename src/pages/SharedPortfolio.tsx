@@ -35,6 +35,7 @@ const SharedPortfolio = () => {
       if (!shareId) {
         setNotFound(true);
         setIsLoading(false);
+        console.error("No shareId provided in URL params");
         return;
       }
 
@@ -93,6 +94,7 @@ const SharedPortfolio = () => {
         }
         
         // Fetch the user's sections and related data from Supabase
+        console.log(`Fetching sections for user ID: ${userId}`);
         const { data: sectionsData, error: sectionsError } = await supabase
           .from('sections')
           .select(`
@@ -124,16 +126,16 @@ const SharedPortfolio = () => {
           const transformedSections: SectionData[] = sectionsData.map(section => ({
             id: section.id,
             title: section.title,
-            projects: section.projects.map(project => ({
+            projects: Array.isArray(section.projects) ? section.projects.map(project => ({
               id: project.id,
               title: project.title,
               description: project.description || "",
-              links: project.links.map(link => ({
+              links: Array.isArray(project.links) ? project.links.map(link => ({
                 id: link.id,
                 title: link.title,
                 url: link.url
-              }))
-            }))
+              })) : []
+            })) : []
           }));
           
           console.log("Transformed sections:", transformedSections);
