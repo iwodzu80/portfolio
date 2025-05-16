@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectList from "./ProjectList";
 import { SectionData } from "../utils/localStorage";
 import EditableField from "./EditableField";
@@ -20,12 +19,22 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
   const { user } = useAuth();
   
   // Update localSections when props change (e.g., on initial load)
-  React.useEffect(() => {
-    setLocalSections(sections);
+  useEffect(() => {
+    console.log("SectionContainer received sections:", JSON.stringify(sections, null, 2));
+    console.log("Number of sections in SectionContainer:", sections?.length || 0);
+    
+    if (Array.isArray(sections)) {
+      setLocalSections(sections);
+    } else {
+      console.error("Sections prop is not an array:", sections);
+      setLocalSections([]);
+    }
   }, [sections]);
   
   // Ensure sections is never undefined
   const safeSections = Array.isArray(localSections) ? localSections : [];
+  
+  console.log("SectionContainer rendering with safeSections:", safeSections.length);
   
   const handleUpdateSection = async (sectionId: string, title: string) => {
     try {
@@ -116,42 +125,48 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
   
   return (
     <div className="pb-20">
-      {safeSections.map((section) => (
-        <div key={section.id} className="mb-12">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            {isEditingMode ? (
-              <>
-                <EditableField
-                  value={section.title}
-                  onChange={(value) => handleUpdateSection(section.id, value)}
-                  tag="h2"
-                  className="text-xl font-semibold text-center"
-                  placeholder="Section Title"
-                />
-                
-                {isEditingSections && (
-                  <button
-                    onClick={() => handleDeleteSection(section.id)}
-                    className="text-portfolio-muted hover:text-red-500 transition-colors"
-                    aria-label="Delete section"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                )}
-              </>
-            ) : (
-              <h2 className="text-xl font-semibold text-center">{section.title}</h2>
-            )}
+      {safeSections.length > 0 ? (
+        safeSections.map((section) => (
+          <div key={section.id} className="mb-12">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              {isEditingMode ? (
+                <>
+                  <EditableField
+                    value={section.title}
+                    onChange={(value) => handleUpdateSection(section.id, value)}
+                    tag="h2"
+                    className="text-xl font-semibold text-center"
+                    placeholder="Section Title"
+                  />
+                  
+                  {isEditingSections && (
+                    <button
+                      onClick={() => handleDeleteSection(section.id)}
+                      className="text-portfolio-muted hover:text-red-500 transition-colors"
+                      aria-label="Delete section"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </>
+              ) : (
+                <h2 className="text-xl font-semibold text-center">{section.title}</h2>
+              )}
+            </div>
+            
+            <ProjectList
+              sectionId={section.id}
+              projects={section.projects || []}
+              onUpdate={onUpdate}
+              isEditingMode={isEditingMode}
+            />
           </div>
-          
-          <ProjectList
-            sectionId={section.id}
-            projects={section.projects}
-            onUpdate={onUpdate}
-            isEditingMode={isEditingMode}
-          />
+        ))
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">No sections available</p>
         </div>
-      ))}
+      )}
       
       {isEditingMode && (
         <div className="max-w-md mx-auto px-6 mt-8">

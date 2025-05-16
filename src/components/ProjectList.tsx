@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import ProjectCard from "./ProjectCard";
 import AddProjectButton from "./AddProjectButton";
@@ -19,12 +18,24 @@ const ProjectList: React.FC<ProjectListProps> = ({
   onUpdate,
   isEditingMode = true
 }) => {
-  const [localProjects, setLocalProjects] = useState<ProjectData[]>(projects);
+  const [localProjects, setLocalProjects] = useState<ProjectData[]>([]);
   
   // Update local state when props change
   useEffect(() => {
-    setLocalProjects(projects);
-  }, [projects]);
+    console.log(`ProjectList for section ${sectionId} received projects:`, JSON.stringify(projects, null, 2));
+    console.log(`Number of projects in section ${sectionId}:`, projects?.length || 0);
+    
+    if (Array.isArray(projects)) {
+      setLocalProjects(projects);
+    } else {
+      console.error(`Projects prop for section ${sectionId} is not an array:`, projects);
+      setLocalProjects([]);
+    }
+  }, [projects, sectionId]);
+  
+  const safeProjects = Array.isArray(localProjects) ? localProjects : [];
+  
+  console.log(`ProjectList for section ${sectionId} rendering with safeProjects:`, safeProjects.length);
 
   const handleUpdateProject = async (updatedProject: ProjectData) => {
     try {
@@ -162,15 +173,21 @@ const ProjectList: React.FC<ProjectListProps> = ({
 
   return (
     <section className="max-w-md mx-auto px-6">
-      {localProjects.map(project => (
-        <ProjectCard
-          key={project.id}
-          project={project}
-          onUpdate={handleUpdateProject}
-          onDelete={handleDeleteProject}
-          isEditingMode={isEditingMode}
-        />
-      ))}
+      {safeProjects.length > 0 ? (
+        safeProjects.map(project => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onUpdate={handleUpdateProject}
+            onDelete={handleDeleteProject}
+            isEditingMode={isEditingMode}
+          />
+        ))
+      ) : (
+        <div className="text-center py-4">
+          <p className="text-sm text-muted-foreground">No projects in this section</p>
+        </div>
+      )}
       
       {isEditingMode && (
         <div className="mt-6">

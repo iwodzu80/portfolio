@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
@@ -13,6 +13,12 @@ const SharedPortfolio = () => {
   const { shareId } = useParams();
   const { profileData, sections, isLoading, notFound } = useSharedPortfolio(shareId);
 
+  useEffect(() => {
+    console.log("SharedPortfolio component mounted with shareId:", shareId);
+    console.log("Sections received in component:", JSON.stringify(sections, null, 2));
+    console.log("Number of sections:", sections?.length || 0);
+  }, [shareId, sections]);
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -21,8 +27,12 @@ const SharedPortfolio = () => {
     return <SharedPortfolioNotFound />;
   }
 
-  console.log("Rendering SharedPortfolio with sections:", sections);
-  console.log("Number of sections to render:", sections.length);
+  console.log("Rendering SharedPortfolio component with sections:", JSON.stringify(sections, null, 2));
+  console.log("Number of sections to render:", sections?.length || 0);
+  
+  // Check if sections is properly initialized
+  const hasValidSections = Array.isArray(sections) && sections.length > 0;
+  console.log("Has valid sections to render:", hasValidSections);
 
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
@@ -42,12 +52,20 @@ const SharedPortfolio = () => {
         
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
         
-        {sections && sections.length > 0 ? (
-          <SectionContainer
-            sections={sections}
-            onUpdate={() => {}}
-            isEditingMode={false}
-          />
+        {hasValidSections ? (
+          <>
+            <div className="text-center mb-8">
+              <p className="text-sm text-portfolio-muted">
+                Found {sections.length} {sections.length === 1 ? 'section' : 'sections'} 
+                with {sections.reduce((count, section) => count + section.projects.length, 0)} projects
+              </p>
+            </div>
+            <SectionContainer
+              sections={sections}
+              onUpdate={() => {}}
+              isEditingMode={false}
+            />
+          </>
         ) : (
           <div className="text-center py-10">
             <p className="text-muted-foreground">No projects to display</p>

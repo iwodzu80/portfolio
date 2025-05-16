@@ -42,7 +42,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           .from('portfolio_shares')
           .select('user_id, active')
           .eq('share_id', shareId)
-          .maybeSingle();
+          .single();
           
         if (shareError) {
           console.error("Error fetching share data:", shareError);
@@ -64,7 +64,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           .from('profiles')
           .select('*')
           .eq('id', userId)
-          .maybeSingle();
+          .single();
           
         if (profileError) {
           console.error("Error fetching shared profile:", profileError);
@@ -87,8 +87,10 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           }
         }
         
-        // Fetch sections with their projects and links in a single query
-        console.log(`Fetching sections for user ID: ${userId}`);
+        // Log before fetching sections to ensure the function is reaching this point
+        console.log(`Starting to fetch sections for user ID: ${userId}`);
+        
+        // Fetch sections with their projects and links
         const { data: sectionsData, error: sectionsError } = await supabase
           .from('sections')
           .select(`
@@ -105,15 +107,14 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
               )
             )
           `)
-          .eq('user_id', userId)
-          .order('created_at', { ascending: true });
+          .eq('user_id', userId);
           
         if (sectionsError) {
           console.error("Error fetching shared sections:", sectionsError);
           throw sectionsError;
         }
-        
-        console.log("Raw sections data from nested query:", sectionsData);
+
+        console.log("Raw sections data:", JSON.stringify(sectionsData, null, 2));
         console.log("Number of sections found:", sectionsData?.length || 0);
         
         if (!sectionsData || sectionsData.length === 0) {
@@ -123,15 +124,33 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           return;
         }
         
-        // Transform the nested data into the expected format
+        // Process the sections data to ensure we have the correct structure
         const processedSections: SectionData[] = sectionsData.map((section: any) => {
-          console.log(`Processing section: ${section.id} - ${section.title}`);
-          console.log(`Projects in section ${section.id}:`, section.projects);
+          console.log(`Processing section ${section.id}: ${section.title}`);
+          console.log(`Projects in section:`, section.projects);
           
-          // Map projects
+          if (!section.projects) {
+            console.log(`No projects found in section ${section.id}`);
+            return {
+              id: section.id,
+              title: section.title,
+              projects: []
+            };
+          }
+          
           const processedProjects: ProjectData[] = section.projects.map((project: any) => {
-            console.log(`Processing project: ${project.id} - ${project.title}`);
-            console.log(`Links in project ${project.id}:`, project.links);
+            console.log(`Processing project ${project.id}: ${project.title}`);
+            console.log(`Links in project:`, project.links);
+            
+            if (!project.links) {
+              console.log(`No links found in project ${project.id}`);
+              return {
+                id: project.id,
+                title: project.title,
+                description: project.description || "",
+                links: []
+              };
+            }
             
             return {
               id: project.id,
@@ -148,8 +167,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           };
         });
         
-        console.log("Processed sections data:", processedSections);
-        console.log("Final number of sections with projects:", processedSections.length);
+        console.log("Final processed sections:", JSON.stringify(processedSections, null, 2));
         setSections(processedSections);
         
       } catch (error: any) {
