@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { 
   Dialog, DialogContent, DialogHeader, 
@@ -56,10 +55,14 @@ const SharePortfolioDialog: React.FC<SharePortfolioDialogProps> = ({
     
     try {
       setLoading(true);
+      // Generate a UUID for the share_id
+      const shareId = crypto.randomUUID();
+      
       const { data, error } = await supabase
         .from('portfolio_shares')
         .insert({
-          user_id: user.id
+          user_id: user.id,
+          share_id: shareId // Add the required share_id field
         })
         .select()
         .single();

@@ -12,9 +12,15 @@ interface SectionContainerProps {
   sections: SectionData[];
   onUpdate: () => void;
   isEditingMode?: boolean;
+  isReadOnly?: boolean;
 }
 
-const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate, isEditingMode = true }) => {
+const SectionContainer: React.FC<SectionContainerProps> = ({ 
+  sections, 
+  onUpdate, 
+  isEditingMode = true,
+  isReadOnly = false
+}) => {
   const [isEditingSections, setIsEditingSections] = useState(false);
   const [localSections, setLocalSections] = useState<SectionData[]>(sections);
   const { user } = useAuth();
@@ -119,7 +125,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
       {safeSections.map((section) => (
         <div key={section.id} className="mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
-            {isEditingMode ? (
+            {isEditingMode && !isReadOnly ? (
               <>
                 <EditableField
                   value={section.title}
@@ -148,12 +154,12 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
             sectionId={section.id}
             projects={section.projects}
             onUpdate={onUpdate}
-            isEditingMode={isEditingMode}
+            isEditingMode={isEditingMode && !isReadOnly}
           />
         </div>
       ))}
       
-      {isEditingMode && (
+      {isEditingMode && !isReadOnly && (
         <div className="max-w-md mx-auto px-6 mt-8">
           <div className="flex items-center justify-center gap-4">
             <button
