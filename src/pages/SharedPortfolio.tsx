@@ -6,14 +6,15 @@ import SectionContainer from "@/components/SectionContainer";
 import { supabase } from "@/integrations/supabase/client";
 import { SectionData } from "@/utils/localStorage";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ShareData {
-  id?: string;
+  id: string;
   user_id: string;
   share_id: string;
   active: boolean;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const SharedPortfolio = () => {
@@ -45,10 +46,7 @@ const SharedPortfolio = () => {
           .from('portfolio_shares')
           .select('user_id, active')
           .eq('share_id', shareId)
-          .maybeSingle() as unknown as {
-            data: ShareData | null;
-            error: any;
-          };
+          .maybeSingle();
           
         if (shareError || !shareData || !shareData.active) {
           console.error("Share not found or inactive:", shareError || "No data");
