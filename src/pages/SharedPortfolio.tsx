@@ -4,9 +4,8 @@ import { useParams } from "react-router-dom";
 import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
 import { supabase } from "@/integrations/supabase/client";
-import { SectionData } from "@/utils/localStorage";
+import { SectionData, ProjectData } from "@/utils/localStorage";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ShareData {
   id: string;
@@ -93,24 +92,11 @@ const SharedPortfolio = () => {
           }
         }
         
-        // Fetch the user's sections and related data from Supabase
+        // Fetch each set of data separately to ensure correct nesting
         console.log(`Fetching sections for user ID: ${userId}`);
         const { data: sectionsData, error: sectionsError } = await supabase
           .from('sections')
-          .select(`
-            id,
-            title,
-            projects:projects(
-              id,
-              title,
-              description,
-              links:links(
-                id,
-                title,
-                url
-              )
-            )
-          `)
+          .select('id, title')
           .eq('user_id', userId)
           .order('created_at', { ascending: true });
           
@@ -119,31 +105,62 @@ const SharedPortfolio = () => {
           throw sectionsError;
         }
         
-        console.log("Sections data retrieved:", sectionsData);
+        console.log("Raw sections data:", sectionsData);
         
-        if (sectionsData && sectionsData.length > 0) {
-          // Transform data to match the expected structure
-          const transformedSections: SectionData[] = sectionsData.map(section => ({
-            id: section.id,
-            title: section.title,
-            projects: Array.isArray(section.projects) ? section.projects.map(project => ({
+        if (!sectionsData || sectionsData.length === 0) {
+          console.log("No sections found for user");
+          setSections([]);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Process each section and get its projects
+        const processedSections: SectionData[] = [];
+        
+        for (const section of sectionsData) {
+          // Fetch projects for this section
+          const { data: projectsData, error: projectsError } = await supabase
+            .from('projects')
+            .select('id, title, description')
+            .eq('section_id', section.id);
+            
+          if (projectsError) {
+            console.error(`Error fetching projects for section ${section.id}:`, projectsError);
+            continue; // Skip this section if there's an error but continue with others
+          }
+          
+          const projects: ProjectData[] = [];
+          
+          // For each project, fetch its links
+          for (const project of (projectsData || [])) {
+            const { data: linksData, error: linksError } = await supabase
+              .from('links')
+              .select('id, title, url')
+              .eq('project_id', project.id);
+              
+            if (linksError) {
+              console.error(`Error fetching links for project ${project.id}:`, linksError);
+              continue;
+            }
+            
+            projects.push({
               id: project.id,
               title: project.title,
               description: project.description || "",
-              links: Array.isArray(project.links) ? project.links.map(link => ({
-                id: link.id,
-                title: link.title,
-                url: link.url
-              })) : []
-            })) : []
-          }));
+              links: linksData || []
+            });
+          }
           
-          console.log("Transformed sections:", transformedSections);
-          setSections(transformedSections);
-        } else {
-          console.log("No sections found for this user");
-          setSections([]);
+          processedSections.push({
+            id: section.id,
+            title: section.title,
+            projects: projects
+          });
         }
+        
+        console.log("Processed sections data:", processedSections);
+        setSections(processedSections);
+        
       } catch (error: any) {
         console.error("Error fetching shared portfolio:", error);
         toast.error("Failed to load shared portfolio");
