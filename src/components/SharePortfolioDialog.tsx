@@ -126,16 +126,16 @@ const SharePortfolioDialog = () => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Share your portfolio</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-2xl font-semibold">Share your portfolio</DialogTitle>
+          <DialogDescription className="text-base text-gray-500">
             Create a shareable link that allows others to view your portfolio without signing in.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-4 py-4">
+        <div className="flex flex-col gap-4 py-6">
           {shareId ? (
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
-                <div className="bg-muted p-2 rounded-md flex-1 overflow-x-auto whitespace-nowrap text-sm">
+                <div className="bg-gray-100 p-3 rounded-md flex-1 overflow-x-auto scrollbar-none whitespace-nowrap text-sm">
                   {shareUrl}
                 </div>
                 <Button
@@ -147,15 +147,18 @@ const SharePortfolioDialog = () => {
                   {copied ? <Check size={18} /> : <Copy size={18} />}
                 </Button>
               </div>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2"
-                onClick={createShareLink}
-                disabled={isLoading}
-              >
-                <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
-                Regenerate Link
-              </Button>
+              
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  onClick={createShareLink}
+                  disabled={isLoading}
+                >
+                  <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
+                  Regenerate Link
+                </Button>
+              </div>
             </div>
           ) : (
             <Button
