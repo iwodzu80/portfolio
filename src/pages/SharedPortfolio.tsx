@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProfileSection from "@/components/ProfileSection";
@@ -21,7 +22,7 @@ const SharedPortfolio = () => {
     name: "",
     photo: "",
     email: "",
-    location: "",
+    telephone: "",
     tagline: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
@@ -75,7 +76,7 @@ const SharedPortfolio = () => {
             name: profileData.name || "",
             photo: profileData.photo || "",
             email: profileData.email || "",
-            location: profileData.location || "",
+            telephone: profileData.telephone || "",
             tagline: profileData.tagline || ""
           });
           
@@ -143,7 +144,7 @@ const SharedPortfolio = () => {
           name={profileData.name}
           photo={profileData.photo}
           email={profileData.email}
-          location={profileData.location}
+          telephone={profileData.telephone}
           tagline={profileData.tagline}
           onUpdate={() => {}}
           isEditingMode={false}

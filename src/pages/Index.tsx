@@ -16,7 +16,7 @@ const Index = () => {
     name: "",
     photo: "",
     email: "",
-    location: "",
+    telephone: "",
     tagline: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
@@ -57,7 +57,7 @@ const Index = () => {
           name: profileData.name || "",
           photo: profileData.photo || "",
           email: profileData.email || user.email || "",
-          location: profileData.location || "",
+          telephone: profileData.telephone || "",
           tagline: profileData.tagline || ""
         });
       } else {
@@ -78,7 +78,7 @@ const Index = () => {
             name: "",
             photo: "",
             email: user.email || "",
-            location: "",
+            telephone: "",
             tagline: ""
           });
         }
@@ -158,7 +158,7 @@ const Index = () => {
           name={profileData.name}
           photo={profileData.photo}
           email={profileData.email}
-          location={profileData.location}
+          telephone={profileData.telephone}
           tagline={profileData.tagline}
           onUpdate={handleUpdateWithoutRefresh}
           isEditingMode={isEditingMode}

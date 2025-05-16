@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
@@ -9,7 +10,7 @@ interface ProfileSectionProps {
   name: string;
   photo: string;
   email: string;
-  location: string;
+  telephone: string;
   tagline: string;
   onUpdate: () => void;
   isEditingMode?: boolean;
@@ -19,7 +20,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   name,
   photo,
   email,
-  location,
+  telephone,
   tagline,
   onUpdate,
   isEditingMode = true
@@ -29,7 +30,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     name,
     photo,
     email,
-    location,
+    telephone,
     tagline
   });
   
@@ -39,10 +40,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       name,
       photo,
       email,
-      location,
+      telephone,
       tagline
     });
-  }, [name, photo, email, location, tagline]);
+  }, [name, photo, email, telephone, tagline]);
   
   // Set document title when name changes
   useEffect(() => {
@@ -137,7 +138,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         name,
         photo,
         email,
-        location,
+        telephone,
         tagline
       });
     }
@@ -161,8 +162,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           
           <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
             {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
-            {localState.email && localState.location && <span className="mx-1">•</span>}
-            {localState.location && <span>{localState.location}</span>}
+            {localState.email && localState.telephone && <span className="mx-1">•</span>}
+            {localState.telephone && <span>{localState.telephone}</span>}
           </div>
         </div>
       </section>
@@ -207,10 +208,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           />
           <span className="mx-1">•</span>
           <EditableField
-            value={localState.location}
-            onChange={(value) => handleProfileUpdate("location", value)}
+            value={localState.telephone}
+            onChange={(value) => handleProfileUpdate("telephone", value)}
             tag="span"
-            placeholder="Location"
+            placeholder="Telephone"
           />
         </div>
       </div>
