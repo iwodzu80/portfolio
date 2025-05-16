@@ -6,6 +6,7 @@ import { Share2, Copy, RefreshCw, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent } from "@/components/ui/card";
 
 const SharePortfolioDialog = () => {
   const [shareId, setShareId] = useState<string | null>(null);
@@ -125,55 +126,70 @@ const SharePortfolioDialog = () => {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">Share your portfolio</DialogTitle>
+        <DialogHeader className="mb-2">
+          <DialogTitle className="text-2xl font-semibold mb-1">Share your portfolio</DialogTitle>
           <DialogDescription className="text-base text-gray-500">
             Create a shareable link that allows others to view your portfolio without signing in.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-4 py-6">
-          {shareId ? (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <div className="bg-gray-100 p-3 rounded-md flex-1 overflow-x-auto scrollbar-none whitespace-nowrap text-sm">
-                  {shareUrl}
+
+        <Card className="border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            {shareId ? (
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-medium text-gray-700">Share Link</label>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-gray-100 p-3 rounded-md flex-1 overflow-x-auto scrollbar-none whitespace-nowrap text-sm border border-gray-200">
+                      {shareUrl}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={copyToClipboard}
+                      className="flex-shrink-0 h-10 w-10 border-gray-300 hover:bg-gray-50"
+                    >
+                      {copied ? <Check size={18} /> : <Copy size={18} />}
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={copyToClipboard}
-                  className="flex-shrink-0"
-                >
-                  {copied ? <Check size={18} /> : <Copy size={18} />}
-                </Button>
+                
+                <div className="flex justify-end mt-2">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={createShareLink}
+                    disabled={isLoading}
+                  >
+                    <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
+                    Regenerate Link
+                  </Button>
+                </div>
               </div>
-              
-              <div className="flex justify-end">
+            ) : (
+              <div className="flex flex-col items-center py-6">
+                <Share2 size={32} className="text-gray-400 mb-4" />
+                <p className="text-gray-600 mb-4 text-center">No share link yet. Create one to let others view your portfolio.</p>
                 <Button
-                  variant="outline"
-                  className="flex items-center gap-2"
                   onClick={createShareLink}
                   disabled={isLoading}
+                  className="flex items-center gap-2 w-full sm:w-auto"
                 >
-                  <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
-                  Regenerate Link
+                  <Share2 size={18} />
+                  {isLoading ? "Creating..." : "Create Share Link"}
                 </Button>
               </div>
-            </div>
-          ) : (
-            <Button
-              onClick={createShareLink}
-              disabled={isLoading}
-              className="flex items-center gap-2"
-            >
-              <Share2 size={18} />
-              {isLoading ? "Creating..." : "Create Share Link"}
-            </Button>
-          )}
-          <div className="text-sm text-muted-foreground mt-2">
-            Anyone with this link will be able to view your portfolio in read-only mode.
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="text-sm text-muted-foreground mt-4">
+          <p className="mb-1">
+            <strong>Note:</strong> Anyone with this link will be able to view your portfolio in read-only mode.
+          </p>
+          <p>
             Generate a new link to revoke access from the previous link.
-          </div>
+          </p>
         </div>
       </DialogContent>
     </Dialog>
