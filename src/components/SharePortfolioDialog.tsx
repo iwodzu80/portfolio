@@ -19,12 +19,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Share2, Copy, RotateCw } from "lucide-react";
 
 interface ShareData {
-  id?: string;
+  id: string;
   user_id: string;
   share_id: string;
   active: boolean;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const SharePortfolioDialog = () => {
@@ -32,7 +32,7 @@ const SharePortfolioDialog = () => {
   const [shareLink, setShareLink] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [shareId, setShareId] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   const baseUrl = window.location.origin;
@@ -42,15 +42,11 @@ const SharePortfolioDialog = () => {
     
     setIsLoading(true);
     try {
-      // Using a type cast to deal with the missing type definition
       const { data, error } = await supabase
         .from('portfolio_shares')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle() as unknown as {
-          data: ShareData | null;
-          error: any;
-        };
+        .maybeSingle();
         
       if (error && error.code !== 'PGRST116') {
         console.error("Error loading share data:", error);
@@ -88,12 +84,9 @@ const SharePortfolioDialog = () => {
       // Check if a share record already exists
       const { data: existingShare } = await supabase
         .from('portfolio_shares')
-        .select('share_id')
+        .select('id')
         .eq('user_id', user.id)
-        .maybeSingle() as unknown as {
-          data: ShareData | null;
-          error: any;
-        };
+        .maybeSingle();
       
       let error;
       
@@ -106,9 +99,7 @@ const SharePortfolioDialog = () => {
             active: true,
             updated_at: new Date().toISOString()
           })
-          .eq('user_id', user.id) as unknown as {
-            error: any;
-          };
+          .eq('user_id', user.id);
           
         error = updateError;
       } else {
@@ -119,9 +110,7 @@ const SharePortfolioDialog = () => {
             user_id: user.id,
             share_id: newShareId,
             active: true
-          }) as unknown as {
-            error: any;
-          };
+          });
           
         error = insertError;
       }
@@ -155,9 +144,7 @@ const SharePortfolioDialog = () => {
           active,
           updated_at: new Date().toISOString() 
         })
-        .eq('user_id', user.id) as unknown as {
-          error: any;
-        };
+        .eq('user_id', user.id);
         
       if (error) {
         console.error("Error updating share status:", error);
