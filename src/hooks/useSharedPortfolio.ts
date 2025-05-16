@@ -87,11 +87,24 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           }
         }
         
-        // Fetch sections
+        // Fetch sections with their projects and links in a single query
         console.log(`Fetching sections for user ID: ${userId}`);
         const { data: sectionsData, error: sectionsError } = await supabase
           .from('sections')
-          .select('id, title')
+          .select(`
+            id, 
+            title,
+            projects:projects(
+              id, 
+              title, 
+              description,
+              links:links(
+                id, 
+                title, 
+                url
+              )
+            )
+          `)
           .eq('user_id', userId)
           .order('created_at', { ascending: true });
           
@@ -100,7 +113,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           throw sectionsError;
         }
         
-        console.log("Raw sections data:", sectionsData);
+        console.log("Raw sections data from nested query:", sectionsData);
         console.log("Number of sections found:", sectionsData?.length || 0);
         
         if (!sectionsData || sectionsData.length === 0) {
@@ -110,57 +123,30 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           return;
         }
         
-        // Process each section and get its projects
-        const processedSections: SectionData[] = [];
-        
-        for (const section of sectionsData) {
+        // Transform the nested data into the expected format
+        const processedSections: SectionData[] = sectionsData.map((section: any) => {
           console.log(`Processing section: ${section.id} - ${section.title}`);
-          // Fetch projects for this section
-          const { data: projectsData, error: projectsError } = await supabase
-            .from('projects')
-            .select('id, title, description')
-            .eq('section_id', section.id);
-            
-          if (projectsError) {
-            console.error(`Error fetching projects for section ${section.id}:`, projectsError);
-            continue; // Skip this section if there's an error but continue with others
-          }
+          console.log(`Projects in section ${section.id}:`, section.projects);
           
-          console.log(`Projects for section ${section.id}:`, projectsData);
-          console.log(`Number of projects for section ${section.id}:`, projectsData?.length || 0);
-          
-          const projects: ProjectData[] = [];
-          
-          // For each project, fetch its links
-          for (const project of (projectsData || [])) {
+          // Map projects
+          const processedProjects: ProjectData[] = section.projects.map((project: any) => {
             console.log(`Processing project: ${project.id} - ${project.title}`);
-            const { data: linksData, error: linksError } = await supabase
-              .from('links')
-              .select('id, title, url')
-              .eq('project_id', project.id);
-              
-            if (linksError) {
-              console.error(`Error fetching links for project ${project.id}:`, linksError);
-              continue;
-            }
+            console.log(`Links in project ${project.id}:`, project.links);
             
-            console.log(`Links for project ${project.id}:`, linksData);
-            console.log(`Number of links for project ${project.id}:`, linksData?.length || 0);
-            
-            projects.push({
+            return {
               id: project.id,
               title: project.title,
               description: project.description || "",
-              links: linksData || []
-            });
-          }
+              links: project.links || []
+            };
+          });
           
-          processedSections.push({
+          return {
             id: section.id,
             title: section.title,
-            projects: projects
-          });
-        }
+            projects: processedProjects
+          };
+        });
         
         console.log("Processed sections data:", processedSections);
         console.log("Final number of sections with projects:", processedSections.length);

@@ -42,14 +42,12 @@ const SharedPortfolio = () => {
         
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
         
-        {sections.length > 0 ? (
-          <>
-            <SectionContainer
-              sections={sections}
-              onUpdate={() => {}}
-              isEditingMode={false}
-            />
-          </>
+        {sections && sections.length > 0 ? (
+          <SectionContainer
+            sections={sections}
+            onUpdate={() => {}}
+            isEditingMode={false}
+          />
         ) : (
           <div className="text-center py-10">
             <p className="text-muted-foreground">No projects to display</p>
