@@ -124,6 +124,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             continue; // Skip this section if there's an error but continue with others
           }
           
+          console.log(`Projects for section ${section.id}:`, projectsData);
+          
           const projects: ProjectData[] = [];
           
           // For each project, fetch its links
@@ -137,6 +139,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
               console.error(`Error fetching links for project ${project.id}:`, linksError);
               continue;
             }
+            
+            console.log(`Links for project ${project.id}:`, linksData);
             
             projects.push({
               id: project.id,

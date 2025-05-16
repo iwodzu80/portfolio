@@ -24,7 +24,7 @@ const SharedPortfolio = () => {
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
       <Toaster position="top-center" />
-      <div className="container mx-auto pt-10">
+      <div className="container mx-auto pt-10 px-4">
         <SharedPortfolioHeader />
 
         <ProfileSection
