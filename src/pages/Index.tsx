@@ -5,7 +5,7 @@ import SectionContainer from "@/components/SectionContainer";
 import { SectionData } from "@/utils/localStorage";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, LogOut } from "lucide-react";
+import { Eye, Pencil, LogOut, Settings as SettingsIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -223,6 +223,14 @@ const Index = () => {
           </div>
           <div className="flex gap-2">
             <SharePortfolioDialog />
+            <Button
+              onClick={() => navigate("/settings")}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <SettingsIcon size={18} />
+              Settings
+            </Button>
             <Button
               onClick={() => setIsEditingMode(!isEditingMode)}
               variant="outline"
