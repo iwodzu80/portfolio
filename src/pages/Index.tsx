@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
@@ -216,9 +217,11 @@ const Index = () => {
       <Toaster position="top-center" />
       
       <div className="container mx-auto pt-10">
-        <div className="flex justify-end mb-4">
-          <div className="flex gap-2">
+        <div className="flex justify-between mb-4">
+          <div>
             <SharePortfolioDialog />
+          </div>
+          <div className="flex gap-2">
             <Button
               onClick={() => navigate("/settings")}
               variant="outline"
