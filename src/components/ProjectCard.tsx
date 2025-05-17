@@ -30,6 +30,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     onUpdate(updatedProject);
   };
   
+  // Helper function to ensure URL has a protocol
+  const ensureUrlProtocol = (url: string): string => {
+    if (url && !url.match(/^https?:\/\/|^mailto:|^tel:/i)) {
+      return `https://${url}`;
+    }
+    return url;
+  };
+  
   const addLink = () => {
     const newLink: LinkData = {
       id: `${localProject.id}-${Date.now()}`,
@@ -44,6 +52,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   };
   
   const updateLink = (linkId: string, field: keyof LinkData, value: string) => {
+    // If updating URL field, ensure it has a protocol
+    if (field === "url") {
+      value = ensureUrlProtocol(value);
+    }
+    
     const updatedLinks = localProject.links.map(link => 
       link.id === linkId ? { ...link, [field]: value } : link
     );
@@ -96,7 +109,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
           {localProject.links.map((link) => (
             <a
               key={link.id}
-              href={link.url}
+              href={ensureUrlProtocol(link.url)}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors inline-flex items-center gap-1"
@@ -168,7 +181,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
                   onChange={(value) => updateLink(link.id, "url", value)}
                   tag="span"
                   className="text-sm text-portfolio-muted flex-1"
-                  placeholder="https://"
+                  placeholder="website.com"
                 />
                 <button
                   onClick={() => deleteLink(link.id)}
@@ -187,7 +200,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
                 asChild
               >
                 <a
-                  href={link.url}
+                  href={ensureUrlProtocol(link.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
