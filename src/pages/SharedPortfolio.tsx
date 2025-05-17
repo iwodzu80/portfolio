@@ -62,20 +62,11 @@ const SharedPortfolio = () => {
         <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
         
         {hasValidSections ? (
-          <>
-            <div className="text-center mb-8">
-              <p className="text-sm text-portfolio-muted">
-                Found {sections.length} {sections.length === 1 ? 'section' : 'sections'} 
-                with {sections.reduce((count, section) => 
-                  count + (Array.isArray(section.projects) ? section.projects.length : 0), 0)} projects
-              </p>
-            </div>
-            <SectionContainer
-              sections={sections}
-              onUpdate={() => {}}
-              isEditingMode={false}
-            />
-          </>
+          <SectionContainer
+            sections={sections}
+            onUpdate={() => {}}
+            isEditingMode={false}
+          />
         ) : (
           <div className="text-center py-10">
             <p className="text-muted-foreground">No projects to display</p>
