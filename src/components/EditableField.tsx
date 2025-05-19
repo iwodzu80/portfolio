@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Pencil } from "lucide-react";
+import { sanitizeText } from "@/utils/securityUtils";
 
 interface EditableFieldProps {
   value: string;
@@ -116,12 +117,17 @@ const EditableField: React.FC<EditableFieldProps> = ({
     );
   }
 
-  // Display mode
+  // Display mode - sanitize the content for display
+  const displayContent = localValueRef.current || placeholder;
+  const sanitizedContent = sanitizeText(displayContent);
+
   return (
     <div className="editable-field relative group">
-      <Tag className={`pr-5 ${className}`} onClick={handleClick}>
-        {localValueRef.current || <span className="text-gray-400">{placeholder}</span>}
-      </Tag>
+      <Tag 
+        className={`pr-5 ${className}`} 
+        onClick={handleClick}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      />
       <span className="editable-field-indicator absolute top-0 right-0">
         <Pencil size={14} />
       </span>

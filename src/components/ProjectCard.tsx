@@ -5,6 +5,7 @@ import EditableField from "./EditableField";
 import { LinkData, ProjectData } from "../utils/localStorage";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
+import { validateAndFormatUrl } from "@/utils/securityUtils";
 
 interface ProjectCardProps {
   project: ProjectData;
@@ -30,14 +31,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     onUpdate(updatedProject);
   };
   
-  // Helper function to ensure URL has a protocol
-  const ensureUrlProtocol = (url: string): string => {
-    if (url && !url.match(/^https?:\/\/|^mailto:|^tel:/i)) {
-      return `https://${url}`;
-    }
-    return url;
-  };
-  
   const addLink = () => {
     const newLink: LinkData = {
       id: `${localProject.id}-${Date.now()}`,
@@ -52,9 +45,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   };
   
   const updateLink = (linkId: string, field: keyof LinkData, value: string) => {
-    // If updating URL field, ensure it has a protocol
+    // If updating URL field, ensure it has a protocol and is validated
     if (field === "url") {
-      value = ensureUrlProtocol(value);
+      value = validateAndFormatUrl(value);
     }
     
     const updatedLinks = localProject.links.map(link => 
@@ -109,7 +102,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
           {localProject.links.map((link) => (
             <a
               key={link.id}
-              href={ensureUrlProtocol(link.url)}
+              href={validateAndFormatUrl(link.url)}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors inline-flex items-center gap-1"
@@ -200,7 +193,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
                 asChild
               >
                 <a
-                  href={ensureUrlProtocol(link.url)}
+                  href={validateAndFormatUrl(link.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

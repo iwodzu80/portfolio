@@ -1,4 +1,6 @@
 
+import { validateAndFormatUrl } from "@/utils/securityUtils";
+
 interface ProfileData {
   name: string;
   photo: string;
@@ -70,15 +72,38 @@ const defaultData: PortfolioData = {
 
 const STORAGE_KEY = "portfolio-data";
 
+// Ensure all URLs in the data are properly validated and formatted
+const sanitizeData = (data: PortfolioData): PortfolioData => {
+  const sanitizedSections = data.sections.map(section => ({
+    ...section,
+    projects: section.projects.map(project => ({
+      ...project,
+      links: project.links.map(link => ({
+        ...link,
+        url: validateAndFormatUrl(link.url)
+      }))
+    }))
+  }));
+  
+  return {
+    ...data,
+    sections: sanitizedSections
+  };
+};
+
 export function saveData(data: PortfolioData): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  // Sanitize data before saving
+  const sanitizedData = sanitizeData(data);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizedData));
 }
 
 export function loadData(): PortfolioData {
   const savedData = localStorage.getItem(STORAGE_KEY);
   if (savedData) {
     try {
-      return JSON.parse(savedData);
+      const parsedData = JSON.parse(savedData);
+      // Sanitize data after loading
+      return sanitizeData(parsedData);
     } catch (error) {
       console.error("Failed to parse saved data:", error);
       return defaultData;

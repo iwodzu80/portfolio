@@ -14,7 +14,10 @@ const SharedPortfolio = () => {
   const { profileData, sections, isLoading, notFound, ownerName } = useSharedPortfolio(shareId);
 
   useEffect(() => {
-    console.log("SharedPortfolio component with shareId:", shareId);
+    // Sanitize any data from URL params for extra security
+    const sanitizedShareId = shareId?.replace(/[^a-zA-Z0-9-]/g, '');
+    
+    console.log("SharedPortfolio component with shareId:", sanitizedShareId);
     console.log("profileData:", profileData);
     console.log("sections:", sections);
     console.log("Number of sections:", sections?.length || 0);
