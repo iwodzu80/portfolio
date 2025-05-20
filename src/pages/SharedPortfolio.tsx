@@ -46,8 +46,8 @@ const SharedPortfolio = () => {
             p_user_agent: navigator.userAgent
           };
           
-          // Use type assertion for supabase.rpc to bypass TypeScript's type checking
-          await supabase.rpc('record_portfolio_view', params as unknown as Record<string, any>);
+          // Fix the type issue by using generic Record type
+          await supabase.rpc<any>('record_portfolio_view', params);
             
           console.log("Portfolio view recorded successfully");
         } catch (error) {
