@@ -40,15 +40,14 @@ const SharedPortfolio = () => {
       if (sanitizedShareId) {
         try {
           // Record the view using a direct RPC call instead of typed table access
-          // Use a type assertion to fix the TypeScript error
           const params: RecordPortfolioViewParams = {
             p_share_id: sanitizedShareId,
             p_referrer: document.referrer || 'direct',
             p_user_agent: navigator.userAgent
           };
           
-          // Use a more explicit type assertion to tell TypeScript about the function parameters
-          await supabase.rpc('record_portfolio_view', params as any);
+          // Use type assertion for supabase.rpc to bypass TypeScript's type checking
+          await supabase.rpc('record_portfolio_view', params as unknown as Record<string, any>);
             
           console.log("Portfolio view recorded successfully");
         } catch (error) {
