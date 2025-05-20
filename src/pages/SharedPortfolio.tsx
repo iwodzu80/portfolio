@@ -8,6 +8,7 @@ import SharedPortfolioHeader from "@/components/SharedPortfolioHeader";
 import SharedPortfolioNotFound from "@/components/SharedPortfolioNotFound";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Toaster } from "sonner";
+import { sanitizeText } from "@/utils/securityUtils";
 
 const SharedPortfolio = () => {
   const { shareId } = useParams();
@@ -15,13 +16,23 @@ const SharedPortfolio = () => {
 
   useEffect(() => {
     // Sanitize any data from URL params for extra security
-    const sanitizedShareId = shareId?.replace(/[^a-zA-Z0-9-]/g, '');
+    const sanitizedShareId = shareId ? sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, '')) : null;
     
     console.log("SharedPortfolio component with shareId:", sanitizedShareId);
-    console.log("profileData:", profileData);
-    console.log("sections:", sections);
-    console.log("Number of sections:", sections?.length || 0);
-  }, [shareId, sections, profileData]);
+    
+    // Set a security-focused CSP header for this page
+    // Note: This won't work in React directly - just educational
+    // You should configure this at the server level
+    document.title = sanitizedShareId 
+      ? `Shared Portfolio: ${sanitizeText(ownerName)}`
+      : "Shared Portfolio";
+    
+  }, [shareId, ownerName]);
+
+  // Security check - if shareId is clearly invalid, show not found
+  if (!shareId || shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {
+    return <SharedPortfolioNotFound />;
+  }
 
   if (isLoading) {
     return (
@@ -37,15 +48,7 @@ const SharedPortfolio = () => {
 
   // Check if sections is properly initialized
   const hasValidSections = Array.isArray(sections) && sections.length > 0;
-  console.log("Has valid sections to render:", hasValidSections);
   
-  // Log projects count if sections exist
-  if (hasValidSections) {
-    const totalProjects = sections.reduce((count, section) => 
-      count + (Array.isArray(section.projects) ? section.projects.length : 0), 0);
-    console.log(`Total projects across all sections: ${totalProjects}`);
-  }
-
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
       <Toaster position="top-center" />

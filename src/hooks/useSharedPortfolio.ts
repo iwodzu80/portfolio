@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SectionData, ProjectData } from "@/utils/localStorage";
 import { toast } from "sonner";
+import { validateAndFormatUrl, sanitizeText } from "@/utils/securityUtils";
 
 export interface ProfileData {
   name: string;
@@ -34,15 +35,24 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         return;
       }
 
+      // Security check - sanitize and validate the shareId
+      const sanitizedShareId = sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, ''));
+      if (sanitizedShareId !== shareId || shareId.length < 8) {
+        console.error("Invalid share ID format detected");
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
-        console.log(`Fetching shared portfolio with ID: ${shareId}`);
+        console.log(`Fetching shared portfolio with ID: ${sanitizedShareId}`);
         
         // Fetch the share record
         const { data: shareData, error: shareError } = await supabase
           .from('portfolio_shares')
           .select('user_id, active')
-          .eq('share_id', shareId)
+          .eq('share_id', sanitizedShareId)
           .single();
           
         if (shareError) {
@@ -76,19 +86,23 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         
         if (profileData) {
           console.log("Profile data retrieved:", profileData);
-          setProfileData({
-            name: profileData.name || "",
-            photo: profileData.photo || "",
-            email: profileData.email || "",
-            telephone: profileData.telephone || "",
-            tagline: profileData.tagline || ""
-          });
           
-          setOwnerName(profileData.name || "Portfolio Owner");
+          // Sanitize all text data for security
+          const sanitizedProfileData = {
+            name: sanitizeText(profileData.name || ""),
+            photo: profileData.photo || "", // URLs handled separately
+            email: sanitizeText(profileData.email || ""),
+            telephone: sanitizeText(profileData.telephone || ""),
+            tagline: sanitizeText(profileData.tagline || "")
+          };
+          
+          setProfileData(sanitizedProfileData);
+          
+          setOwnerName(sanitizedProfileData.name || "Portfolio Owner");
           
           // Set document title
-          if (profileData.name) {
-            document.title = `${profileData.name}'s Portfolio`;
+          if (sanitizedProfileData.name) {
+            document.title = `${sanitizedProfileData.name}'s Portfolio`;
           }
         }
         
@@ -139,24 +153,24 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             };
           }
           
-          // Process projects if they exist
+          // Process projects if they exist and sanitize data
           const projects = Array.isArray(section.projects) 
             ? section.projects.map(project => {
                 if (!project) return null;
                 
-                // Process links if they exist
+                // Process links if they exist and sanitize URLs
                 const links = Array.isArray(project.links) 
                   ? project.links.map(link => ({
                       id: link.id || `temp-${Math.random().toString(36)}`,
-                      title: link.title || "",
-                      url: link.url || ""
+                      title: sanitizeText(link.title || ""),
+                      url: validateAndFormatUrl(link.url || "")
                     }))
                   : [];
                 
                 return {
                   id: project.id || `temp-${Math.random().toString(36)}`,
-                  title: project.title || "Untitled Project",
-                  description: project.description || "",
+                  title: sanitizeText(project.title || "Untitled Project"),
+                  description: sanitizeText(project.description || ""),
                   links
                 };
               }).filter(Boolean) as ProjectData[]
@@ -164,7 +178,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           
           return {
             id: section.id || `temp-${Math.random().toString(36)}`,
-            title: section.title || "Untitled Section",
+            title: sanitizeText(section.title || "Untitled Section"),
             projects
           };
         });
