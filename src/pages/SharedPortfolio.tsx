@@ -9,6 +9,7 @@ import SharedPortfolioNotFound from "@/components/SharedPortfolioNotFound";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Toaster } from "sonner";
 import { sanitizeText } from "@/utils/securityUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 const SharedPortfolio = () => {
   const { shareId } = useParams();
@@ -26,6 +27,33 @@ const SharedPortfolio = () => {
     document.title = sanitizedShareId 
       ? `Shared Portfolio: ${sanitizeText(ownerName)}`
       : "Shared Portfolio";
+    
+    // Record analytics for this portfolio view
+    const recordAnalytics = async () => {
+      if (sanitizedShareId) {
+        try {
+          // Record the view in the analytics table
+          await supabase
+            .from('portfolio_analytics')
+            .insert({
+              share_id: sanitizedShareId,
+              view_date: new Date().toISOString(),
+              referrer: document.referrer || 'direct',
+              user_agent: navigator.userAgent
+            });
+            
+          console.log("Portfolio view recorded successfully");
+        } catch (error) {
+          console.error("Failed to record portfolio view:", error);
+          // Don't show error to user - analytics should be silent
+        }
+      }
+    };
+    
+    // Only record analytics if we have a valid shareId
+    if (sanitizedShareId && sanitizedShareId.length >= 8 && !/[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
+      recordAnalytics();
+    }
     
   }, [shareId, ownerName]);
 
