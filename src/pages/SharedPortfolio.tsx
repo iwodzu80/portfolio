@@ -46,8 +46,8 @@ const SharedPortfolio = () => {
             p_user_agent: navigator.userAgent
           };
           
-          // Fix the type issue by using generic Record type
-          await supabase.rpc<any>('record_portfolio_view', params);
+          // Fix the type issue by providing both generic type parameters
+          await supabase.rpc<any, any>('record_portfolio_view', params);
             
           console.log("Portfolio view recorded successfully");
         } catch (error) {
