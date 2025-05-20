@@ -41,7 +41,7 @@ const SharedPortfolio = () => {
         try {
           // Record the view using a direct RPC call instead of typed table access
           // Use the interface to properly type the call
-          await supabase.rpc<void>('record_portfolio_view', {
+          await supabase.rpc('record_portfolio_view', {
             p_share_id: sanitizedShareId,
             p_referrer: document.referrer || 'direct',
             p_user_agent: navigator.userAgent
