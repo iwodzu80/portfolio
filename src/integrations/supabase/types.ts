@@ -44,6 +44,33 @@ export type Database = {
           },
         ]
       }
+      portfolio_analytics: {
+        Row: {
+          created_at: string
+          id: string
+          referrer: string | null
+          share_id: string
+          user_agent: string | null
+          view_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referrer?: string | null
+          share_id: string
+          user_agent?: string | null
+          view_date?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referrer?: string | null
+          share_id?: string
+          user_agent?: string | null
+          view_date?: string
+        }
+        Relationships: []
+      }
       portfolio_shares: {
         Row: {
           active: boolean
