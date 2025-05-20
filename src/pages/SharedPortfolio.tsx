@@ -39,7 +39,7 @@ const SharedPortfolio = () => {
     const recordAnalytics = async () => {
       if (sanitizedShareId) {
         try {
-          // Record the view using a direct RPC call instead of typed table access
+          // Record the view using a direct RPC call with proper typing
           const params: RecordPortfolioViewParams = {
             p_share_id: sanitizedShareId,
             p_referrer: document.referrer || 'direct',

@@ -195,7 +195,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      record_portfolio_view: {
+        Args: { p_share_id: string; p_referrer?: string; p_user_agent?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
