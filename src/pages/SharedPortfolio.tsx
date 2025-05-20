@@ -11,7 +11,7 @@ import { Toaster } from "sonner";
 import { sanitizeText } from "@/utils/securityUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-// Define the type for the RPC function parameters
+// Define the type for the RPC function parameters with correct type mapping
 interface RecordPortfolioViewParams {
   p_share_id: string;
   p_referrer?: string;
@@ -40,12 +40,14 @@ const SharedPortfolio = () => {
       if (sanitizedShareId) {
         try {
           // Record the view using a direct RPC call instead of typed table access
-          // Use the interface to properly type the call
-          await supabase.rpc('record_portfolio_view', {
+          // Use a type assertion to fix the TypeScript error
+          const params: RecordPortfolioViewParams = {
             p_share_id: sanitizedShareId,
             p_referrer: document.referrer || 'direct',
             p_user_agent: navigator.userAgent
-          } as RecordPortfolioViewParams);
+          };
+          
+          await supabase.rpc('record_portfolio_view', params);
             
           console.log("Portfolio view recorded successfully");
         } catch (error) {
