@@ -47,7 +47,8 @@ const SharedPortfolio = () => {
             p_user_agent: navigator.userAgent
           };
           
-          await supabase.rpc('record_portfolio_view', params);
+          // Use a more explicit type assertion to tell TypeScript about the function parameters
+          await supabase.rpc('record_portfolio_view', params as any);
             
           console.log("Portfolio view recorded successfully");
         } catch (error) {
