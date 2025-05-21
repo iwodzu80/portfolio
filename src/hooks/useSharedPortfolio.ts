@@ -95,7 +95,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             photo: profileData.photo || "", // URLs handled separately
             email: sanitizeText(profileData.email || ""),
             telephone: sanitizeText(profileData.telephone || ""),
-            role: sanitizeText(profileData.role || ""),
+            role: sanitizeText(profileData.role || ""), // Safely access role property
             tagline: sanitizeText(profileData.tagline || "")
           };
           

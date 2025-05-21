@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProfileSection from "@/components/ProfileSection";
@@ -95,6 +94,7 @@ const SharedPortfolio = () => {
           photo={profileData.photo}
           email={profileData.email}
           telephone={profileData.telephone}
+          role={profileData.role}
           tagline={profileData.tagline}
           onUpdate={() => {}}
           isEditingMode={false}

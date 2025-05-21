@@ -143,6 +143,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         photo,
         email,
         telephone,
+        role,
         tagline
       });
     }

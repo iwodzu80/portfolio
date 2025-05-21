@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,7 +58,7 @@ export const usePortfolioData = () => {
           photo: profileData.photo || "",
           email: profileData.email || user.email || "",
           telephone: profileData.telephone || "",
-          role: profileData.role || "",
+          role: profileData.role || "", // Safely access role property
           tagline: profileData.tagline || ""
         });
       } else {
