@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound } from "lucide-react";
+import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import SharePortfolioDialog from "@/components/SharePortfolioDialog";
@@ -26,7 +26,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="flex justify-between mb-4">
+    <div className="flex justify-between mb-4 w-full">
       <div>
         <SharePortfolioDialog />
       </div>
@@ -56,6 +56,10 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => navigate("/analytics")}>
+              <BarChart3 size={16} className="mr-2" />
+              View Analytics
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/settings")}>
               <SettingsIcon size={16} className="mr-2" />
               Settings

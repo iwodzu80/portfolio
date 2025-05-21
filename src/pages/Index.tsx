@@ -6,8 +6,6 @@ import { Toaster } from "sonner";
 import PortfolioHeader from "@/components/PortfolioHeader";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Link } from "react-router-dom";
-import { BarChart3 } from "lucide-react";
 
 const Index = () => {
   const [isEditingMode, setIsEditingMode] = useState(false);
@@ -22,19 +20,11 @@ const Index = () => {
       <Toaster position="top-center" />
       
       <div className="container mx-auto pt-10">
-        <div className="flex justify-between items-center mb-6 px-4">
+        <div className="px-4">
           <PortfolioHeader 
             isEditingMode={isEditingMode} 
             setIsEditingMode={setIsEditingMode} 
           />
-          
-          <Link 
-            to="/analytics" 
-            className="flex items-center gap-2 text-gray-700 hover:text-gray-900 bg-white rounded-md px-3 py-2 shadow-sm transition-colors"
-          >
-            <BarChart3 size={18} />
-            <span>View Analytics</span>
-          </Link>
         </div>
 
         <ProfileSection
