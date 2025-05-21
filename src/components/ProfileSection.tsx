@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
@@ -174,7 +175,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           </div>
           
           {localState.description && (
-            <p className="text-portfolio-muted mt-4 max-w-prose mx-auto">{localState.description}</p>
+            <p className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify">{localState.description}</p>
           )}
         </div>
       </section>
@@ -238,7 +239,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.description}
           onChange={(value) => handleProfileUpdate("description", value)}
           tag="p"
-          className="text-portfolio-muted mt-4 max-w-prose mx-auto"
+          className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify"
           placeholder="Add a brief description about yourself..."
           multiline
         />
