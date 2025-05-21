@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import ProjectList from "./ProjectList";
 import { SectionData } from "../utils/localStorage";
@@ -146,8 +145,56 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
     const [movedSection] = newSections.splice(currentIndex, 1);
     newSections.splice(newIndex, 0, movedSection);
 
+    // Update local state immediately for responsive UI
     setLocalSections(newSections);
-    toast.success(`Section moved ${direction}`);
+    
+    try {
+      // In a future implementation, we could add a position column 
+      // For now, we're just ordering by created_at (timestamp)
+      // So we will update the timestamps to reflect the new order
+
+      // Get the current timestamp as baseline
+      const baseTime = new Date();
+      
+      // Create an array of promises to update each section's timestamp
+      // We'll use timestamps spaced 1 second apart to maintain order
+      const updatePromises = newSections.map((section, index) => {
+        // Calculate a new timestamp for each section based on its position
+        // Earlier positions get more recent timestamps (for descending sort)
+        // or older timestamps (for ascending sort)
+        const newTimestamp = new Date(baseTime.getTime() + (index * 1000)).toISOString();
+        
+        return supabase
+          .from('sections')
+          .update({ 
+            updated_at: newTimestamp,
+            created_at: newTimestamp // Update created_at since we're sorting by it
+          })
+          .eq('id', section.id)
+          .eq('user_id', user?.id);
+      });
+      
+      // Execute all updates
+      const results = await Promise.all(updatePromises);
+      
+      // Check if any updates had errors
+      const errors = results.filter(result => result.error);
+      if (errors.length > 0) {
+        console.error("Errors updating section order:", errors);
+        throw new Error("Failed to update section order");
+      }
+      
+      toast.success(`Section moved ${direction}`);
+      
+      // Trigger the parent component to reload data from the database
+      onUpdate();
+    } catch (error: any) {
+      console.error("Error saving section order:", error);
+      toast.error("Failed to save section order");
+      
+      // Revert the local state if there was an error
+      setLocalSections(safeSections);
+    }
   };
   
   return (
