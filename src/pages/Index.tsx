@@ -32,6 +32,7 @@ const Index = () => {
           photo={profileData.photo}
           email={profileData.email}
           telephone={profileData.telephone}
+          role={profileData.role}
           tagline={profileData.tagline}
           onUpdate={loadData}
           isEditingMode={isEditingMode}

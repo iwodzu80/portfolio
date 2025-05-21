@@ -11,6 +11,7 @@ interface ProfileData {
   photo: string;
   email: string;
   telephone: string;
+  role: string;
   tagline: string;
 }
 
@@ -20,6 +21,7 @@ export const usePortfolioData = () => {
     photo: "",
     email: "",
     telephone: "",
+    role: "",
     tagline: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
@@ -57,6 +59,7 @@ export const usePortfolioData = () => {
           photo: profileData.photo || "",
           email: profileData.email || user.email || "",
           telephone: profileData.telephone || "",
+          role: profileData.role || "",
           tagline: profileData.tagline || ""
         });
       } else {
@@ -78,6 +81,7 @@ export const usePortfolioData = () => {
             photo: "",
             email: user.email || "",
             telephone: "",
+            role: "",
             tagline: ""
           });
         }

@@ -10,6 +10,7 @@ export interface ProfileData {
   photo: string;
   email: string;
   telephone: string;
+  role: string;
   tagline: string;
 }
 
@@ -19,6 +20,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
     photo: "",
     email: "",
     telephone: "",
+    role: "",
     tagline: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
@@ -93,6 +95,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             photo: profileData.photo || "", // URLs handled separately
             email: sanitizeText(profileData.email || ""),
             telephone: sanitizeText(profileData.telephone || ""),
+            role: sanitizeText(profileData.role || ""),
             tagline: sanitizeText(profileData.tagline || "")
           };
           

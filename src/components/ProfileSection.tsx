@@ -11,6 +11,7 @@ interface ProfileSectionProps {
   photo: string;
   email: string;
   telephone: string;
+  role: string;
   tagline: string;
   onUpdate: () => void;
   isEditingMode?: boolean;
@@ -21,6 +22,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   photo,
   email,
   telephone,
+  role,
   tagline,
   onUpdate,
   isEditingMode = true
@@ -31,6 +33,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     photo,
     email,
     telephone,
+    role,
     tagline
   });
   
@@ -41,9 +44,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       photo,
       email,
       telephone,
+      role,
       tagline
     });
-  }, [name, photo, email, telephone, tagline]);
+  }, [name, photo, email, telephone, role, tagline]);
   
   // Set document title when name changes
   useEffect(() => {
@@ -158,6 +162,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         
         <div className="mt-6 w-full text-center">
           <h1 className="font-bold text-2xl md:text-3xl mb-2">{localState.name || "Your Name"}</h1>
+          {localState.role && <p className="text-portfolio-blue text-lg mb-2">{localState.role}</p>}
           <p className="text-portfolio-muted mb-4">{localState.tagline || "Your tagline"}</p>
           
           <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
@@ -187,6 +192,14 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           tag="h1"
           className="font-bold text-2xl md:text-3xl mb-2"
           placeholder="Your Name"
+        />
+        
+        <EditableField
+          value={localState.role}
+          onChange={(value) => handleProfileUpdate("role", value)}
+          tag="p"
+          className="text-portfolio-blue text-lg mb-2"
+          placeholder="Your Role"
         />
         
         <EditableField
