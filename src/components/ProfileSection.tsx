@@ -154,7 +154,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Read-only mode
   if (!isEditingMode) {
     return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
         {localState.photo && (
           <img
             src={localState.photo}
@@ -184,7 +184,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   // Edit mode
   return (
-    <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
+    <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
       <EditableImage
         src={localState.photo}
         alt={localState.name}
