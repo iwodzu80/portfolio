@@ -39,7 +39,7 @@ const Index = () => {
           isEditingMode={isEditingMode}
         />
         
-        <div className="my-6 border-t border-gray-200 max-w-xl mx-auto" />
+        <div className="my-2 border-t border-gray-200 max-w-xl mx-auto" />
         
         <SectionContainer
           sections={sections}

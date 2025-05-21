@@ -154,7 +154,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Read-only mode
   if (!isEditingMode) {
     return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-4 p-6">
         {localState.photo && (
           <img
             src={localState.photo}
@@ -166,16 +166,16 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         <div className="mt-6 w-full text-center">
           <h1 className="font-bold text-2xl md:text-3xl mb-2">{localState.name || "Your Name"}</h1>
           {localState.role && <p className="text-portfolio-blue text-lg mb-2">{localState.role}</p>}
-          {localState.tagline && <p className="text-portfolio-muted mb-4">{localState.tagline}</p>}
+          {localState.tagline && <p className="text-portfolio-muted mb-2">{localState.tagline}</p>}
           
-          <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
+          <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-2">
             {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
             {localState.email && localState.telephone && <span className="mx-1">•</span>}
             {localState.telephone && <span>{localState.telephone}</span>}
           </div>
           
           {localState.description && (
-            <p className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify">{localState.description}</p>
+            <p className="text-portfolio-muted mt-2 max-w-prose mx-auto text-justify">{localState.description}</p>
           )}
         </div>
       </section>
@@ -184,7 +184,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   // Edit mode
   return (
-    <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
+    <section className="flex flex-col items-center max-w-xl mx-auto mb-4 p-6">
       <EditableImage
         src={localState.photo}
         alt={localState.name}
@@ -213,12 +213,12 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.tagline}
           onChange={(value) => handleProfileUpdate("tagline", value)}
           tag="p"
-          className="text-portfolio-muted mb-4"
+          className="text-portfolio-muted mb-2"
           placeholder="Your tagline"
           multiline
         />
         
-        <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
+        <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-2">
           <EditableField
             value={localState.email}
             onChange={(value) => handleProfileUpdate("email", value)}
@@ -239,7 +239,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.description}
           onChange={(value) => handleProfileUpdate("description", value)}
           tag="p"
-          className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify"
+          className="text-portfolio-muted mt-2 max-w-prose mx-auto text-justify"
           placeholder="Add a brief description about yourself..."
           multiline
         />
