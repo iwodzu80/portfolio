@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 const SharedPortfolio = () => {
   const { shareId } = useParams();
   const { profileData, sections, isLoading, notFound, ownerName } = useSharedPortfolio(shareId);
+  const analyticsRecorded = useRef(false);
 
   useEffect(() => {
     // Sanitize any data from URL params for extra security
@@ -21,34 +22,29 @@ const SharedPortfolio = () => {
     
     // Set page title
     document.title = sanitizedShareId 
-      ? `Shared Portfolio: ${sanitizeText(ownerName)}`
+      ? `Shared Portfolio: ${sanitizeText(ownerName || "")}`
       : "Shared Portfolio";
     
-    // Record analytics for this portfolio view in the background
-    const recordAnalytics = async () => {
-      if (!sanitizedShareId || sanitizedShareId.length < 8 || /[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
-        return;
-      }
+    // Only record analytics once per page visit
+    if (!analyticsRecorded.current && sanitizedShareId && sanitizedShareId.length >= 8 && !/[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
+      analyticsRecorded.current = true;
       
-      try {
-        // Use a separate, non-blocking call to record the view
-        setTimeout(async () => {
-          await supabase.rpc('record_portfolio_view', {
-            p_share_id: sanitizedShareId,
-            p_referrer: document.referrer || 'direct',
-            p_user_agent: navigator.userAgent
-          });
-        }, 0);
-      } catch (error) {
-        // Silent fail - analytics shouldn't block the main functionality
-        console.error("Failed to record portfolio view:", error);
-      }
-    };
-    
-    recordAnalytics();
+      // Use non-blocking approach for analytics
+      setTimeout(() => {
+        // Record view completely in the background without affecting UI
+        supabase.rpc('record_portfolio_view', {
+          p_share_id: sanitizedShareId,
+          p_referrer: document.referrer || 'direct',
+          p_user_agent: navigator.userAgent
+        }).catch(err => {
+          // Silent fail for analytics - log but don't impact user experience
+          console.error("Analytics error:", err);
+        });
+      }, 100); // Small delay to prioritize UI rendering
+    }
   }, [shareId, ownerName]);
 
-  // Security check - if shareId is clearly invalid, show not found
+  // Security check - if shareId is clearly invalid, show not found immediately
   if (!shareId || shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {
     return <SharedPortfolioNotFound />;
   }
@@ -86,7 +82,7 @@ const SharedPortfolio = () => {
           isEditingMode={false}
         />
         
-        <div className="my-6 border-t border-gray-200 max-w-xl mx-auto" />
+        <div className="my-4 border-t border-gray-200 max-w-xl mx-auto" />
         
         {hasValidSections ? (
           <SectionContainer

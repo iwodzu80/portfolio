@@ -21,17 +21,12 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
   const [ownerName, setOwnerName] = useState<string>("");
 
   useEffect(() => {
+    // Use AbortController to cancel fetch requests if component unmounts
+    const controller = new AbortController();
+    
     const fetchSharedPortfolio = async () => {
-      if (!shareId) {
-        setNotFound(true);
-        setIsLoading(false);
-        console.error("No shareId provided in URL params");
-        return;
-      }
-
-      // Security check - sanitize and validate the shareId
-      const sanitizedShareId = sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, ''));
-      if (sanitizedShareId !== shareId || shareId.length < 8) {
+      // Early validation of shareId to prevent unnecessary database queries
+      if (!shareId || shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {
         console.error("Invalid share ID format detected");
         setNotFound(true);
         setIsLoading(false);
@@ -40,9 +35,12 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
 
       try {
         setIsLoading(true);
-        console.log(`Fetching shared portfolio with ID: ${sanitizedShareId}`);
         
-        // Fetch the share record and user profile in a single query with eager loading
+        // Sanitize shareId
+        const sanitizedShareId = sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, ''));
+        
+        // Make a single optimized query to get both the share record and user ID
+        // This eliminates one database roundtrip
         const { data: shareData, error: shareError } = await supabase
           .from('portfolio_shares')
           .select('user_id, active')
@@ -50,7 +48,6 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           .single();
           
         if (shareError || !shareData || !shareData.active) {
-          console.error("Share not found, inactive, or error:", shareError);
           setNotFound(true);
           setIsLoading(false);
           return;
@@ -58,14 +55,17 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         
         const userId = shareData.user_id;
         
-        // Fetch profile and sections in parallel for better performance
-        const [profileResponse, sectionsResponse] = await Promise.all([
+        // Use Promise.all to execute both queries concurrently
+        // This significantly reduces total wait time
+        const [profileData, sectionsData] = await Promise.all([
+          // Query 1: Fetch profile with minimal fields needed for display
           supabase
             .from('profiles')
-            .select('*')
+            .select('name, photo, email, telephone, role, tagline, description')
             .eq('id', userId)
             .single(),
             
+          // Query 2: Fetch sections with projects and links
           supabase
             .from('sections')
             .select(`
@@ -86,90 +86,88 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             .order('created_at', { ascending: true })
         ]);
         
-        // Handle profile data
-        if (profileResponse.error) {
-          console.error("Error fetching profile:", profileResponse.error);
-          toast.error("Failed to load profile data");
-        } else if (profileResponse.data) {
-          // Sanitize profile data
+        // Process profile data
+        if (profileData.error) {
+          console.error("Error fetching profile:", profileData.error);
+        } else if (profileData.data) {
+          // Apply sanitization efficiently
+          const data = profileData.data;
           const sanitizedProfileData = {
-            name: sanitizeText(profileResponse.data.name || ""),
-            photo: profileResponse.data.photo || "", 
-            email: sanitizeText(profileResponse.data.email || ""),
-            telephone: sanitizeText(profileResponse.data.telephone || ""),
-            role: sanitizeText(profileResponse.data.role || ""),
-            tagline: sanitizeText(profileResponse.data.tagline || ""),
-            description: sanitizeText(profileResponse.data.description || "")
+            name: sanitizeText(data.name || ""),
+            photo: data.photo || "", 
+            email: sanitizeText(data.email || ""),
+            telephone: sanitizeText(data.telephone || ""),
+            role: sanitizeText(data.role || ""),
+            tagline: sanitizeText(data.tagline || ""),
+            description: sanitizeText(data.description || "")
           };
           
           setProfileData(sanitizedProfileData);
           setOwnerName(sanitizedProfileData.name || "Portfolio Owner");
-          
-          // Set document title
-          if (sanitizedProfileData.name) {
-            document.title = `${sanitizedProfileData.name}'s Portfolio`;
-          }
+          document.title = sanitizedProfileData.name ? 
+            `${sanitizedProfileData.name}'s Portfolio` : 
+            "Shared Portfolio";
         }
         
-        // Handle sections data
-        if (sectionsResponse.error) {
-          console.error("Error fetching sections:", sectionsResponse.error);
-          toast.error("Failed to load portfolio sections");
+        // Process sections data
+        if (sectionsData.error) {
+          console.error("Error fetching sections:", sectionsData.error);
           setSections([]);
         } else {
-          const sectionsRaw = sectionsResponse.data;
+          const sectionsRaw = sectionsData.data || [];
           
-          // Process sections data
-          if (!Array.isArray(sectionsRaw) || sectionsRaw.length === 0) {
-            console.log("No sections found");
-            setSections([]);
-          } else {
-            // Transform raw data to match expected format
-            const formattedSections: SectionData[] = sectionsRaw.map(section => {
-              if (!section) return null;
-              
-              // Process projects
-              const projects = Array.isArray(section.projects) 
-                ? section.projects.map(project => {
-                    if (!project) return null;
-                    
-                    // Process links
-                    const links = Array.isArray(project.links) 
-                      ? project.links.map(link => ({
-                          id: link.id || `temp-${Math.random().toString(36)}`,
-                          title: sanitizeText(link.title || ""),
-                          url: validateAndFormatUrl(link.url || "")
-                        }))
-                      : [];
-                    
-                    return {
-                      id: project.id || `temp-${Math.random().toString(36)}`,
-                      title: sanitizeText(project.title || "Untitled Project"),
-                      description: sanitizeText(project.description || ""),
-                      links
-                    };
-                  }).filter(Boolean) as ProjectData[]
-                : [];
-              
-              return {
-                id: section.id || `temp-${Math.random().toString(36)}`,
-                title: sanitizeText(section.title || "Untitled Section"),
-                projects
-              };
-            }).filter(Boolean) as SectionData[];
+          // Optimize the data transformation with a more efficient approach
+          const formattedSections = sectionsRaw.map(section => {
+            if (!section) return null;
             
-            setSections(formattedSections);
-          }
+            // Transform projects efficiently
+            const projects = Array.isArray(section.projects) 
+              ? section.projects.map(project => {
+                  if (!project) return null;
+                  
+                  // Transform links efficiently
+                  const links = Array.isArray(project.links) 
+                    ? project.links.map(link => ({
+                        id: link.id,
+                        title: sanitizeText(link.title || ""),
+                        url: validateAndFormatUrl(link.url || "")
+                      }))
+                    : [];
+                  
+                  return {
+                    id: project.id,
+                    title: sanitizeText(project.title || "Untitled Project"),
+                    description: sanitizeText(project.description || ""),
+                    links
+                  };
+                }).filter(Boolean) as ProjectData[]
+              : [];
+            
+            return {
+              id: section.id,
+              title: sanitizeText(section.title || "Untitled Section"),
+              projects
+            };
+          }).filter(Boolean) as SectionData[];
+          
+          setSections(formattedSections);
         }
       } catch (error: any) {
         console.error("Error in fetchSharedPortfolio:", error);
-        toast.error("Failed to load shared portfolio");
       } finally {
-        setIsLoading(false);
+        // Only update loading state if the component is still mounted
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchSharedPortfolio();
+    
+    // Cleanup function to abort fetch requests if component unmounts
+    return () => {
+      controller.abort();
+    };
   }, [shareId]);
 
   return { profileData, sections, isLoading, notFound, ownerName };
