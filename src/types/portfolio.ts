@@ -6,6 +6,7 @@ export interface ProfileData {
   telephone: string;
   role: string;
   tagline: string;
+  description: string;
 }
 
 export interface LinkData {
