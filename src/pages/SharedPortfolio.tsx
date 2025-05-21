@@ -96,12 +96,12 @@ const SharedPortfolio = () => {
           telephone={profileData.telephone}
           role={profileData.role}
           tagline={profileData.tagline}
-          description={profileData.description}
+          description={profileData.description || ""}
           onUpdate={() => {}}
           isEditingMode={false}
         />
         
-        <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
+        <div className="my-6 border-t border-gray-200 max-w-2xl mx-auto" />
         
         {hasValidSections ? (
           <SectionContainer

@@ -1,10 +1,7 @@
-
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
-import EditableImage from "./EditableImage";
+import React, { useState, useEffect } from "react";
 import EditableField from "./EditableField";
-import { supabase } from "../integrations/supabase/client";
-import { useAuth } from "../contexts/AuthContext";
+import { ProfileData } from "@/types/portfolio";
+import { toast } from "sonner";
 
 interface ProfileSectionProps {
   name: string;
@@ -29,225 +26,166 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   onUpdate,
   isEditingMode = true
 }) => {
-  const { user } = useAuth();
-  const [localState, setLocalState] = useState({
-    name,
-    photo,
-    email,
-    telephone,
-    role,
-    tagline,
-    description
+  const [isEditing, setIsEditing] = useState(false);
+  const [localProfile, setLocalProfile] = useState({
+    name: name || "",
+    photo: photo || "",
+    email: email || "",
+    telephone: telephone || "",
+    role: role || "",
+    tagline: tagline || "",
+    description: description || ""
   });
-  
-  // Update local state when props change (e.g., on initial load)
+
   useEffect(() => {
-    setLocalState({
-      name,
-      photo,
-      email,
-      telephone,
-      role,
-      tagline,
-      description
+    setLocalProfile({
+      name: name || "",
+      photo: photo || "",
+      email: email || "",
+      telephone: telephone || "",
+      role: role || "",
+      tagline: tagline || "",
+      description: description || ""
     });
   }, [name, photo, email, telephone, role, tagline, description]);
-  
-  // Set document title when name changes
-  useEffect(() => {
-    if (localState.name) {
-      document.title = `${localState.name}'s Portfolio`;
-    } else {
-      document.title = "Portfolio";
-    }
-  }, [localState.name]);
 
-  const handleProfileUpdate = async (field: string, value: string) => {
-    if (!user) {
-      toast.error("You must be logged in to update your profile");
-      return;
-    }
-    
-    // Update local state immediately for a responsive UI
-    setLocalState(prevState => ({
-      ...prevState,
-      [field]: value
-    }));
-    
-    try {
-      console.log(`Updating profile field ${field} for user ${user.id} with value:`, value);
-      
-      // Create data object for update
-      const updateData = {
-        [field]: value,
-        updated_at: new Date().toISOString()
-      };
-      
-      // Check if profile exists first
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
-      
-      if (checkError && checkError.code !== 'PGRST116') {
-        // PGRST116 means no rows returned, which is fine
-        console.error("Error checking profile existence:", checkError);
-        throw checkError;
-      }
-      
-      let error;
-      
-      if (!existingProfile) {
-        // Create profile if it doesn't exist
-        console.log("Profile doesn't exist, creating new profile");
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email,
-            [field]: value
-          });
-        error = insertError;
-        
-        if (!insertError) {
-          console.log("Profile created successfully with field:", field);
-        }
-      } else {
-        // Update existing profile
-        console.log("Profile exists, updating field:", field);
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update(updateData)
-          .eq('id', user.id);
-        error = updateError;
-        
-        if (!updateError) {
-          console.log("Profile updated successfully with field:", field);
-        }
-      }
-        
-      if (error) {
-        console.error("Supabase update error:", error);
-        throw error;
-      }
-      
-      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
-      
-    } catch (error: any) {
-      console.error("Error updating profile:", error);
-      toast.error(`Error updating profile: ${error.message}`);
-      
-      // Revert local state on error
-      setLocalState({
-        name,
-        photo,
-        email,
-        telephone,
-        role,
-        tagline
-      });
-    }
+  const updateField = (field: keyof ProfileData, value: string) => {
+    setLocalProfile(prev => ({ ...prev, [field]: value }));
   };
 
-  // Read-only mode
-  if (!isEditingMode) {
-    return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
-        {localState.photo && (
-          <img
-            src={localState.photo}
-            alt={localState.name}
-            className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-white rounded-full object-cover"
-          />
-        )}
-        
-        <div className="mt-6 w-full text-center">
-          <h1 className="font-bold text-2xl md:text-3xl mb-2">{localState.name || "Your Name"}</h1>
-          {localState.role && <p className="text-portfolio-blue text-lg mb-2">{localState.role}</p>}
-          {localState.tagline && <p className="text-portfolio-muted mb-4">{localState.tagline}</p>}
-          
-          <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
-            {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
-            {localState.email && localState.telephone && <span className="mx-1">•</span>}
-            {localState.telephone && <span>{localState.telephone}</span>}
-          </div>
-          
-          {localState.description && (
-            <div className="mt-4 text-left px-4">
-              <p className="text-portfolio-text">{localState.description}</p>
-            </div>
-          )}
-        </div>
-      </section>
-    );
-  }
+  const handleProfileUpdate = async () => {
+    setIsEditing(false);
+    
+    const updatedProfile: ProfileData = {
+      name: localProfile.name,
+      photo: localProfile.photo,
+      email: localProfile.email,
+      telephone: localProfile.telephone,
+      role: localProfile.role,
+      tagline: localProfile.tagline,
+      description: localProfile.description
+    };
 
-  // Edit mode
+    setLocalProfile({
+      name: updatedProfile.name,
+      photo: updatedProfile.photo,
+      email: updatedProfile.email,
+      telephone: updatedProfile.telephone,
+      role: updatedProfile.role,
+      tagline: updatedProfile.tagline,
+      description: updatedProfile.description
+    });
+
+    toast.success("Profile updated");
+    onUpdate();
+  };
+
   return (
-    <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
-      <EditableImage
-        src={localState.photo}
-        alt={localState.name}
-        onChange={(value) => handleProfileUpdate("photo", value)}
-        className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-white"
-      />
-      
-      <div className="mt-6 w-full text-center">
-        <EditableField
-          value={localState.name}
-          onChange={(value) => handleProfileUpdate("name", value)}
-          tag="h1"
-          className="font-bold text-2xl md:text-3xl mb-2"
-          placeholder="Your Name"
-        />
-        
-        <EditableField
-          value={localState.role}
-          onChange={(value) => handleProfileUpdate("role", value)}
-          tag="p"
-          className="text-portfolio-blue text-lg mb-2"
-          placeholder="Your Role"
-        />
-        
-        <EditableField
-          value={localState.tagline}
-          onChange={(value) => handleProfileUpdate("tagline", value)}
-          tag="p"
-          className="text-portfolio-muted mb-4"
-          placeholder="Your tagline"
-          multiline
-        />
-        
-        <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
-          <EditableField
-            value={localState.email}
-            onChange={(value) => handleProfileUpdate("email", value)}
-            tag="span"
-            placeholder="Email"
-            className="text-portfolio-blue"
-          />
-          <span className="mx-1">•</span>
-          <EditableField
-            value={localState.telephone}
-            onChange={(value) => handleProfileUpdate("telephone", value)}
-            tag="span"
-            placeholder="Telephone"
-          />
-        </div>
-        
-        <div className="mt-4 w-full">
-          <EditableField
-            value={localState.description}
-            onChange={(value) => handleProfileUpdate("description", value)}
-            tag="p"
-            className="text-portfolio-text text-left"
-            placeholder="Add a description about yourself..."
-            multiline
+    <div className="max-w-2xl mx-auto px-6">
+      <div className="flex justify-center">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden">
+          <img
+            src={localProfile.photo}
+            alt="Profile"
+            className="object-cover w-full h-full"
           />
         </div>
       </div>
-    </section>
+      
+      <div className="mt-4 text-center">
+        {isEditingMode ? (
+          <EditableField
+            value={localProfile.name}
+            onChange={(value) => updateField("name", value)}
+            tag="h1"
+            className="text-2xl font-bold"
+            placeholder="Your Name"
+          />
+        ) : (
+          <h1 className="text-2xl font-bold">{localProfile.name}</h1>
+        )}
+        
+        {isEditingMode ? (
+          <EditableField
+            value={localProfile.role}
+            onChange={(value) => updateField("role", value)}
+            tag="h2"
+            className="text-xl text-muted-foreground"
+            placeholder="Your Role"
+          />
+        ) : (
+          <h2 className="text-xl text-muted-foreground">{localProfile.role}</h2>
+        )}
+        
+        {isEditingMode ? (
+          <EditableField
+            value={localProfile.tagline}
+            onChange={(value) => updateField("tagline", value)}
+            tag="h3"
+            className="text-lg text-portfolio-muted"
+            placeholder="Your Tagline"
+          />
+        ) : (
+          <h3 className="text-lg text-portfolio-muted">{localProfile.tagline}</h3>
+        )}
+      </div>
+      
+      <div className="mt-6 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+          <div className="flex-1">
+            {isEditingMode ? (
+              <EditableField
+                value={localProfile.email}
+                onChange={(value) => updateField("email", value)}
+                className="text-sm text-muted-foreground"
+                label="Email"
+                placeholder="Your email address"
+              />
+            ) : (
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Email</div>
+                <div className="text-sm">{localProfile.email}</div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex-1">
+            {isEditingMode ? (
+              <EditableField
+                value={localProfile.telephone}
+                onChange={(value) => updateField("telephone", value)}
+                className="text-sm text-muted-foreground"
+                label="Telephone"
+                placeholder="Your telephone number"
+              />
+            ) : (
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Telephone</div>
+                <div className="text-sm">{localProfile.telephone}</div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          {isEditingMode ? (
+            <EditableField
+              value={localProfile.description}
+              onChange={(value) => updateField("description", value)}
+              className="text-sm text-muted-foreground"
+              label="Description"
+              placeholder="Add a brief description about yourself"
+              multiline
+            />
+          ) : (
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Description</div>
+              <div className="text-sm">{localProfile.description}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
