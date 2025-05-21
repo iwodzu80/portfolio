@@ -91,12 +91,38 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     }
   };
   
+  // Process description to render bullet points
+  const renderDescription = (text: string) => {
+    // Split the text by newlines
+    const lines = text.split('\n');
+    
+    return (
+      <>
+        {lines.map((line, index) => {
+          // Check if line starts with "- " or "* " for bullet points
+          if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+            return (
+              <div key={index} className="flex items-start mb-1">
+                <div className="text-portfolio-blue mr-2">•</div>
+                <div>{line.trim().substring(2)}</div>
+              </div>
+            );
+          }
+          // Return regular paragraph for non-bullet lines
+          return line.trim() ? <p key={index} className="mb-1">{line}</p> : <br key={index} />;
+        })}
+      </>
+    );
+  };
+  
   // Read-only mode (view mode)
   if (!isEditingMode) {
     return (
       <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
         <h2 className="font-bold text-xl mb-3">{localProject.title}</h2>
-        <p className="text-portfolio-muted mb-4 text-sm">{localProject.description}</p>
+        <div className="text-portfolio-muted mb-4 text-sm">
+          {renderDescription(localProject.description)}
+        </div>
         
         <div className="links flex flex-wrap gap-2">
           {localProject.links.map((link) => (
@@ -149,9 +175,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
         onChange={(value) => updateField("description", value)}
         tag="p"
         className="text-portfolio-muted mb-4 text-sm"
-        placeholder="Project Description"
+        placeholder="Project Description (Use '- ' or '* ' at the start of a line for bullet points)"
         multiline
       />
+      
+      {isEditing && (
+        <div className="text-xs text-gray-500 mb-3 italic">
+          Tip: Use "- " or "* " at the start of a line to create bullet points
+        </div>
+      )}
       
       <div className="links">
         {localProject.links.map((link) => (
