@@ -58,7 +58,7 @@ export const usePortfolioData = () => {
           photo: profileData.photo || "",
           email: profileData.email || user.email || "",
           telephone: profileData.telephone || "",
-          role: profileData.role || "", // Safely access role property
+          role: profileData.role || "", // Now the role property exists in the database
           tagline: profileData.tagline || ""
         });
       } else {
@@ -68,7 +68,8 @@ export const usePortfolioData = () => {
           .from('profiles')
           .insert({
             id: user.id,
-            email: user.email
+            email: user.email,
+            role: "" // Add default empty role
           });
           
         if (insertError) {

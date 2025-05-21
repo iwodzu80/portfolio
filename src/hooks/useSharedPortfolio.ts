@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SectionData, ProjectData } from "@/utils/localStorage";
@@ -95,7 +94,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             photo: profileData.photo || "", // URLs handled separately
             email: sanitizeText(profileData.email || ""),
             telephone: sanitizeText(profileData.telephone || ""),
-            role: sanitizeText(profileData.role || ""), // Safely access role property
+            role: sanitizeText(profileData.role || ""), // Now the role property exists in the database
             tagline: sanitizeText(profileData.tagline || "")
           };
           
