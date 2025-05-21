@@ -62,9 +62,47 @@ export const useSectionData = (userId: string | undefined) => {
     }
   };
 
+  const moveSection = async (sectionId: string, direction: 'up' | 'down') => {
+    if (sections.length <= 1) return;
+    
+    // Find the current index of the section
+    const currentIndex = sections.findIndex(section => section.id === sectionId);
+    if (currentIndex === -1) return;
+    
+    // Calculate the new index based on direction
+    const newIndex = direction === 'up' 
+      ? Math.max(0, currentIndex - 1) 
+      : Math.min(sections.length - 1, currentIndex + 1);
+    
+    // If the section is already at the top/bottom, do nothing
+    if (newIndex === currentIndex) return;
+    
+    // Create a new array with the updated order
+    const newSections = [...sections];
+    const [movedSection] = newSections.splice(currentIndex, 1);
+    newSections.splice(newIndex, 0, movedSection);
+    
+    // Update state immediately for responsive UI
+    setSections(newSections);
+    
+    try {
+      // For now we're just reordering in memory
+      // In a future implementation, we could add a position column to the sections table
+      // and update it for affected sections in the database
+      console.log(`Section ${sectionId} moved ${direction} from index ${currentIndex} to ${newIndex}`);
+      return true;
+    } catch (error) {
+      console.error("Error moving section:", error);
+      // Revert the state change on error
+      setSections(sections);
+      return false;
+    }
+  };
+
   return {
     sections,
     setSections,
-    fetchSections
+    fetchSections,
+    moveSection
   };
 };

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import ProjectList from "./ProjectList";
 import { SectionData } from "../utils/localStorage";
 import EditableField from "./EditableField";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -128,6 +128,27 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
       toast.error("Failed to add section");
     }
   };
+
+  const handleMoveSection = async (sectionId: string, direction: 'up' | 'down') => {
+    const currentIndex = safeSections.findIndex(section => section.id === sectionId);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === 'up' 
+      ? Math.max(0, currentIndex - 1) 
+      : Math.min(safeSections.length - 1, currentIndex + 1);
+
+    // If section is already at the top/bottom, do nothing
+    if (newIndex === currentIndex) {
+      return;
+    }
+
+    const newSections = [...safeSections];
+    const [movedSection] = newSections.splice(currentIndex, 1);
+    newSections.splice(newIndex, 0, movedSection);
+
+    setLocalSections(newSections);
+    toast.success(`Section moved ${direction}`);
+  };
   
   return (
     <div className="pb-20">
@@ -146,13 +167,31 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
                   />
                   
                   {isEditingSections && (
-                    <button
-                      onClick={() => handleDeleteSection(section.id)}
-                      className="text-portfolio-muted hover:text-red-500 transition-colors"
-                      aria-label="Delete section"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleMoveSection(section.id, 'up')}
+                        className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                        aria-label="Move section up"
+                        disabled={index === 0}
+                      >
+                        <ArrowUp size={18} className={index === 0 ? "opacity-30" : ""} />
+                      </button>
+                      <button
+                        onClick={() => handleMoveSection(section.id, 'down')}
+                        className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                        aria-label="Move section down"
+                        disabled={index === safeSections.length - 1}
+                      >
+                        <ArrowDown size={18} className={index === safeSections.length - 1 ? "opacity-30" : ""} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSection(section.id)}
+                        className="text-portfolio-muted hover:text-red-500 transition-colors"
+                        aria-label="Delete section"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </>
                   )}
                 </>
               ) : (
