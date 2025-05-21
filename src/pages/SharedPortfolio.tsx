@@ -96,7 +96,6 @@ const SharedPortfolio = () => {
           telephone={profileData.telephone}
           role={profileData.role}
           tagline={profileData.tagline}
-          description={profileData.description}
           onUpdate={() => {}}
           isEditingMode={false}
         />
