@@ -130,9 +130,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       
       toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
       
-      // Don't call onUpdate() here to avoid page refreshes
-      // The local state is already updated for UI responsiveness
-      
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);
@@ -164,7 +161,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         <div className="mt-6 w-full text-center">
           <h1 className="font-bold text-2xl md:text-3xl mb-2">{localState.name || "Your Name"}</h1>
           {localState.role && <p className="text-portfolio-blue text-lg mb-2">{localState.role}</p>}
-          <p className="text-portfolio-muted mb-4">{localState.tagline || "Your tagline"}</p>
+          {localState.tagline && <p className="text-portfolio-muted mb-4">{localState.tagline}</p>}
           
           <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
             {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
