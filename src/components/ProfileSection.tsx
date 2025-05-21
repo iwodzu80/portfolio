@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
@@ -138,14 +137,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);
       
-      // Revert local state on error
+      // Revert local state on error - FIX: Adding description to match state type
       setLocalState({
         name,
         photo,
         email,
         telephone,
         role,
-        tagline
+        tagline,
+        description
       });
     }
   };

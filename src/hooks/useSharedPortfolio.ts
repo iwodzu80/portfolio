@@ -4,16 +4,6 @@ import { SectionData, ProjectData, ProfileData } from "@/types/portfolio";
 import { toast } from "sonner";
 import { validateAndFormatUrl, sanitizeText } from "@/utils/securityUtils";
 
-export interface ProfileData {
-  name: string;
-  photo: string;
-  email: string;
-  telephone: string;
-  role: string;
-  tagline: string;
-  description: string;
-}
-
 export const useSharedPortfolio = (shareId: string | undefined) => {
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
