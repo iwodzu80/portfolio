@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/table";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface AnalyticsData {
   id: string;
@@ -31,50 +34,63 @@ const PortfolioAnalytics = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData[]>([]);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        setLoading(true);
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('portfolio_analytics')
+        .select('*')
+        .order('view_date', { ascending: false });
         
-        const { data, error } = await supabase
-          .from('portfolio_analytics')
-          .select('*')
-          .order('view_date', { ascending: false });
-          
-        if (error) {
-          throw error;
-        }
-        
-        if (data) {
-          setAnalytics(data);
-          
-          // Process data for chart
-          const groupedByDate = data.reduce((acc: Record<string, number>, item: AnalyticsData) => {
-            const date = new Date(item.view_date).toLocaleDateString();
-            acc[date] = (acc[date] || 0) + 1;
-            return acc;
-          }, {});
-          
-          const chartData = Object.entries(groupedByDate)
-            .map(([date, views]) => ({ date, views }))
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-          
-          setChartData(chartData);
-        }
-      } catch (error: any) {
-        console.error("Error fetching analytics:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
+      if (error) {
+        throw error;
       }
-    };
+      
+      if (data) {
+        setAnalytics(data);
+        
+        // Process data for chart
+        const groupedByDate = data.reduce((acc: Record<string, number>, item: AnalyticsData) => {
+          const date = new Date(item.view_date).toLocaleDateString();
+          acc[date] = (acc[date] || 0) + 1;
+          return acc;
+        }, {});
+        
+        const chartData = Object.entries(groupedByDate)
+          .map(([date, views]) => ({ date, views }))
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        
+        setChartData(chartData);
+      }
+    } catch (error: any) {
+      console.error("Error fetching analytics:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
+  useEffect(() => {
     fetchAnalytics();
   }, []);
 
-  if (loading) {
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchAnalytics();
+      toast.success("Analytics refreshed successfully");
+    } catch (error) {
+      console.error("Error refreshing analytics:", error);
+      toast.error("Failed to refresh analytics");
+    }
+  };
+
+  if (loading && !refreshing) {
     return (
       <div className="min-h-[400px] flex justify-center items-center">
         <LoadingSpinner />
@@ -82,7 +98,7 @@ const PortfolioAnalytics = () => {
     );
   }
 
-  if (error) {
+  if (error && !refreshing) {
     return (
       <div className="p-4 bg-red-50 text-red-800 rounded-md">
         <p>Error loading analytics: {error}</p>
@@ -93,23 +109,41 @@ const PortfolioAnalytics = () => {
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold mb-4">Portfolio View Analytics</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">Portfolio View Analytics</h2>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-1"
+          >
+            <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </Button>
+        </div>
         
         <div className="mb-8">
           <h3 className="text-lg font-medium mb-3">Views Over Time</h3>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip 
-                  formatter={(value) => [`${value} view${value !== 1 ? 's' : ''}`, 'Views']}
-                  labelFormatter={(label) => `Date: ${label}`}
-                />
-                <Bar dataKey="views" fill="#8884d8" name="Views" />
-              </BarChart>
-            </ResponsiveContainer>
+            {refreshing ? (
+              <div className="h-full flex justify-center items-center">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value) => [`${value} view${value !== 1 ? 's' : ''}`, 'Views']}
+                    labelFormatter={(label) => `Date: ${label}`}
+                  />
+                  <Bar dataKey="views" fill="#8884d8" name="Views" />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
         
@@ -126,7 +160,15 @@ const PortfolioAnalytics = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {analytics.length > 0 ? (
+              {refreshing ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-4">
+                    <div className="flex justify-center">
+                      <LoadingSpinner />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : analytics.length > 0 ? (
                 analytics.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{new Date(item.view_date).toLocaleString()}</TableCell>
