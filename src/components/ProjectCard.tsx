@@ -120,7 +120,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     return (
       <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
         <h2 className="font-bold text-xl mb-3">{localProject.title}</h2>
-        <div className="text-portfolio-muted mb-4 text-sm">
+        <div className="text-portfolio-muted mb-4 text-sm text-justify">
           {renderDescription(localProject.description)}
         </div>
         
@@ -174,7 +174,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
         value={localProject.description}
         onChange={(value) => updateField("description", value)}
         tag="p"
-        className="text-portfolio-muted mb-4 text-sm"
+        className="text-portfolio-muted mb-4 text-sm text-justify"
         placeholder="Project Description (Use '- ' or '* ' at the start of a line for bullet points)"
         multiline
       />
