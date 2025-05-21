@@ -175,7 +175,7 @@ const SectionContainer: React.FC<SectionContainerProps> = ({ sections, onUpdate,
       )}
       
       {isEditingMode && (
-        <div className="max-w-2xl mx-auto px-6 mt-8">
+        <div className="max-w-md mx-auto px-6 mt-8">
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={handleAddSection}

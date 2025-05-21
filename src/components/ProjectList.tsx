@@ -179,7 +179,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
   };
 
   return (
-    <section className="max-w-2xl mx-auto px-6">
+    <section className="max-w-md mx-auto px-6">
       {safeProjects.length > 0 ? (
         safeProjects.map((project, index) => (
           <ProjectCard
