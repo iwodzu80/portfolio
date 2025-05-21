@@ -10,7 +10,6 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
@@ -99,18 +98,18 @@ const PortfolioAnalytics = () => {
         <div className="mb-8">
           <h3 className="text-lg font-medium mb-3">Views Over Time</h3>
           <div className="h-[300px] w-full">
-            <ChartContainer 
-              config={{ views: { label: "Views" }}}
-              className="p-2"
-            >
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="views" fill="#8884d8" />
+                <Tooltip 
+                  formatter={(value) => [`${value} view${value !== 1 ? 's' : ''}`, 'Views']}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Bar dataKey="views" fill="#8884d8" name="Views" />
               </BarChart>
-            </ChartContainer>
+            </ResponsiveContainer>
           </div>
         </div>
         
