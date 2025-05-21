@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
@@ -138,7 +137,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);
       
-      // Revert local state on error - FIX: Adding description to match state type
+      // Revert local state on error
       setLocalState({
         name,
         photo,
@@ -166,7 +165,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         <div className="mt-6 w-full text-center">
           <h1 className="font-bold text-2xl md:text-3xl mb-2">{localState.name || "Your Name"}</h1>
           {localState.role && <p className="text-portfolio-blue text-lg mb-2">{localState.role}</p>}
-          {localState.tagline && <p className="text-portfolio-muted mb-4">{localState.tagline}</p>}
+          {localState.tagline && <p className="text-portfolio-muted mb-4 text-justify">{localState.tagline}</p>}
           
           <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
             {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
@@ -213,7 +212,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.tagline}
           onChange={(value) => handleProfileUpdate("tagline", value)}
           tag="p"
-          className="text-portfolio-muted mb-4"
+          className="text-portfolio-muted mb-4 text-justify"
           placeholder="Your tagline"
           multiline
         />
