@@ -11,7 +11,8 @@ export const useProfileData = (userId: string | undefined) => {
     email: "",
     telephone: "",
     role: "",
-    tagline: ""
+    tagline: "",
+    description: ""
   });
 
   const fetchProfileData = async () => {
@@ -36,7 +37,8 @@ export const useProfileData = (userId: string | undefined) => {
           email: profileData.email || "",
           telephone: profileData.telephone || "",
           role: profileData.role || "", 
-          tagline: profileData.tagline || ""
+          tagline: profileData.tagline || "",
+          description: profileData.description || ""
         };
         setProfileData(formattedProfile);
         return formattedProfile;
@@ -59,7 +61,8 @@ export const useProfileData = (userId: string | undefined) => {
         .insert({
           id: userId,
           email,
-          role: "" // Add default empty role
+          role: "", // Add default empty role
+          description: "" // Add default empty description
         });
         
       if (insertError) {
@@ -74,7 +77,8 @@ export const useProfileData = (userId: string | undefined) => {
         email: email,
         telephone: "",
         role: "",
-        tagline: ""
+        tagline: "",
+        description: ""
       };
       
       setProfileData(newProfile);

@@ -34,11 +34,12 @@ const Index = () => {
           telephone={profileData.telephone}
           role={profileData.role}
           tagline={profileData.tagline}
+          description={profileData.description}
           onUpdate={loadData}
           isEditingMode={isEditingMode}
         />
         
-        <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
+        <div className="my-6 border-t border-gray-200 max-w-xl mx-auto" />
         
         <SectionContainer
           sections={sections}

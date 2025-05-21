@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { SectionData, ProjectData } from "@/utils/localStorage";
+import { SectionData, ProjectData, ProfileData } from "@/types/portfolio";
 import { toast } from "sonner";
 import { validateAndFormatUrl, sanitizeText } from "@/utils/securityUtils";
 
@@ -11,6 +11,7 @@ export interface ProfileData {
   telephone: string;
   role: string;
   tagline: string;
+  description: string;
 }
 
 export const useSharedPortfolio = (shareId: string | undefined) => {
@@ -20,7 +21,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
     email: "",
     telephone: "",
     role: "",
-    tagline: ""
+    tagline: "",
+    description: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,8 +96,9 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             photo: profileData.photo || "", // URLs handled separately
             email: sanitizeText(profileData.email || ""),
             telephone: sanitizeText(profileData.telephone || ""),
-            role: sanitizeText(profileData.role || ""), // Now the role property exists in the database
-            tagline: sanitizeText(profileData.tagline || "")
+            role: sanitizeText(profileData.role || ""),
+            tagline: sanitizeText(profileData.tagline || ""),
+            description: sanitizeText(profileData.description || "")
           };
           
           setProfileData(sanitizedProfileData);

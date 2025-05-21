@@ -13,6 +13,7 @@ interface ProfileSectionProps {
   telephone: string;
   role: string;
   tagline: string;
+  description: string;
   onUpdate: () => void;
   isEditingMode?: boolean;
 }
@@ -24,6 +25,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   telephone,
   role,
   tagline,
+  description,
   onUpdate,
   isEditingMode = true
 }) => {
@@ -34,7 +36,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     email,
     telephone,
     role,
-    tagline
+    tagline,
+    description
   });
   
   // Update local state when props change (e.g., on initial load)
@@ -45,9 +48,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       email,
       telephone,
       role,
-      tagline
+      tagline,
+      description
     });
-  }, [name, photo, email, telephone, role, tagline]);
+  }, [name, photo, email, telephone, role, tagline, description]);
   
   // Set document title when name changes
   useEffect(() => {
@@ -163,11 +167,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           {localState.role && <p className="text-portfolio-blue text-lg mb-2">{localState.role}</p>}
           {localState.tagline && <p className="text-portfolio-muted mb-4">{localState.tagline}</p>}
           
-          <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
+          <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
             {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
             {localState.email && localState.telephone && <span className="mx-1">•</span>}
             {localState.telephone && <span>{localState.telephone}</span>}
           </div>
+          
+          {localState.description && (
+            <p className="text-portfolio-muted mt-4 max-w-prose mx-auto">{localState.description}</p>
+          )}
         </div>
       </section>
     );
@@ -209,7 +217,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           multiline
         />
         
-        <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted">
+        <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
           <EditableField
             value={localState.email}
             onChange={(value) => handleProfileUpdate("email", value)}
@@ -225,6 +233,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             placeholder="Telephone"
           />
         </div>
+        
+        <EditableField
+          value={localState.description}
+          onChange={(value) => handleProfileUpdate("description", value)}
+          tag="p"
+          className="text-portfolio-muted mt-4 max-w-prose mx-auto"
+          placeholder="Add a brief description about yourself..."
+          multiline
+        />
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProfileSection from "@/components/ProfileSection";
@@ -96,11 +97,12 @@ const SharedPortfolio = () => {
           telephone={profileData.telephone}
           role={profileData.role}
           tagline={profileData.tagline}
+          description={profileData.description}
           onUpdate={() => {}}
           isEditingMode={false}
         />
         
-        <div className="my-6 border-t border-gray-200 max-w-md mx-auto" />
+        <div className="my-6 border-t border-gray-200 max-w-xl mx-auto" />
         
         {hasValidSections ? (
           <SectionContainer
