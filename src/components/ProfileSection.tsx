@@ -154,7 +154,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Read-only mode
   if (!isEditingMode) {
     return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
         {localState.photo && (
           <img
             src={localState.photo}
@@ -175,7 +175,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           </div>
           
           {localState.description && (
-            <p className="text-portfolio-muted mt-2 mb-2 max-w-prose mx-auto text-justify">{localState.description}</p>
+            <p className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify">{localState.description}</p>
           )}
         </div>
       </section>
@@ -184,7 +184,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   // Edit mode
   return (
-    <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+    <section className="flex flex-col items-center max-w-xl mx-auto mb-8 p-6">
       <EditableImage
         src={localState.photo}
         alt={localState.name}
@@ -239,7 +239,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.description}
           onChange={(value) => handleProfileUpdate("description", value)}
           tag="p"
-          className="text-portfolio-muted mt-2 mb-2 max-w-prose mx-auto text-justify"
+          className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify"
           placeholder="Add a brief description about yourself..."
           multiline
         />
