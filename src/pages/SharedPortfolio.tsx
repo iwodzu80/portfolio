@@ -11,13 +11,6 @@ import { Toaster } from "sonner";
 import { sanitizeText } from "@/utils/securityUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-// Define the type for the RPC function parameters with correct type mapping
-interface RecordPortfolioViewParams {
-  p_share_id: string;
-  p_referrer?: string;
-  p_user_agent?: string;
-}
-
 const SharedPortfolio = () => {
   const { shareId } = useParams();
   const { profileData, sections, isLoading, notFound, ownerName } = useSharedPortfolio(shareId);
@@ -26,42 +19,33 @@ const SharedPortfolio = () => {
     // Sanitize any data from URL params for extra security
     const sanitizedShareId = shareId ? sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, '')) : null;
     
-    console.log("SharedPortfolio component with shareId:", sanitizedShareId);
-    
-    // Set a security-focused CSP header for this page
-    // Note: This won't work in React directly - just educational
-    // You should configure this at the server level
+    // Set page title
     document.title = sanitizedShareId 
       ? `Shared Portfolio: ${sanitizeText(ownerName)}`
       : "Shared Portfolio";
     
-    // Record analytics for this portfolio view
+    // Record analytics for this portfolio view in the background
     const recordAnalytics = async () => {
-      if (sanitizedShareId) {
-        try {
-          // Record the view using a direct RPC call with proper typing
-          const params: RecordPortfolioViewParams = {
+      if (!sanitizedShareId || sanitizedShareId.length < 8 || /[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
+        return;
+      }
+      
+      try {
+        // Use a separate, non-blocking call to record the view
+        setTimeout(async () => {
+          await supabase.rpc('record_portfolio_view', {
             p_share_id: sanitizedShareId,
             p_referrer: document.referrer || 'direct',
             p_user_agent: navigator.userAgent
-          };
-          
-          // Fix the type issue by properly typing the RPC call
-          await supabase.rpc('record_portfolio_view', params);
-            
-          console.log("Portfolio view recorded successfully");
-        } catch (error) {
-          console.error("Failed to record portfolio view:", error);
-          // Don't show error to user - analytics should be silent
-        }
+          });
+        }, 0);
+      } catch (error) {
+        // Silent fail - analytics shouldn't block the main functionality
+        console.error("Failed to record portfolio view:", error);
       }
     };
     
-    // Only record analytics if we have a valid shareId
-    if (sanitizedShareId && sanitizedShareId.length >= 8 && !/[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
-      recordAnalytics();
-    }
-    
+    recordAnalytics();
   }, [shareId, ownerName]);
 
   // Security check - if shareId is clearly invalid, show not found
