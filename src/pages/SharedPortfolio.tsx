@@ -32,14 +32,20 @@ const SharedPortfolio = () => {
       // Use non-blocking approach for analytics
       setTimeout(() => {
         // Record view completely in the background without affecting UI
-        supabase.rpc('record_portfolio_view', {
-          p_share_id: sanitizedShareId,
-          p_referrer: document.referrer || 'direct',
-          p_user_agent: navigator.userAgent
-        }).catch(err => {
-          // Silent fail for analytics - log but don't impact user experience
-          console.error("Analytics error:", err);
-        });
+        const recordView = async () => {
+          try {
+            await supabase.rpc('record_portfolio_view', {
+              p_share_id: sanitizedShareId,
+              p_referrer: document.referrer || 'direct',
+              p_user_agent: navigator.userAgent
+            });
+          } catch (err) {
+            // Silent fail for analytics - log but don't impact user experience
+            console.error("Analytics error:", err);
+          }
+        };
+        
+        recordView();
       }, 100); // Small delay to prioritize UI rendering
     }
   }, [shareId, ownerName]);
