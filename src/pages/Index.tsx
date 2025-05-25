@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import ProfileSection from "@/components/ProfileSection";
 import SectionContainer from "@/components/SectionContainer";
-import { Toaster } from "sonner";
 import PortfolioHeader from "@/components/PortfolioHeader";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -17,8 +16,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
-      <Toaster position="top-center" />
-      
       <div className="container mx-auto pt-10">
         <div className="px-4">
           <PortfolioHeader 
