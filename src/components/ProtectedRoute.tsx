@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, Outlet } from "react-router-dom";
 import { Loader2, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 const ProtectedRoute = () => {
   const { user, isLoading } = useAuth();
   const [resendingEmail, setResendingEmail] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleResendConfirmationEmail = async () => {
     try {
@@ -30,10 +31,33 @@ const ProtectedRoute = () => {
     }
   };
 
+  const handleRefreshVerification = async () => {
+    try {
+      setRefreshing(true);
+      const { data, error } = await supabase.auth.getUser();
+      
+      if (error) throw error;
+      
+      if (data.user?.email_confirmed_at) {
+        toast.success("Email verified! Redirecting...");
+        window.location.reload();
+      } else {
+        toast.info("Email not yet verified. Please check your inbox.");
+      }
+    } catch (error: any) {
+      toast.error("Failed to check verification status");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -67,20 +91,23 @@ const ProtectedRoute = () => {
             </p>
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
-            <Button 
+            <LoadingButton 
               onClick={handleResendConfirmationEmail}
-              disabled={resendingEmail}
+              loading={resendingEmail}
+              loadingText="Sending..."
               className="w-full"
             >
-              {resendingEmail ? "Sending..." : "Resend Verification Email"}
-            </Button>
-            <Button 
+              Resend Verification Email
+            </LoadingButton>
+            <LoadingButton 
               variant="outline" 
               className="w-full"
-              onClick={() => window.location.reload()}
+              onClick={handleRefreshVerification}
+              loading={refreshing}
+              loadingText="Checking..."
             >
               I've Verified My Email
-            </Button>
+            </LoadingButton>
           </CardFooter>
         </Card>
       </div>

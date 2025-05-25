@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -13,11 +13,12 @@ const Auth = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [signUpLoading, setSignUpLoading] = useState(false);
+  const [signInLoading, setSignInLoading] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSignUpLoading(true);
     try {
       const { error } = await supabase.auth.signUp({ 
         email, 
@@ -33,13 +34,13 @@ const Auth = () => {
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign-up");
     } finally {
-      setLoading(false);
+      setSignUpLoading(false);
     }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSignInLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
@@ -50,7 +51,7 @@ const Auth = () => {
     } catch (error: any) {
       toast.error(error.message || "Invalid login credentials");
     } finally {
-      setLoading(false);
+      setSignInLoading(false);
     }
   };
 
@@ -64,8 +65,12 @@ const Auth = () => {
 
         <Tabs defaultValue="sign-in" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in">Sign In</TabsTrigger>
-            <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
+            <TabsTrigger value="sign-in" disabled={signInLoading || signUpLoading}>
+              Sign In
+            </TabsTrigger>
+            <TabsTrigger value="sign-up" disabled={signInLoading || signUpLoading}>
+              Sign Up
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="sign-in">
@@ -79,6 +84,7 @@ const Auth = () => {
                     placeholder="your@email.com" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={signInLoading}
                     required
                   />
                 </div>
@@ -89,18 +95,20 @@ const Auth = () => {
                     type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={signInLoading}
                     required
                   />
                 </div>
               </CardContent>
               <CardFooter>
-                <Button 
+                <LoadingButton 
                   type="submit" 
                   className="w-full" 
-                  disabled={loading}
+                  loading={signInLoading}
+                  loadingText="Signing in..."
                 >
-                  {loading ? "Signing in..." : "Sign In"}
-                </Button>
+                  Sign In
+                </LoadingButton>
               </CardFooter>
             </form>
           </TabsContent>
@@ -116,6 +124,7 @@ const Auth = () => {
                     placeholder="your@email.com" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={signUpLoading}
                     required
                   />
                 </div>
@@ -127,18 +136,20 @@ const Auth = () => {
                     placeholder="Min 6 characters" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={signUpLoading}
                     required
                   />
                 </div>
               </CardContent>
               <CardFooter>
-                <Button 
+                <LoadingButton 
                   type="submit" 
                   className="w-full" 
-                  disabled={loading}
+                  loading={signUpLoading}
+                  loadingText="Creating Account..."
                 >
-                  {loading ? "Creating Account..." : "Create Account"}
-                </Button>
+                  Create Account
+                </LoadingButton>
               </CardFooter>
             </form>
           </TabsContent>
