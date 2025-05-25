@@ -16,6 +16,17 @@ const SharedPortfolio = () => {
   const analyticsRecorded = useRef(false);
 
   useEffect(() => {
+    // Add meta robots tag to prevent indexing
+    const existingRobotsTag = document.querySelector('meta[name="robots"]');
+    if (existingRobotsTag) {
+      existingRobotsTag.remove();
+    }
+    
+    const robotsTag = document.createElement('meta');
+    robotsTag.name = 'robots';
+    robotsTag.content = 'noindex, nofollow, noarchive, nosnippet';
+    document.head.appendChild(robotsTag);
+
     const sanitizedShareId = shareId ? sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, '')) : null;
     
     document.title = sanitizedShareId 
@@ -41,6 +52,14 @@ const SharedPortfolio = () => {
         recordView();
       }, 100);
     }
+
+    // Cleanup function to remove the meta tag when component unmounts
+    return () => {
+      const robotsTagToRemove = document.querySelector('meta[name="robots"][content="noindex, nofollow, noarchive, nosnippet"]');
+      if (robotsTagToRemove) {
+        robotsTagToRemove.remove();
+      }
+    };
   }, [shareId, ownerName]);
 
   if (!shareId || shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {

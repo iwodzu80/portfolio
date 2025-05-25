@@ -1,14 +1,17 @@
+
 User-agent: Googlebot
-Allow: /
+Disallow: /shared/
 
 User-agent: Bingbot
-Allow: /
+Disallow: /shared/
 
 User-agent: Twitterbot
-Allow: /
+Disallow: /shared/
 
 User-agent: facebookexternalhit
-Allow: /
+Disallow: /shared/
 
 User-agent: *
+Disallow: /shared/
+
 Allow: /

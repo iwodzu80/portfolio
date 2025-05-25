@@ -1,9 +1,30 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FileX, ArrowLeft } from "lucide-react";
 
 const SharedPortfolioNotFound = () => {
+  useEffect(() => {
+    // Add meta robots tag to prevent indexing
+    const existingRobotsTag = document.querySelector('meta[name="robots"]');
+    if (existingRobotsTag) {
+      existingRobotsTag.remove();
+    }
+    
+    const robotsTag = document.createElement('meta');
+    robotsTag.name = 'robots';
+    robotsTag.content = 'noindex, nofollow, noarchive, nosnippet';
+    document.head.appendChild(robotsTag);
+
+    // Cleanup function to remove the meta tag when component unmounts
+    return () => {
+      const robotsTagToRemove = document.querySelector('meta[name="robots"][content="noindex, nofollow, noarchive, nosnippet"]');
+      if (robotsTagToRemove) {
+        robotsTagToRemove.remove();
+      }
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
       <div className="bg-red-50 p-4 rounded-full mb-4">
