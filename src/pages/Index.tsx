@@ -5,9 +5,18 @@ import PortfolioHeader from "@/components/PortfolioHeader";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-// Lazy load heavy components
-const ProfileSection = lazy(() => import("@/components/ProfileSection"));
-const SectionContainer = lazy(() => import("@/components/SectionContainer"));
+// Lazy load heavy components with better error handling
+const ProfileSection = lazy(() => 
+  import("@/components/ProfileSection").then(module => ({
+    default: module.default
+  }))
+);
+
+const SectionContainer = lazy(() => 
+  import("@/components/SectionContainer").then(module => ({
+    default: module.default
+  }))
+);
 
 const ProfileSkeleton = () => (
   <div className="max-w-xl mx-auto px-6 py-8">
@@ -30,6 +39,23 @@ const SectionSkeleton = () => (
   </div>
 );
 
+// Error boundary for lazy loaded components
+const LazyComponentErrorBoundary = ({ children, fallback }: { children: React.ReactNode, fallback: React.ReactNode }) => {
+  const [hasError, setHasError] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleError = () => setHasError(true);
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  if (hasError) {
+    return <>{fallback}</>;
+  }
+
+  return <>{children}</>;
+};
+
 const Index = React.memo(() => {
   const [isEditingMode, setIsEditingMode] = useState(false);
   const { profileData, sections, isLoading, loadData } = usePortfolioData();
@@ -48,29 +74,33 @@ const Index = React.memo(() => {
           />
         </div>
 
-        <Suspense fallback={<ProfileSkeleton />}>
-          <ProfileSection
-            name={profileData.name}
-            photo={profileData.photo}
-            email={profileData.email}
-            telephone={profileData.telephone}
-            role={profileData.role}
-            tagline={profileData.tagline}
-            description={profileData.description}
-            onUpdate={loadData}
-            isEditingMode={isEditingMode}
-          />
-        </Suspense>
+        <LazyComponentErrorBoundary fallback={<ProfileSkeleton />}>
+          <Suspense fallback={<ProfileSkeleton />}>
+            <ProfileSection
+              name={profileData.name}
+              photo={profileData.photo}
+              email={profileData.email}
+              telephone={profileData.telephone}
+              role={profileData.role}
+              tagline={profileData.tagline}
+              description={profileData.description}
+              onUpdate={loadData}
+              isEditingMode={isEditingMode}
+            />
+          </Suspense>
+        </LazyComponentErrorBoundary>
         
         <div className="my-4 border-t border-gray-200 max-w-xl mx-auto" />
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <SectionContainer
-            sections={sections}
-            onUpdate={loadData}
-            isEditingMode={isEditingMode}
-          />
-        </Suspense>
+        <LazyComponentErrorBoundary fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <SectionContainer
+              sections={sections}
+              onUpdate={loadData}
+              isEditingMode={isEditingMode}
+            />
+          </Suspense>
+        </LazyComponentErrorBoundary>
       </div>
     </div>
   );
