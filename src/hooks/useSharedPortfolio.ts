@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SectionData, ProjectData, ProfileData } from "@/types/portfolio";
@@ -13,7 +12,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
     telephone: "",
     role: "",
     tagline: "",
-    description: ""
+    description: "",
+    location: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +61,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           // Query 1: Fetch profile with minimal fields needed for display
           supabase
             .from('profiles')
-            .select('name, photo, email, telephone, role, tagline, description')
+            .select('name, photo, email, telephone, role, tagline, description, location')
             .eq('id', userId)
             .single(),
             
@@ -99,7 +99,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             telephone: sanitizeText(data.telephone || ""),
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
-            description: sanitizeText(data.description || "")
+            description: sanitizeText(data.description || ""),
+            location: sanitizeText(data.location || "")
           };
           
           setProfileData(sanitizedProfileData);
