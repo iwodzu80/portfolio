@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useCallback } from "react";
 import ProjectList from "./ProjectList";
 import EditableField from "./EditableField";
 import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
@@ -17,7 +17,7 @@ interface SectionItemProps {
   onMoveSection: (sectionId: string, direction: 'up' | 'down') => void;
 }
 
-const SectionItem: React.FC<SectionItemProps> = ({
+const SectionItem: React.FC<SectionItemProps> = React.memo(({
   section,
   index,
   totalSections,
@@ -28,6 +28,22 @@ const SectionItem: React.FC<SectionItemProps> = ({
   onDeleteSection,
   onMoveSection
 }) => {
+  const handleUpdateSection = useCallback((value: string) => {
+    onUpdateSection(section.id, value);
+  }, [section.id, onUpdateSection]);
+
+  const handleMoveUp = useCallback(() => {
+    onMoveSection(section.id, 'up');
+  }, [section.id, onMoveSection]);
+
+  const handleMoveDown = useCallback(() => {
+    onMoveSection(section.id, 'down');
+  }, [section.id, onMoveSection]);
+
+  const handleDelete = useCallback(() => {
+    onDeleteSection(section.id);
+  }, [section.id, onDeleteSection]);
+
   return (
     <div className="mb-12">
       <div className="flex items-center justify-center gap-2 mb-4">
@@ -35,7 +51,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
           <>
             <EditableField
               value={section.title}
-              onChange={(value) => onUpdateSection(section.id, value)}
+              onChange={handleUpdateSection}
               tag="h2"
               className="text-xl font-semibold text-center"
               placeholder="Section Title"
@@ -44,7 +60,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
             {isEditingSections && (
               <>
                 <button
-                  onClick={() => onMoveSection(section.id, 'up')}
+                  onClick={handleMoveUp}
                   className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
                   aria-label="Move section up"
                   disabled={index === 0}
@@ -52,7 +68,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
                   <ArrowUp size={18} className={index === 0 ? "opacity-30" : ""} />
                 </button>
                 <button
-                  onClick={() => onMoveSection(section.id, 'down')}
+                  onClick={handleMoveDown}
                   className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
                   aria-label="Move section down"
                   disabled={index === totalSections - 1}
@@ -60,7 +76,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
                   <ArrowDown size={18} className={index === totalSections - 1 ? "opacity-30" : ""} />
                 </button>
                 <button
-                  onClick={() => onDeleteSection(section.id)}
+                  onClick={handleDelete}
                   className="text-portfolio-muted hover:text-red-500 transition-colors"
                   aria-label="Delete section"
                 >
@@ -82,6 +98,8 @@ const SectionItem: React.FC<SectionItemProps> = ({
       />
     </div>
   );
-};
+});
+
+SectionItem.displayName = "SectionItem";
 
 export default SectionItem;

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import ProjectListView from "./ProjectListView";
 import AddProjectButton from "./AddProjectButton";
 import { ProjectData } from "../utils/localStorage";
@@ -12,7 +12,7 @@ interface ProjectListProps {
   isEditingMode?: boolean;
 }
 
-const ProjectList: React.FC<ProjectListProps> = ({ 
+const ProjectList: React.FC<ProjectListProps> = React.memo(({ 
   sectionId, 
   projects, 
   onUpdate,
@@ -25,11 +25,13 @@ const ProjectList: React.FC<ProjectListProps> = ({
     handleAddProject
   } = useProjectOperations(sectionId, projects);
 
+  const memoizedProjects = useMemo(() => safeProjects, [safeProjects]);
+
   return (
     <section className="max-w-xl mx-auto px-6">
       <ProjectListView
         sectionId={sectionId}
-        projects={safeProjects}
+        projects={memoizedProjects}
         onUpdate={handleUpdateProject}
         onDelete={handleDeleteProject}
         isEditingMode={isEditingMode}
@@ -42,6 +44,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
       )}
     </section>
   );
-};
+});
+
+ProjectList.displayName = "ProjectList";
 
 export default ProjectList;

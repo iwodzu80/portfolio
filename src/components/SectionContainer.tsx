@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { SectionData } from "../utils/localStorage";
 import SectionItem from "./SectionItem";
 import SectionControls from "./SectionControls";
@@ -11,7 +11,7 @@ interface SectionContainerProps {
   isEditingMode?: boolean;
 }
 
-const SectionContainer: React.FC<SectionContainerProps> = ({ 
+const SectionContainer: React.FC<SectionContainerProps> = React.memo(({ 
   sections, 
   onUpdate, 
   isEditingMode = true 
@@ -38,7 +38,14 @@ const SectionContainer: React.FC<SectionContainerProps> = ({
     }
   }, [sections]);
   
-  const safeSections = Array.isArray(localSections) ? localSections : [];
+  const safeSections = useMemo(() => 
+    Array.isArray(localSections) ? localSections : [], 
+    [localSections]
+  );
+  
+  const toggleEditSections = useCallback(() => {
+    setIsEditingSections(prev => !prev);
+  }, []);
   
   console.log("SectionContainer rendering with safeSections:", safeSections.length);
   if (safeSections.length > 0) {
@@ -73,12 +80,14 @@ const SectionContainer: React.FC<SectionContainerProps> = ({
       {isEditingMode && (
         <SectionControls
           isEditingSections={isEditingSections}
-          onToggleEditSections={() => setIsEditingSections(!isEditingSections)}
+          onToggleEditSections={toggleEditSections}
           onAddSection={handleAddSection}
         />
       )}
     </div>
   );
-};
+});
+
+SectionContainer.displayName = "SectionContainer";
 
 export default SectionContainer;
