@@ -15,11 +15,17 @@ export interface LinkData {
   url: string;
 }
 
+export interface FeatureData {
+  id: string;
+  title: string;
+}
+
 export interface ProjectData {
   id: string;
   title: string;
   description: string;
   links: LinkData[];
+  features: FeatureData[];
 }
 
 export interface SectionData {
@@ -54,6 +60,10 @@ const defaultData: PortfolioData = {
           links: [
             { id: "1-1", title: "GitHub", url: "https://github.com" },
             { id: "1-2", title: "Live Site", url: "https://example.com" }
+          ],
+          features: [
+            { id: "1-f1", title: "React" },
+            { id: "1-f2", title: "TailwindCSS" }
           ]
         },
         {
@@ -63,6 +73,10 @@ const defaultData: PortfolioData = {
           links: [
             { id: "2-1", title: "GitHub", url: "https://github.com" },
             { id: "2-2", title: "Demo", url: "https://example.com/demo" }
+          ],
+          features: [
+            { id: "2-f1", title: "Node.js" },
+            { id: "2-f2", title: "MongoDB" }
           ]
         }
       ]
@@ -78,6 +92,7 @@ const sanitizeData = (data: PortfolioData): PortfolioData => {
     ...section,
     projects: section.projects.map(project => ({
       ...project,
+      features: project.features || [], // Ensure features array exists
       links: project.links.map(link => ({
         ...link,
         url: validateAndFormatUrl(link.url)

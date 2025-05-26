@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Plus, Pencil, ExternalLink } from "lucide-react";
 import EditableField from "./EditableField";
-import { LinkData, ProjectData } from "../utils/localStorage";
+import { LinkData, ProjectData, FeatureData } from "../utils/localStorage";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { validateAndFormatUrl } from "@/utils/securityUtils";
@@ -17,15 +17,20 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, isEditingMode = true }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [confirmLastLinkDelete, setConfirmLastLinkDelete] = useState(false);
-  const [localProject, setLocalProject] = useState<ProjectData>(project);
+  const [localProject, setLocalProject] = useState<ProjectData>({
+    ...project,
+    features: project.features || []
+  });
   
   // Update local state when props change
   useEffect(() => {
-    setLocalProject(project);
+    setLocalProject({
+      ...project,
+      features: project.features || []
+    });
   }, [project]);
   
-  const updateField = (field: keyof ProjectData, value: string | LinkData[]) => {
+  const updateField = (field: keyof ProjectData, value: string | LinkData[] | FeatureData[]) => {
     const updatedProject = { ...localProject, [field]: value };
     setLocalProject(updatedProject);
     onUpdate(updatedProject);
@@ -33,7 +38,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   
   const addLink = () => {
     const newLink: LinkData = {
-      id: `${localProject.id}-${Date.now()}`,
+      id: `${localProject.id}-link-${Date.now()}`,
       title: "New Link",
       url: "https://"
     };
@@ -42,6 +47,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     setLocalProject(prev => ({ ...prev, links: updatedLinks }));
     updateField("links", updatedLinks);
     toast.success("Link added");
+  };
+
+  const addFeature = () => {
+    const newFeature: FeatureData = {
+      id: `${localProject.id}-feature-${Date.now()}`,
+      title: "New Feature"
+    };
+    
+    const updatedFeatures = [...localProject.features, newFeature];
+    setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
+    updateField("features", updatedFeatures);
+    toast.success("Feature added");
   };
   
   const updateLink = (linkId: string, field: keyof LinkData, value: string) => {
@@ -56,29 +73,27 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     setLocalProject(prev => ({ ...prev, links: updatedLinks }));
     updateField("links", updatedLinks);
   };
+
+  const updateFeature = (featureId: string, field: keyof FeatureData, value: string) => {
+    const updatedFeatures = localProject.features.map(feature => 
+      feature.id === featureId ? { ...feature, [field]: value } : feature
+    );
+    setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
+    updateField("features", updatedFeatures);
+  };
   
   const deleteLink = (linkId: string) => {
-    if (localProject.links.length <= 1) {
-      // Instead of preventing deletion, ask for confirmation
-      if (confirmLastLinkDelete) {
-        const updatedLinks = localProject.links.filter(link => link.id !== linkId);
-        setLocalProject(prev => ({ ...prev, links: updatedLinks }));
-        updateField("links", updatedLinks);
-        toast.success("Link removed");
-        setConfirmLastLinkDelete(false);
-      } else {
-        setConfirmLastLinkDelete(true);
-        // Reset confirmation after 3 seconds
-        setTimeout(() => setConfirmLastLinkDelete(false), 3000);
-        toast.warning("Click again to remove last link");
-      }
-      return;
-    }
-    
     const updatedLinks = localProject.links.filter(link => link.id !== linkId);
     setLocalProject(prev => ({ ...prev, links: updatedLinks }));
     updateField("links", updatedLinks);
     toast.success("Link removed");
+  };
+
+  const deleteFeature = (featureId: string) => {
+    const updatedFeatures = localProject.features.filter(feature => feature.id !== featureId);
+    setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
+    updateField("features", updatedFeatures);
+    toast.success("Feature removed");
   };
 
   const handleDeleteProject = () => {
@@ -124,20 +139,37 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
           {renderDescription(localProject.description)}
         </div>
         
-        <div className="links flex flex-wrap gap-2">
-          {localProject.links.map((link) => (
-            <a
-              key={link.id}
-              href={validateAndFormatUrl(link.url)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors inline-flex items-center gap-1"
-            >
-              {link.title}
-              <ExternalLink size={14} />
-            </a>
-          ))}
-        </div>
+        {/* Features */}
+        {localProject.features.length > 0 && (
+          <div className="features flex flex-wrap gap-2 mb-4">
+            {localProject.features.map((feature) => (
+              <span
+                key={feature.id}
+                className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border"
+              >
+                {feature.title}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Links */}
+        {localProject.links.length > 0 && (
+          <div className="links flex flex-wrap gap-2">
+            {localProject.links.map((link) => (
+              <a
+                key={link.id}
+                href={validateAndFormatUrl(link.url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors inline-flex items-center gap-1"
+              >
+                {link.title}
+                <ExternalLink size={14} />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
@@ -185,6 +217,50 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
         </div>
       )}
       
+      {/* Features Section */}
+      <div className="features mb-4">
+        <div className="flex flex-wrap gap-2 mb-2">
+          {localProject.features.map((feature) => (
+            <div 
+              key={feature.id} 
+              className="flex items-center gap-1"
+            >
+              {isEditing ? (
+                <>
+                  <EditableField
+                    value={feature.title}
+                    onChange={(value) => updateFeature(feature.id, "title", value)}
+                    tag="span"
+                    className="text-sm bg-gray-100 text-gray-700 py-1 px-3 rounded-full border"
+                    placeholder="Feature name"
+                  />
+                  <button
+                    onClick={() => deleteFeature(feature.id)}
+                    className="text-red-500 hover:text-red-700 transition-colors ml-1"
+                  >
+                    <X size={12} />
+                  </button>
+                </>
+              ) : (
+                <span className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border">
+                  {feature.title}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {isEditing && (
+          <button
+            onClick={addFeature}
+            className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
+          >
+            <Plus size={14} className="mr-1" /> Add Feature
+          </button>
+        )}
+      </div>
+
+      {/* Links Section */}
       <div className="links">
         {localProject.links.map((link) => (
           <div 
@@ -210,9 +286,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
                 />
                 <button
                   onClick={() => deleteLink(link.id)}
-                  className={`transition-colors ${
-                    confirmLastLinkDelete && localProject.links.length <= 1 ? 'text-red-500' : 'text-portfolio-muted hover:text-red-500'
-                  }`}
+                  className="text-portfolio-muted hover:text-red-500 transition-colors"
                 >
                   <X size={14} />
                 </button>

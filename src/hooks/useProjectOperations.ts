@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ProjectData } from "../utils/localStorage";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,7 +15,12 @@ export const useProjectOperations = (
     console.log(`Number of projects in section ${sectionId}:`, initialProjects?.length || 0);
     
     if (Array.isArray(initialProjects)) {
-      setLocalProjects(initialProjects);
+      // Ensure features array exists on all projects
+      const projectsWithFeatures = initialProjects.map(project => ({
+        ...project,
+        features: project.features || []
+      }));
+      setLocalProjects(projectsWithFeatures);
     } else {
       console.error(`Projects prop for section ${sectionId} is not an array:`, initialProjects);
       setLocalProjects([]);
@@ -145,7 +149,8 @@ export const useProjectOperations = (
         links: newProject.links.map((link, idx) => ({
           ...link,
           id: `${projectData.id}-link-${idx}`  // Temporary ID until we fetch from Supabase
-        }))
+        })),
+        features: newProject.features || []
       };
       
       // Update local state immediately without calling onUpdate
