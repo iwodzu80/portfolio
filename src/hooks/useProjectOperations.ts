@@ -72,6 +72,32 @@ export const useProjectOperations = (
         }
       }
       
+      // Delete existing features for this project
+      const { error: deleteFeaturesError } = await supabase
+        .from('features')
+        .delete()
+        .eq('project_id', updatedProject.id);
+        
+      if (deleteFeaturesError) {
+        throw deleteFeaturesError;
+      }
+      
+      // Add updated features
+      if (updatedProject.features.length > 0) {
+        const featuresToInsert = updatedProject.features.map(feature => ({
+          project_id: updatedProject.id,
+          title: feature.title
+        }));
+        
+        const { error: insertFeaturesError } = await supabase
+          .from('features')
+          .insert(featuresToInsert);
+          
+        if (insertFeaturesError) {
+          throw insertFeaturesError;
+        }
+      }
+      
       // Update local state immediately for responsive UI
       const updatedProjects = localProjects.map(project => 
         project.id === updatedProject.id ? updatedProject : project
@@ -87,7 +113,7 @@ export const useProjectOperations = (
 
   const handleDeleteProject = async (id: string) => {
     try {
-      // Delete project from Supabase (cascade will handle links)
+      // Delete project from Supabase (cascade will handle links and features)
       const { error } = await supabase
         .from('projects')
         .delete()
@@ -142,6 +168,22 @@ export const useProjectOperations = (
         }
       }
       
+      // Insert features for the new project
+      if (newProject.features.length > 0) {
+        const featuresToInsert = newProject.features.map(feature => ({
+          project_id: projectData.id,
+          title: feature.title
+        }));
+        
+        const { error: featuresError } = await supabase
+          .from('features')
+          .insert(featuresToInsert);
+          
+        if (featuresError) {
+          throw featuresError;
+        }
+      }
+      
       // Create new project with proper ID from Supabase
       const insertedProject: ProjectData = {
         id: projectData.id,
@@ -151,7 +193,10 @@ export const useProjectOperations = (
           ...link,
           id: `${projectData.id}-link-${idx}`  // Temporary ID until we fetch from Supabase
         })),
-        features: newProject.features || []
+        features: newProject.features.map((feature, idx) => ({
+          ...feature,
+          id: `${projectData.id}-feature-${idx}`  // Temporary ID until we fetch from Supabase
+        }))
       };
       
       // Update local state immediately without calling onUpdate

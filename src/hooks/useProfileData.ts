@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileData } from "@/types/portfolio";
-import { toast } from "sonner";
 
 export const useProfileData = (userId: string | undefined) => {
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -12,80 +11,93 @@ export const useProfileData = (userId: string | undefined) => {
     telephone: "",
     role: "",
     tagline: "",
-    description: ""
+    description: "",
+    location: ""
   });
 
   const fetchProfileData = async () => {
     if (!userId) return null;
     
     try {
-      const { data: profileData, error: fetchError } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle();
-        
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error("Error fetching profile:", fetchError);
-        throw fetchError;
+        .single();
+      
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No profile found, this is ok
+          console.log("No profile found for user:", userId);
+          return null;
+        }
+        throw error;
       }
       
-      if (profileData) {
-        const formattedProfile = {
-          name: profileData.name || "",
-          photo: profileData.photo || "",
-          email: profileData.email || "",
-          telephone: profileData.telephone || "",
-          role: profileData.role || "", 
-          tagline: profileData.tagline || "",
-          description: profileData.description || ""
+      if (data) {
+        const profile: ProfileData = {
+          name: data.name || "",
+          photo: data.photo || "",
+          email: data.email || "",
+          telephone: data.telephone || "",
+          role: data.role || "",
+          tagline: data.tagline || "",
+          description: data.description || "",
+          location: data.location || ""
         };
-        setProfileData(formattedProfile);
-        return formattedProfile;
+        
+        setProfileData(profile);
+        return profile;
       }
       
       return null;
     } catch (error: any) {
-      console.error("Error in fetchProfileData:", error);
+      console.error("Error fetching profile data:", error.message);
       return null;
     }
   };
 
   const createProfile = async (email: string | undefined) => {
-    if (!userId || !email) return false;
+    if (!userId || !email) return;
     
     try {
-      console.log("Creating profile for user:", userId);
-      const { error: insertError } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .insert({
           id: userId,
-          email,
-          role: "", // Add default empty role
-          description: "" // Add default empty description
-        });
+          email: email,
+          name: "",
+          photo: "",
+          telephone: "",
+          role: "",
+          tagline: "",
+          description: "",
+          location: ""
+        })
+        .select()
+        .single();
         
-      if (insertError) {
-        console.error("Error creating profile:", insertError);
-        return false;
-      } 
+      if (error) {
+        throw error;
+      }
       
-      console.log("Profile created successfully");
-      const newProfile = {
-        name: "",
-        photo: "",
-        email: email,
-        telephone: "",
-        role: "",
-        tagline: "",
-        description: ""
-      };
-      
-      setProfileData(newProfile);
-      return true;
+      if (data) {
+        const profile: ProfileData = {
+          name: data.name || "",
+          photo: data.photo || "",
+          email: data.email || "",
+          telephone: data.telephone || "",
+          role: data.role || "",
+          tagline: data.tagline || "",
+          description: data.description || "",
+          location: data.location || ""
+        };
+        
+        setProfileData(profile);
+        console.log("Profile created successfully:", profile);
+      }
     } catch (error: any) {
-      console.error("Error in createProfile:", error);
-      return false;
+      console.error("Error creating profile:", error.message);
     }
   };
 

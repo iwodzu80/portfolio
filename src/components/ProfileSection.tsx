@@ -14,6 +14,7 @@ interface ProfileSectionProps {
   role: string;
   tagline: string;
   description: string;
+  location?: string;
   onUpdate: () => void;
   isEditingMode?: boolean;
 }
@@ -26,6 +27,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   role,
   tagline,
   description,
+  location = "",
   onUpdate,
   isEditingMode = true
 }) => {
@@ -37,7 +39,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     telephone,
     role,
     tagline,
-    description
+    description,
+    location
   });
   
   // Update local state when props change (e.g., on initial load)
@@ -49,9 +52,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       telephone,
       role,
       tagline,
-      description
+      description,
+      location
     });
-  }, [name, photo, email, telephone, role, tagline, description]);
+  }, [name, photo, email, telephone, role, tagline, description, location]);
   
   // Set document title when name changes
   useEffect(() => {
@@ -138,7 +142,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       console.error("Error updating profile:", error);
       toast.error(`Error updating profile: ${error.message}`);
       
-      // Revert local state on error - FIX: Adding description to match state type
+      // Revert local state on error
       setLocalState({
         name,
         photo,
@@ -146,7 +150,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         telephone,
         role,
         tagline,
-        description
+        description,
+        location
       });
     }
   };
@@ -172,6 +177,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
             {localState.email && localState.telephone && <span className="mx-1">•</span>}
             {localState.telephone && <span>{localState.telephone}</span>}
+            {(localState.email || localState.telephone) && localState.location && <span className="mx-1">•</span>}
+            {localState.location && <span>{localState.location}</span>}
           </div>
           
           {localState.description && (
@@ -232,6 +239,13 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             onChange={(value) => handleProfileUpdate("telephone", value)}
             tag="span"
             placeholder="Telephone"
+          />
+          <span className="mx-1">•</span>
+          <EditableField
+            value={localState.location}
+            onChange={(value) => handleProfileUpdate("location", value)}
+            tag="span"
+            placeholder="Location"
           />
         </div>
         

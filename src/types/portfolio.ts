@@ -1,4 +1,3 @@
-
 export interface ProfileData {
   name: string;
   photo: string;
@@ -7,6 +6,7 @@ export interface ProfileData {
   role: string;
   tagline: string;
   description: string;
+  location: string;
 }
 
 export interface LinkData {

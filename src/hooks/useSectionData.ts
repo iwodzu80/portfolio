@@ -23,6 +23,10 @@ export const useSectionData = (userId: string | undefined) => {
               id,
               title,
               url
+            ),
+            features:features(
+              id,
+              title
             )
           )
         `)
@@ -48,7 +52,10 @@ export const useSectionData = (userId: string | undefined) => {
               title: link.title,
               url: link.url
             })),
-            features: [] // Initialize empty features array for existing projects
+            features: project.features.map(feature => ({
+              id: feature.id,
+              title: feature.title
+            }))
           }))
         }));
         

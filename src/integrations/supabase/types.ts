@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      features: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "features_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       links: {
         Row: {
           created_at: string
@@ -104,6 +136,7 @@ export type Database = {
           description: string | null
           email: string | null
           id: string
+          location: string | null
           name: string | null
           photo: string | null
           role: string | null
@@ -116,6 +149,7 @@ export type Database = {
           description?: string | null
           email?: string | null
           id: string
+          location?: string | null
           name?: string | null
           photo?: string | null
           role?: string | null
@@ -128,6 +162,7 @@ export type Database = {
           description?: string | null
           email?: string | null
           id?: string
+          location?: string | null
           name?: string | null
           photo?: string | null
           role?: string | null
