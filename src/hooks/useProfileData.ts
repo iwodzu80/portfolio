@@ -11,8 +11,7 @@ export const useProfileData = (userId: string | undefined) => {
     telephone: "",
     role: "",
     tagline: "",
-    description: "",
-    location: ""
+    description: ""
   });
 
   const fetchProfileData = async () => {
@@ -42,8 +41,7 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: data.telephone || "",
           role: data.role || "",
           tagline: data.tagline || "",
-          description: data.description || "",
-          location: data.location || ""
+          description: data.description || ""
         };
         
         setProfileData(profile);
@@ -71,8 +69,7 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: "",
           role: "",
           tagline: "",
-          description: "",
-          location: ""
+          description: ""
         })
         .select()
         .single();
@@ -89,8 +86,7 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: data.telephone || "",
           role: data.role || "",
           tagline: data.tagline || "",
-          description: data.description || "",
-          location: data.location || ""
+          description: data.description || ""
         };
         
         setProfileData(profile);

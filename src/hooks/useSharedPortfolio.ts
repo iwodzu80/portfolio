@@ -12,8 +12,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
     telephone: "",
     role: "",
     tagline: "",
-    description: "",
-    location: ""
+    description: ""
   });
   const [sections, setSections] = useState<SectionData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +60,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           // Query 1: Fetch profile with minimal fields needed for display
           supabase
             .from('profiles')
-            .select('name, photo, email, telephone, role, tagline, description, location')
+            .select('name, photo, email, telephone, role, tagline, description')
             .eq('id', userId)
             .single(),
             
@@ -99,8 +98,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             telephone: sanitizeText(data.telephone || ""),
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
-            description: sanitizeText(data.description || ""),
-            location: sanitizeText(data.location || "")
+            description: sanitizeText(data.description || "")
           };
           
           setProfileData(sanitizedProfileData);
