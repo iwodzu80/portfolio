@@ -15,7 +15,8 @@ const AddProjectButton: React.FC<AddProjectButtonProps> = ({ onAdd }) => {
       description: "A brief description of your project",
       links: [
         { id: `link-${Date.now()}`, title: "GitHub", url: "https://github.com" }
-      ]
+      ],
+      features: []
     };
     
     onAdd(newProject);

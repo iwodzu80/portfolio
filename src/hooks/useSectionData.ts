@@ -47,7 +47,8 @@ export const useSectionData = (userId: string | undefined) => {
               id: link.id,
               title: link.title,
               url: link.url
-            }))
+            })),
+            features: [] // Initialize empty features array for existing projects
           }))
         }));
         
