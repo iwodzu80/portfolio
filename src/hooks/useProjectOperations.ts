@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { ProjectData } from "../utils/localStorage";
+import { ProjectData } from "@/types/portfolio";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
