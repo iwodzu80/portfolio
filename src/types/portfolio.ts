@@ -6,6 +6,7 @@ export interface ProfileData {
   role: string;
   tagline: string;
   description: string;
+  userRole?: 'admin' | 'moderator' | 'user';
 }
 
 export interface LinkData {

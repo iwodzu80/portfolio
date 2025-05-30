@@ -54,9 +54,9 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         
         const userId = shareData.user_id;
         
-        // Use Promise.all to execute both queries concurrently
+        // Use Promise.all to execute queries concurrently
         // This significantly reduces total wait time
-        const [profileData, sectionsData] = await Promise.all([
+        const [profileData, sectionsData, userRoleData] = await Promise.all([
           // Query 1: Fetch profile with minimal fields needed for display
           supabase
             .from('profiles')
@@ -82,7 +82,14 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
               )
             `)
             .eq('user_id', userId)
-            .order('created_at', { ascending: true })
+            .order('created_at', { ascending: true }),
+            
+          // Query 3: Fetch user role
+          supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', userId)
+            .single()
         ]);
         
         // Process profile data
@@ -91,6 +98,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         } else if (profileData.data) {
           // Apply sanitization efficiently
           const data = profileData.data;
+          const userRole = userRoleData.data?.role || 'user';
+          
           const sanitizedProfileData = {
             name: sanitizeText(data.name || ""),
             photo: data.photo || "", 
@@ -98,7 +107,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             telephone: sanitizeText(data.telephone || ""),
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
-            description: sanitizeText(data.description || "")
+            description: sanitizeText(data.description || ""),
+            userRole: userRole as 'admin' | 'moderator' | 'user'
           };
           
           setProfileData(sanitizedProfileData);
