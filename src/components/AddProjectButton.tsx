@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Plus } from "lucide-react";
-import { ProjectData } from "../utils/localStorage";
+import { ProjectData } from "@/types/portfolio";
 
 interface AddProjectButtonProps {
   onAdd: (project: ProjectData) => void;

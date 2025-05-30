@@ -1,7 +1,7 @@
 
 import React, { useMemo } from "react";
 import ProjectCard from "./ProjectCard";
-import { ProjectData } from "../utils/localStorage";
+import { ProjectData } from "@/types/portfolio";
 
 interface ProjectListViewProps {
   sectionId: string;

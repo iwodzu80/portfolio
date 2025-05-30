@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldCheck, User, Eye } from "lucide-react";
+import { ShieldCheck, User, Eye } from "lucide-react";
 
 interface RoleViewerProps {
   role: 'admin' | 'user' | 'viewer';

@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 import ProjectListView from "./ProjectListView";
 import AddProjectButton from "./AddProjectButton";
-import { ProjectData } from "../utils/localStorage";
+import { ProjectData } from "@/types/portfolio";
 import { useProjectOperations } from "@/hooks/useProjectOperations";
 
 interface ProjectListProps {
