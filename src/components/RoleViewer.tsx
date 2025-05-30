@@ -1,15 +1,15 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldCheck, User } from "lucide-react";
+import { Shield, ShieldCheck, User, Eye } from "lucide-react";
 
 interface RoleViewerProps {
-  role: 'admin' | 'moderator' | 'user';
+  role: 'admin' | 'user' | 'viewer';
   className?: string;
 }
 
 const RoleViewer = ({ role, className = "" }: RoleViewerProps) => {
-  const getRoleConfig = (role: 'admin' | 'moderator' | 'user') => {
+  const getRoleConfig = (role: 'admin' | 'user' | 'viewer') => {
     switch (role) {
       case 'admin':
         return {
@@ -18,10 +18,10 @@ const RoleViewer = ({ role, className = "" }: RoleViewerProps) => {
           variant: 'destructive' as const,
           className: 'bg-red-100 text-red-800 border-red-200'
         };
-      case 'moderator':
+      case 'viewer':
         return {
-          label: 'Moderator',
-          icon: Shield,
+          label: 'Viewer',
+          icon: Eye,
           variant: 'secondary' as const,
           className: 'bg-blue-100 text-blue-800 border-blue-200'
         };

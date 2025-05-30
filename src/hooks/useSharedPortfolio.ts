@@ -108,7 +108,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
             description: sanitizeText(data.description || ""),
-            userRole: userRole as 'admin' | 'moderator' | 'user'
+            userRole: userRole as 'admin' | 'user' | 'viewer'
           };
           
           setProfileData(sanitizedProfileData);
