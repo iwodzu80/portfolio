@@ -135,13 +135,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     return (
       <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
         <h2 className="font-bold text-xl mb-3">{localProject.title}</h2>
-        
-        {/* Only render description if it has content */}
-        {localProject.description && localProject.description.trim() && (
-          <div className="text-portfolio-muted mb-4 text-sm text-justify">
-            {renderDescription(localProject.description)}
-          </div>
-        )}
+        <div className="text-portfolio-muted mb-4 text-sm text-justify">
+          {renderDescription(localProject.description)}
+        </div>
         
         {/* Features */}
         {localProject.features.length > 0 && (
