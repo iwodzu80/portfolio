@@ -30,6 +30,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
+        
+        // Redirect authenticated users to dashboard
+        if (currentSession?.user && window.location.pathname === '/auth') {
+          navigate("/dashboard");
+        }
       }
     );
 
@@ -38,10 +43,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setIsLoading(false);
+      
+      // Redirect authenticated users to dashboard if they're on auth page
+      if (currentSession?.user && window.location.pathname === '/auth') {
+        navigate("/dashboard");
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signOut = async () => {
     try {

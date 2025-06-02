@@ -24,7 +24,7 @@ const Auth = () => {
         email, 
         password,
         options: {
-          emailRedirectTo: window.location.origin
+          emailRedirectTo: `${window.location.origin}/dashboard`
         }
       });
       
@@ -47,7 +47,7 @@ const Auth = () => {
       if (error) throw error;
       
       toast.success("Successfully logged in!");
-      navigate("/");
+      navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Invalid login credentials");
     } finally {
