@@ -8,7 +8,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/project-pop-up-showcase/' : '/',
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
     emptyOutDir: true,
   },
   server: {
