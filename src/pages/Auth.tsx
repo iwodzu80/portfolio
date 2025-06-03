@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +9,6 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Auth = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signUpLoading, setSignUpLoading] = useState(false);
@@ -29,7 +27,6 @@ const Auth = () => {
       });
       
       if (error) throw error;
-      
       toast.success("Sign-up successful! Please check your email for verification.");
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign-up");
@@ -43,17 +40,16 @@ const Auth = () => {
     setSignInLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      
       if (error) throw error;
-      
       toast.success("Successfully logged in!");
-      navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Invalid login credentials");
     } finally {
       setSignInLoading(false);
     }
   };
+
+  const isLoading = signInLoading || signUpLoading;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -65,12 +61,8 @@ const Auth = () => {
 
         <Tabs defaultValue="sign-in" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in" disabled={signInLoading || signUpLoading}>
-              Sign In
-            </TabsTrigger>
-            <TabsTrigger value="sign-up" disabled={signInLoading || signUpLoading}>
-              Sign Up
-            </TabsTrigger>
+            <TabsTrigger value="sign-in" disabled={isLoading}>Sign In</TabsTrigger>
+            <TabsTrigger value="sign-up" disabled={isLoading}>Sign Up</TabsTrigger>
           </TabsList>
           
           <TabsContent value="sign-in">

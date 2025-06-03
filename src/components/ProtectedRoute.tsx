@@ -13,44 +13,6 @@ const ProtectedRoute = () => {
   const [resendingEmail, setResendingEmail] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const handleResendConfirmationEmail = async () => {
-    try {
-      setResendingEmail(true);
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: user?.email || '',
-      });
-      
-      if (error) throw error;
-      
-      toast.success("Verification email sent! Please check your inbox and spam folder.");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to resend verification email");
-    } finally {
-      setResendingEmail(false);
-    }
-  };
-
-  const handleRefreshVerification = async () => {
-    try {
-      setRefreshing(true);
-      const { data, error } = await supabase.auth.getUser();
-      
-      if (error) throw error;
-      
-      if (data.user?.email_confirmed_at) {
-        toast.success("Email verified! Redirecting...");
-        window.location.reload();
-      } else {
-        toast.info("Email not yet verified. Please check your inbox.");
-      }
-    } catch (error: any) {
-      toast.error("Failed to check verification status");
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -62,13 +24,48 @@ const ProtectedRoute = () => {
     );
   }
 
-  // No user, redirect to auth
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check if email has been confirmed
-  if (user && !user.email_confirmed_at) {
+  if (!user.email_confirmed_at) {
+    const handleResendEmail = async () => {
+      try {
+        setResendingEmail(true);
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email: user.email || '',
+        });
+        
+        if (error) throw error;
+        toast.success("Verification email sent! Please check your inbox and spam folder.");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to resend verification email");
+      } finally {
+        setResendingEmail(false);
+      }
+    };
+
+    const handleRefreshVerification = async () => {
+      try {
+        setRefreshing(true);
+        const { data, error } = await supabase.auth.getUser();
+        
+        if (error) throw error;
+        
+        if (data.user?.email_confirmed_at) {
+          toast.success("Email verified! Redirecting...");
+          window.location.reload();
+        } else {
+          toast.info("Email not yet verified. Please check your inbox.");
+        }
+      } catch (error: any) {
+        toast.error("Failed to check verification status");
+      } finally {
+        setRefreshing(false);
+      }
+    };
+
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <Card className="w-full max-w-md">
@@ -92,7 +89,7 @@ const ProtectedRoute = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <LoadingButton 
-              onClick={handleResendConfirmationEmail}
+              onClick={handleResendEmail}
               loading={resendingEmail}
               loadingText="Sending..."
               className="w-full"
@@ -114,7 +111,6 @@ const ProtectedRoute = () => {
     );
   }
 
-  // User is authenticated and verified, allow access to protected route
   return <Outlet />;
 };
 
