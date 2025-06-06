@@ -72,7 +72,7 @@ export const useProfileData = (userId: string | undefined) => {
           role: "",
           tagline: "",
           description: "",
-          custom_url: ""
+          custom_url: null
         })
         .select()
         .single();
