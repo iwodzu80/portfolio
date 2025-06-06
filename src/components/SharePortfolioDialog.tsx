@@ -35,6 +35,7 @@ const SharePortfolioDialog = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+  // Use the current domain (clickly.it) for share links
   const baseUrl = window.location.origin;
   
   const loadShareData = async () => {
@@ -161,13 +162,25 @@ const SharePortfolioDialog = () => {
     }
   };
   
-  const copyToClipboard = () => {
+  const copyToClipboard = async () => {
     try {
-      navigator.clipboard.writeText(shareLink);
+      await navigator.clipboard.writeText(shareLink);
       toast.success("Share link copied to clipboard");
     } catch (error) {
       console.error("Failed to copy:", error);
-      toast.error("Failed to copy link");
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = shareLink;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast.success("Share link copied to clipboard");
+      } catch (fallbackError) {
+        toast.error("Failed to copy link");
+      }
+      document.body.removeChild(textArea);
     }
   };
 
