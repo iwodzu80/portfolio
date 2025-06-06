@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import CustomUrlSettings from "@/components/CustomUrlSettings";
 import {
   Form,
   FormControl,
@@ -88,10 +89,10 @@ const Settings = () => {
           </Link>
         </div>
         
-        <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
+        <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-sm space-y-8">
+          <h1 className="text-2xl font-bold">Account Settings</h1>
           
-          <div className="mb-8">
+          <div>
             <h2 className="text-lg font-semibold mb-4">Account Information</h2>
             <div className="flex flex-col space-y-2">
               <div>
@@ -99,6 +100,11 @@ const Settings = () => {
                 <p className="font-medium">{user?.email}</p>
               </div>
             </div>
+          </div>
+          
+          <div className="border-t pt-6">
+            <h2 className="text-lg font-semibold mb-4">Custom Portfolio URL</h2>
+            <CustomUrlSettings />
           </div>
           
           <div className="border-t pt-6">
