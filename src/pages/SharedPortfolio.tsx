@@ -5,7 +5,6 @@ import { useSharedPortfolio } from "@/hooks/useSharedPortfolio";
 import SharedPortfolioHeader from "@/components/SharedPortfolioHeader";
 import SharedPortfolioNotFound from "@/components/SharedPortfolioNotFound";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import RoleViewer from "@/components/RoleViewer";
 import { sanitizeText } from "@/utils/securityUtils";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -107,12 +106,7 @@ const SharedPortfolio = React.memo(() => {
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
       <div className="container mx-auto pt-10 px-4">
-        <div className="flex items-center justify-between mb-6">
-          <SharedPortfolioHeader ownerName={ownerName} />
-          {profileData.userRole && (
-            <RoleViewer role={profileData.userRole} />
-          )}
-        </div>
+        <SharedPortfolioHeader ownerName={ownerName} />
 
         <Suspense fallback={<ProfileSkeleton />}>
           <ProfileSection
