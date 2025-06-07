@@ -32,10 +32,12 @@ const EditableField: React.FC<EditableFieldProps> = ({
     localValueRef.current = value;
   }, [value]);
   
-  // Focus input when entering edit mode
+  // Focus input and select all text when entering edit mode
   useEffect(() => {
     if (editing && inputRef.current) {
       inputRef.current.focus();
+      // Select all text to make replacement easier
+      inputRef.current.select();
     }
   }, [editing]);
 
