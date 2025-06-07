@@ -7,7 +7,6 @@ export interface ProfileData {
   role: string;
   tagline: string;
   description: string;
-  custom_url?: string;
   userRole?: 'admin' | 'user' | 'viewer';
 }
 

@@ -11,8 +11,7 @@ export const useProfileData = (userId: string | undefined) => {
     telephone: "",
     role: "",
     tagline: "",
-    description: "",
-    custom_url: ""
+    description: ""
   });
 
   const fetchProfileData = async () => {
@@ -42,8 +41,7 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: data.telephone || "",
           role: data.role || "",
           tagline: data.tagline || "",
-          description: data.description || "",
-          custom_url: data.custom_url || ""
+          description: data.description || ""
         };
         
         setProfileData(profile);
@@ -71,8 +69,7 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: "",
           role: "",
           tagline: "",
-          description: "",
-          custom_url: null
+          description: ""
         })
         .select()
         .single();
@@ -89,8 +86,7 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: data.telephone || "",
           role: data.role || "",
           tagline: data.tagline || "",
-          description: data.description || "",
-          custom_url: data.custom_url || ""
+          description: data.description || ""
         };
         
         setProfileData(profile);
@@ -101,34 +97,10 @@ export const useProfileData = (userId: string | undefined) => {
     }
   };
 
-  const checkCustomUrlAvailability = async (customUrl: string): Promise<boolean> => {
-    if (!customUrl || customUrl.trim() === '') return true;
-    
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('custom_url', customUrl.toLowerCase().trim())
-        .neq('id', userId)
-        .maybeSingle();
-      
-      if (error && error.code !== 'PGRST116') {
-        console.error("Error checking custom URL:", error);
-        return false;
-      }
-      
-      return !data; // Returns true if URL is available (no data found)
-    } catch (error: any) {
-      console.error("Error checking custom URL availability:", error);
-      return false;
-    }
-  };
-
   return {
     profileData,
     setProfileData,
     fetchProfileData,
-    createProfile,
-    checkCustomUrlAvailability
+    createProfile
   };
 };
