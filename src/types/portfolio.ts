@@ -1,4 +1,5 @@
 
+
 export interface ProfileData {
   name: string;
   photo: string;
@@ -16,6 +17,11 @@ export interface LinkData {
   url: string;
 }
 
+export interface FeatureData {
+  id: string;
+  title: string;
+}
+
 export interface ProjectData {
   id: string;
   title: string;
@@ -24,13 +30,9 @@ export interface ProjectData {
   features: FeatureData[];
 }
 
-export interface FeatureData {
-  id: string;
-  title: string;
-}
-
 export interface SectionData {
   id: string;
   title: string;
   projects: ProjectData[];
 }
+
