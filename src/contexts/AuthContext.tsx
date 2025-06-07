@@ -23,6 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.email);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
@@ -30,10 +31,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (currentSession?.user && window.location.pathname === '/auth') {
           navigate("/dashboard");
         }
+        
+        // Handle sign out event
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          navigate("/auth");
+        }
       }
     );
 
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Initial session:", currentSession?.user?.email);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setIsLoading(false);
@@ -48,11 +57,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-      toast.success("Logged out successfully");
+      console.log("Attempting to sign out...");
+      
+      // Clear local state first
+      setSession(null);
+      setUser(null);
+      
+      // Attempt to sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.log("Sign out error (may be expected if session expired):", error.message);
+        // Don't show error to user for session_not_found as it's expected behavior
+        if (!error.message.includes("session_not_found") && !error.message.includes("Session not found")) {
+          toast.error("Error signing out: " + error.message);
+        }
+      } else {
+        console.log("Successfully signed out");
+        toast.success("Logged out successfully");
+      }
+      
+      // Always navigate to auth page regardless of API response
       navigate("/auth");
     } catch (error: any) {
-      toast.error(error.message || "Error signing out");
+      console.log("Sign out catch error:", error.message);
+      // Clear state and navigate even if there's an error
+      setSession(null);
+      setUser(null);
+      navigate("/auth");
+      
+      if (!error.message.includes("session_not_found") && !error.message.includes("Session not found")) {
+        toast.error(error.message || "Error signing out");
+      }
     }
   };
 
