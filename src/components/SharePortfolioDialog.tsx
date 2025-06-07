@@ -35,8 +35,23 @@ const SharePortfolioDialog = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Use the current domain (clickly.it) for share links
-  const baseUrl = window.location.origin;
+  // Dynamic base URL detection
+  const getBaseUrl = () => {
+    const currentOrigin = window.location.origin;
+    
+    // Check if we're on Lovable preview
+    if (currentOrigin.includes('lovable.app') || currentOrigin.includes('id-preview')) {
+      return currentOrigin;
+    }
+    
+    // Check if we're on the deployed domain (clickly.it)
+    if (currentOrigin.includes('clickly.it')) {
+      return 'https://clickly.it';
+    }
+    
+    // Default to current origin for any other cases
+    return currentOrigin;
+  };
   
   const loadShareData = async () => {
     if (!user) return;
@@ -57,6 +72,7 @@ const SharePortfolioDialog = () => {
       if (data) {
         setShareId(data.share_id);
         setIsActive(data.active);
+        const baseUrl = getBaseUrl();
         setShareLink(`${baseUrl}/shared/${data.share_id}`);
       }
     } catch (error: any) {
@@ -122,6 +138,7 @@ const SharePortfolioDialog = () => {
       }
       
       setShareId(newShareId);
+      const baseUrl = getBaseUrl();
       setShareLink(`${baseUrl}/shared/${newShareId}`);
       setIsActive(true);
       toast.success("New share link generated");
