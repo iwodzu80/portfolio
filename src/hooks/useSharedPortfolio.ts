@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SectionData, ProjectData, ProfileData } from "@/types/portfolio";
@@ -64,7 +65,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             .eq('id', userId)
             .single(),
             
-          // Query 2: Fetch sections with projects and links
+          // Query 2: Fetch sections with projects, links, and features
           supabase
             .from('sections')
             .select(`
@@ -78,6 +79,10 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                   id, 
                   title, 
                   url
+                ),
+                features (
+                  id,
+                  title
                 )
               )
             `)
@@ -142,12 +147,21 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                         url: validateAndFormatUrl(link.url || "")
                       }))
                     : [];
+
+                  // Transform features efficiently
+                  const features = Array.isArray(project.features) 
+                    ? project.features.map(feature => ({
+                        id: feature.id,
+                        title: sanitizeText(feature.title || "")
+                      }))
+                    : [];
                   
                   return {
                     id: project.id,
                     title: sanitizeText(project.title || "Untitled Project"),
                     description: sanitizeText(project.description || ""),
-                    links
+                    links,
+                    features
                   };
                 }).filter(Boolean) as ProjectData[]
               : [];
