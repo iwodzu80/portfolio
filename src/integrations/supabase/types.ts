@@ -180,6 +180,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          project_role: string | null
           section_id: string
           title: string
           updated_at: string
@@ -188,6 +189,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          project_role?: string | null
           section_id: string
           title: string
           updated_at?: string
@@ -196,6 +198,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          project_role?: string | null
           section_id?: string
           title?: string
           updated_at?: string

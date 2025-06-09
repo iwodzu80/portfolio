@@ -1,5 +1,4 @@
 
-
 export interface ProfileData {
   name: string;
   photo: string;
@@ -28,6 +27,7 @@ export interface ProjectData {
   description: string;
   links: LinkData[];
   features: FeatureData[];
+  project_role?: string;
 }
 
 export interface SectionData {
@@ -35,4 +35,3 @@ export interface SectionData {
   title: string;
   projects: ProjectData[];
 }
-

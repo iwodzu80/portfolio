@@ -19,7 +19,8 @@ export const useProjectOperations = (
       // Ensure features array exists on all projects
       const projectsWithFeatures = initialProjects.map(project => ({
         ...project,
-        features: project.features || []
+        features: project.features || [],
+        project_role: project.project_role || ""
       }));
       setLocalProjects(projectsWithFeatures);
     } else {
@@ -36,6 +37,7 @@ export const useProjectOperations = (
         .update({ 
           title: updatedProject.title, 
           description: updatedProject.description,
+          project_role: updatedProject.project_role || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', updatedProject.id)
@@ -142,7 +144,8 @@ export const useProjectOperations = (
         .insert({
           section_id: sectionId,
           title: newProject.title,
-          description: newProject.description
+          description: newProject.description,
+          project_role: newProject.project_role || null
         })
         .select()
         .single();
@@ -189,6 +192,7 @@ export const useProjectOperations = (
         id: projectData.id,
         title: projectData.title,
         description: projectData.description || "",
+        project_role: projectData.project_role || "",
         links: newProject.links.map((link, idx) => ({
           ...link,
           id: `${projectData.id}-link-${idx}`  // Temporary ID until we fetch from Supabase

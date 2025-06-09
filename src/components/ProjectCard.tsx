@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { X, Plus, Pencil, ExternalLink } from "lucide-react";
 import EditableField from "./EditableField";
@@ -19,14 +18,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localProject, setLocalProject] = useState<ProjectData>({
     ...project,
-    features: project.features || []
+    features: project.features || [],
+    project_role: project.project_role || ""
   });
   
   // Update local state when props change
   useEffect(() => {
     setLocalProject({
       ...project,
-      features: project.features || []
+      features: project.features || [],
+      project_role: project.project_role || ""
     });
   }, [project]);
   
@@ -134,7 +135,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   if (!isEditingMode) {
     return (
       <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
-        <h2 className="font-bold text-xl mb-3">{localProject.title}</h2>
+        <div className="mb-3">
+          <h2 className="font-bold text-xl mb-1">{localProject.title}</h2>
+          {localProject.project_role && (
+            <p className="text-sm text-portfolio-muted italic">{localProject.project_role}</p>
+          )}
+        </div>
         <div className="text-portfolio-muted mb-4 text-sm text-justify">
           {renderDescription(localProject.description)}
         </div>
@@ -178,13 +184,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
   return (
     <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
       <div className="flex justify-between items-start mb-3">
-        <EditableField
-          value={localProject.title}
-          onChange={(value) => updateField("title", value)}
-          tag="h2"
-          className="font-bold text-xl"
-          placeholder="Project Title"
-        />
+        <div className="flex-1">
+          <EditableField
+            value={localProject.title}
+            onChange={(value) => updateField("title", value)}
+            tag="h2"
+            className="font-bold text-xl mb-1"
+            placeholder="Project Title"
+          />
+          <EditableField
+            value={localProject.project_role || ""}
+            onChange={(value) => updateField("project_role", value)}
+            tag="p"
+            className="text-sm text-portfolio-muted italic"
+            placeholder="Project Role (optional)"
+          />
+        </div>
         
         <div className="flex gap-2">
           <button 
