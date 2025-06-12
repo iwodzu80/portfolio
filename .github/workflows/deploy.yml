@@ -37,6 +37,11 @@ jobs:
     
     - name: Build project
       run: npm run build
+      env:
+        NODE_ENV: production
+    
+    - name: Copy .nojekyll to dist
+      run: cp public/.nojekyll dist/.nojekyll
     
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
