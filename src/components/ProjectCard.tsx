@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { X, Plus, Pencil, ExternalLink } from "lucide-react";
 import EditableField from "./EditableField";
-import { LinkData, ProjectData, FeatureData } from "../utils/localStorage";
+import { LinkData, ProjectData, FeatureData } from "@/types/portfolio";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { validateAndFormatUrl } from "@/utils/securityUtils";
