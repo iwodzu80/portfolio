@@ -5,6 +5,7 @@ import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3 } f
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import SharePortfolioDialog from "@/components/SharePortfolioDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +49,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
             </>
           )}
         </Button>
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">

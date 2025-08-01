@@ -65,7 +65,7 @@ const Index = React.memo(() => {
   }
 
   return (
-    <div className="min-h-screen bg-portfolio-bg pb-12">
+    <div className="min-h-screen bg-background pb-12">
       <div className="container mx-auto pt-10">
         <div className="px-4">
           <PortfolioHeader 

@@ -104,7 +104,7 @@ const SharedPortfolio = React.memo(() => {
   const hasValidSections = Array.isArray(sections) && sections.length > 0;
   
   return (
-    <div className="min-h-screen bg-portfolio-bg pb-12">
+    <div className="min-h-screen bg-background pb-12">
       <div className="container mx-auto pt-10 px-4">
         <SharedPortfolioHeader ownerName={ownerName} />
 
@@ -122,7 +122,7 @@ const SharedPortfolio = React.memo(() => {
           />
         </Suspense>
         
-        <div className="my-4 border-t border-gray-200 max-w-xl mx-auto" />
+        <div className="my-4 border-t border-border max-w-xl mx-auto" />
         
         {hasValidSections ? (
           <Suspense fallback={<SectionSkeleton />}>
