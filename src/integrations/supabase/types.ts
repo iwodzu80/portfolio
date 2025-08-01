@@ -88,7 +88,6 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          referrer: string | null
           share_id: string
           user_agent: string | null
           viewed_at: string
@@ -96,7 +95,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          referrer?: string | null
           share_id: string
           user_agent?: string | null
           viewed_at?: string
@@ -104,7 +102,6 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          referrer?: string | null
           share_id?: string
           user_agent?: string | null
           viewed_at?: string
@@ -188,7 +185,6 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
-          project_role: string | null
           section_id: string
           title: string
           updated_at: string
@@ -198,7 +194,6 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
-          project_role?: string | null
           section_id: string
           title: string
           updated_at?: string
@@ -208,7 +203,6 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
-          project_role?: string | null
           section_id?: string
           title?: string
           updated_at?: string
@@ -247,39 +241,13 @@ export type Database = {
         }
         Relationships: []
       }
-      user_roles: {
-        Row: {
-          created_at: string | null
-          id: string
-          role: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          role: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          role?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       record_portfolio_view: {
-        Args:
-          | { p_share_id: string; p_referrer?: string; p_user_agent?: string }
-          | { p_share_id: string; p_user_agent?: string }
+        Args: { p_share_id: string; p_user_agent?: string }
         Returns: undefined
       }
     }

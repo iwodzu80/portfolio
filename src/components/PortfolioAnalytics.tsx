@@ -51,24 +51,17 @@ const PortfolioAnalytics = () => {
       }
       
       if (data) {
-        // Transform data to match expected format
-        const transformedData = data.map(item => ({
-          ...item,
-          view_date: item.viewed_at || item.created_at, // Use viewed_at as view_date
-          referrer: item.referrer || 'direct'
-        }));
-        
-        setAnalytics(transformedData);
+        setAnalytics(data);
         
         // Process data for chart
-        const groupedByDate = transformedData.reduce((acc: Record<string, number>, item) => {
+        const groupedByDate = data.reduce((acc: Record<string, number>, item: AnalyticsData) => {
           const date = new Date(item.view_date).toLocaleDateString();
           acc[date] = (acc[date] || 0) + 1;
           return acc;
         }, {});
         
         const chartData = Object.entries(groupedByDate)
-          .map(([date, views]) => ({ date, views: Number(views) }))
+          .map(([date, views]) => ({ date, views }))
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         
         setChartData(chartData);

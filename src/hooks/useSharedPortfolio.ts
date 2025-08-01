@@ -90,11 +90,11 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             .eq('user_id', userId)
             .order('created_at', { ascending: true }),
             
-          // Query 3: Fetch user role from profiles table instead
+          // Query 3: Fetch user role
           supabase
-            .from('profiles')
+            .from('user_roles')
             .select('role')
-            .eq('id', userId)
+            .eq('user_id', userId)
             .single()
         ]);
         
