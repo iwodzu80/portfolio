@@ -1,3 +1,5 @@
+// Centralized constants for the application
+
 // Supabase configuration - centralized place for all Supabase credentials
 export const SUPABASE_CONFIG = {
   PROJECT_ID: "ozgiefftrbeypfsrfyws",
