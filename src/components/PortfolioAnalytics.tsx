@@ -19,7 +19,7 @@ import { toast } from "sonner";
 interface AnalyticsData {
   id: string;
   share_id: string;
-  view_date: string;
+  viewed_at: string;
   referrer: string | null;
   user_agent: string | null;
   created_at: string;
@@ -44,7 +44,7 @@ const PortfolioAnalytics = () => {
       const { data, error } = await supabase
         .from('portfolio_analytics')
         .select('*')
-        .order('view_date', { ascending: false });
+        .order('viewed_at', { ascending: false });
         
       if (error) {
         throw error;
@@ -55,13 +55,13 @@ const PortfolioAnalytics = () => {
         
         // Process data for chart
         const groupedByDate = data.reduce((acc: Record<string, number>, item: AnalyticsData) => {
-          const date = new Date(item.view_date).toLocaleDateString();
+          const date = new Date(item.viewed_at).toLocaleDateString();
           acc[date] = (acc[date] || 0) + 1;
           return acc;
         }, {});
         
         const chartData = Object.entries(groupedByDate)
-          .map(([date, views]) => ({ date, views }))
+          .map(([date, views]) => ({ date, views: Number(views) }))
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         
         setChartData(chartData);
@@ -171,7 +171,7 @@ const PortfolioAnalytics = () => {
               ) : analytics.length > 0 ? (
                 analytics.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell>{new Date(item.view_date).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(item.viewed_at).toLocaleString()}</TableCell>
                     <TableCell>{item.share_id}</TableCell>
                     <TableCell>{item.referrer || 'Direct'}</TableCell>
                     <TableCell className="max-w-[300px] truncate">{item.user_agent || 'Unknown'}</TableCell>
