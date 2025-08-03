@@ -64,12 +64,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				portfolio: {
-					'blue': '#3b82f6',
-					'light-blue': '#93c5fd',
-					'bg': '#f8fafc',
-					'card': '#ffffff',
-					'text': '#1e293b',
-					'muted': '#64748b'
+					'blue': 'hsl(221.2 83.2% 53.3%)',
+					'light-blue': 'hsl(210 40% 96.1%)',
+					'bg': 'hsl(var(--background))',
+					'card': 'hsl(var(--card))',
+					'text': 'hsl(var(--foreground))',
+					'muted': 'hsl(var(--muted-foreground))'
 				}
 			},
 			borderRadius: {

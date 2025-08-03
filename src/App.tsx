@@ -11,17 +11,19 @@ import SharedPortfolio from "./pages/SharedPortfolio";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
+    <ThemeProvider defaultTheme="system" storageKey="lovable-ui-theme">
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/shared/:shareId" element={<SharedPortfolio />} />
@@ -36,9 +38,10 @@ const App = () => (
             <Route path="/" element={<Navigate to="/auth" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

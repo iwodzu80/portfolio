@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
-import { SUPABASE_CONFIG } from './config';
+import { SUPABASE_CONFIG } from '@/lib/constants';
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
