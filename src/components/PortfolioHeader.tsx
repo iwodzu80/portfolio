@@ -58,13 +58,13 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigate("/analytics")}>
-              <BarChart3 size={16} className="mr-2" />
-              View Analytics
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/settings")}>
               <SettingsIcon size={16} className="mr-2" />
               Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/analytics")}>
+              <BarChart3 size={16} className="mr-2" />
+              View Analytics
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut}>
