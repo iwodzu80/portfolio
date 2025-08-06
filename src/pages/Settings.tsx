@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   Form,
   FormControl,
@@ -31,6 +33,7 @@ const passwordSchema = z.object({
 });
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   
@@ -54,7 +57,7 @@ const Settings = () => {
       });
       
       if (signInError) {
-        toast.error("Current password is incorrect");
+        toast.error(t('settings.incorrectPassword'));
         return;
       }
       
@@ -68,7 +71,7 @@ const Settings = () => {
         return;
       }
       
-      toast.success("Password updated successfully");
+      toast.success(t('settings.passwordUpdated'));
       form.reset();
     } catch (error: any) {
       toast.error(`Error changing password: ${error.message}`);
@@ -80,29 +83,32 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-portfolio-bg pb-12">
       <Toaster position="top-center" />
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="container mx-auto pt-10 px-4">
         <div className="mb-8">
-          <Link to="/" className="flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors">
+          <Link to="/dashboard" className="flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors">
             <ArrowLeft className="mr-1 h-4 w-4" />
-            Back to Portfolio
+            {t('settings.backToPortfolio')}
           </Link>
         </div>
         
         <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
+          <h1 className="text-2xl font-bold mb-6">{t('settings.title')}</h1>
           
           <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Account Information</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('settings.accountInfo')}</h2>
             <div className="flex flex-col space-y-2">
               <div>
-                <span className="text-sm text-gray-500">Email</span>
+                <span className="text-sm text-gray-500">{t('auth.email')}</span>
                 <p className="font-medium">{user?.email}</p>
               </div>
             </div>
           </div>
           
           <div className="border-t pt-6">
-            <h2 className="text-lg font-semibold mb-4">Change Password</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('settings.changePassword')}</h2>
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handlePasswordChange)} className="space-y-4">
@@ -111,10 +117,10 @@ const Settings = () => {
                   name="currentPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Current Password</FormLabel>
+                      <FormLabel>{t('settings.currentPassword')}</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Enter current password" 
+                          placeholder={t('settings.currentPasswordPlaceholder')}
                           type="password" 
                           {...field} 
                         />
@@ -129,10 +135,10 @@ const Settings = () => {
                   name="newPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>{t('settings.newPassword')}</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Enter new password" 
+                          placeholder={t('settings.newPasswordPlaceholder')}
                           type="password" 
                           {...field} 
                         />
@@ -147,10 +153,10 @@ const Settings = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormLabel>{t('settings.confirmPassword')}</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Confirm new password" 
+                          placeholder={t('settings.confirmPasswordPlaceholder')}
                           type="password" 
                           {...field} 
                         />
@@ -168,12 +174,12 @@ const Settings = () => {
                   {isChangingPassword ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Updating...
+                      {t('settings.updating')}
                     </>
                   ) : (
                     <>
                       <Check className="mr-2 h-4 w-4" />
-                      Update Password
+                      {t('settings.updatePassword')}
                     </>
                   )}
                 </Button>
