@@ -1,6 +1,4 @@
-
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Input } from "@/components/ui/input";
@@ -10,10 +8,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Auth = () => {
-  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signUpLoading, setSignUpLoading] = useState(false);
@@ -35,7 +31,7 @@ const Auth = () => {
       });
       
       if (error) throw error;
-      toast.success(t('auth.signUpSuccess'));
+      toast.success("Sign-up successful! Please check your email for verification.");
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign-up");
     } finally {
@@ -49,9 +45,9 @@ const Auth = () => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      toast.success(t('auth.signInSuccess'));
+      toast.success("Successfully logged in!");
     } catch (error: any) {
-      toast.error(error.message || t('auth.invalidCredentials'));
+      toast.error(error.message || "Invalid login credentials");
     } finally {
       setSignInLoading(false);
     }
@@ -69,7 +65,7 @@ const Auth = () => {
       
       if (error) throw error;
     } catch (error: any) {
-      toast.error(error.message || t('auth.googleSignInError'));
+      toast.error(error.message || "Failed to sign in with Google");
       setGoogleLoading(false);
     }
   };
@@ -77,7 +73,7 @@ const Auth = () => {
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      toast.error(t('auth.enterEmail'));
+      toast.error("Please enter your email address");
       return;
     }
     
@@ -88,10 +84,10 @@ const Auth = () => {
       });
       
       if (error) throw error;
-      toast.success(t('auth.resetEmailSent'));
+      toast.success("Password reset email sent! Check your inbox.");
       setShowResetForm(false);
     } catch (error: any) {
-      toast.error(error.message || t('auth.resetEmailError'));
+      toast.error(error.message || "Failed to send reset email");
     } finally {
       setResetLoading(false);
     }
@@ -101,20 +97,17 @@ const Auth = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="absolute top-4 right-4">
-        <LanguageSwitcher />
-      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">{t('auth.title')}</CardTitle>
-          <CardDescription>{t('auth.subtitle')}</CardDescription>
+          <CardTitle className="text-2xl">Portfolio Manager</CardTitle>
+          <CardDescription>Sign in to manage your portfolio</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <LoadingButton 
             onClick={handleGoogleSignIn}
             loading={googleLoading}
-            loadingText={t('auth.signingInWithGoogle')}
+            loadingText="Signing in with Google..."
             variant="outline"
             className="w-full flex items-center gap-2"
             disabled={isLoading}
@@ -125,7 +118,7 @@ const Auth = () => {
               <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            {t('auth.continueWithGoogle')}
+            Continue with Google
           </LoadingButton>
           
           <div className="relative">
@@ -133,15 +126,15 @@ const Auth = () => {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">{t('auth.orContinueWith')}</span>
+              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
         </CardContent>
 
         <Tabs defaultValue="sign-in" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in" disabled={isLoading}>{t('auth.signIn')}</TabsTrigger>
-            <TabsTrigger value="sign-up" disabled={isLoading}>{t('auth.signUp')}</TabsTrigger>
+            <TabsTrigger value="sign-in" disabled={isLoading}>Sign In</TabsTrigger>
+            <TabsTrigger value="sign-up" disabled={isLoading}>Sign Up</TabsTrigger>
           </TabsList>
           
           <TabsContent value="sign-in">
@@ -149,11 +142,11 @@ const Auth = () => {
               <form onSubmit={handleSignIn}>
                 <CardContent className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">{t('auth.email')}</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input 
                       id="email" 
                       type="email" 
-                      placeholder={t('auth.emailPlaceholder')}
+                      placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
@@ -161,7 +154,7 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">{t('auth.password')}</Label>
+                    <Label htmlFor="password">Password</Label>
                     <Input 
                       id="password" 
                       type="password" 
@@ -177,10 +170,10 @@ const Auth = () => {
                     type="submit" 
                     className="w-full" 
                     loading={signInLoading}
-                    loadingText={t('auth.signingIn')}
+                    loadingText="Signing in..."
                     disabled={isLoading}
                   >
-                    {t('auth.signIn')}
+                    Sign In
                   </LoadingButton>
                   <Button 
                     type="button"
@@ -190,7 +183,7 @@ const Auth = () => {
                     disabled={isLoading}
                     className="text-sm text-muted-foreground hover:text-foreground"
                   >
-                    {t('auth.forgotPassword')}
+                    Forgot your password?
                   </Button>
                 </CardFooter>
               </form>
@@ -198,11 +191,11 @@ const Auth = () => {
                 <form onSubmit={handlePasswordReset}>
                   <CardContent className="space-y-4 pt-4">
                     <div className="space-y-2">
-                      <Label htmlFor="reset-email">{t('auth.email')}</Label>
+                      <Label htmlFor="reset-email">Email</Label>
                       <Input 
                         id="reset-email" 
                         type="email" 
-                        placeholder={t('auth.emailPlaceholder')}
+                        placeholder="your@email.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isLoading}
@@ -210,7 +203,7 @@ const Auth = () => {
                       />
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {t('auth.resetEmailDescription')}
+                      Enter your email address and we'll send you a link to reset your password.
                     </p>
                   </CardContent>
                   <CardFooter className="flex flex-col space-y-2">
@@ -218,10 +211,10 @@ const Auth = () => {
                       type="submit" 
                       className="w-full" 
                       loading={resetLoading}
-                      loadingText={t('auth.sendingResetEmail')}
+                      loadingText="Sending reset email..."
                       disabled={isLoading}
                     >
-                      {t('auth.sendResetEmail')}
+                      Send Reset Email
                     </LoadingButton>
                     <Button 
                       type="button"
@@ -231,7 +224,7 @@ const Auth = () => {
                       disabled={isLoading}
                       className="text-sm text-muted-foreground hover:text-foreground"
                     >
-                      {t('auth.backToSignIn')}
+                      Back to sign in
                     </Button>
                   </CardFooter>
                 </form>
@@ -242,11 +235,11 @@ const Auth = () => {
             <form onSubmit={handleSignUp}>
               <CardContent className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">{t('auth.email')}</Label>
+                  <Label htmlFor="signup-email">Email</Label>
                   <Input 
                     id="signup-email" 
                     type="email" 
-                    placeholder={t('auth.emailPlaceholder')}
+                    placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
@@ -254,11 +247,11 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">{t('auth.password')}</Label>
+                  <Label htmlFor="signup-password">Password</Label>
                   <Input 
                     id="signup-password" 
                     type="password"
-                    placeholder={t('auth.passwordPlaceholder')}
+                    placeholder="Min 6 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
@@ -271,10 +264,10 @@ const Auth = () => {
                   type="submit" 
                   className="w-full" 
                   loading={signUpLoading}
-                  loadingText={t('auth.creatingAccount')}
+                  loadingText="Creating Account..."
                   disabled={isLoading}
                 >
-                  {t('auth.createAccount')}
+                  Create Account
                 </LoadingButton>
               </CardFooter>
             </form>
