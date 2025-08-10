@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ProjectData } from "@/types/portfolio";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { sanitizeText, validateAndFormatUrl } from "@/utils/securityUtils";
 
 export const useProjectOperations = (
   sectionId: string,
@@ -59,16 +60,18 @@ export const useProjectOperations = (
       
       // Add updated links
       if (updatedProject.links.length > 0) {
-        const linksToInsert = updatedProject.links.map(link => ({
-          project_id: updatedProject.id,
-          title: link.title,
-          url: link.url
-        }));
+        const linksToInsert = updatedProject.links
+          .map(link => ({
+            project_id: updatedProject.id,
+            title: sanitizeText(link.title),
+            url: validateAndFormatUrl(link.url)
+          }))
+          .filter(l => l.url !== "");
         
         const { error: insertLinksError } = await supabase
           .from('links')
           .insert(linksToInsert);
-          
+        
         if (insertLinksError) {
           throw insertLinksError;
         }
@@ -156,16 +159,18 @@ export const useProjectOperations = (
       
       // Insert links for the new project
       if (newProject.links.length > 0) {
-        const linksToInsert = newProject.links.map(link => ({
-          project_id: projectData.id,
-          title: link.title,
-          url: link.url
-        }));
+        const linksToInsert = newProject.links
+          .map(link => ({
+            project_id: projectData.id,
+            title: sanitizeText(link.title),
+            url: validateAndFormatUrl(link.url)
+          }))
+          .filter(l => l.url !== "");
         
         const { error: linksError } = await supabase
           .from('links')
           .insert(linksToInsert);
-          
+        
         if (linksError) {
           throw linksError;
         }

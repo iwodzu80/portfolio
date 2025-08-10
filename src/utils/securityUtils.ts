@@ -9,19 +9,35 @@
  */
 export const validateAndFormatUrl = (url: string): string => {
   // Return empty string if the URL is empty
-  if (!url || url.trim() === '') {
+  if (!url) return '';
+  let input = url.trim();
+  if (input === '') return '';
+
+  // Normalize protocol-relative URLs
+  if (input.startsWith('//')) {
+    input = `https:${input}`;
+  }
+
+  const protocolPattern = /^(https?:\/\/|mailto:|tel:)/i;
+
+  // Try to parse; if missing protocol, default to https
+  let parsed: URL;
+  try {
+    parsed = new URL(protocolPattern.test(input) ? input : `https://${input}`);
+  } catch (_e) {
     return '';
   }
 
-  // Check if URL already has a valid protocol
-  const hasValidProtocol = /^(https?:\/\/|mailto:|tel:)/i.test(url);
-  
-  if (hasValidProtocol) {
-    return url;
+  // Allowlist of safe protocols
+  const allowed = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+  if (!allowed.has(parsed.protocol)) {
+    return '';
   }
-  
-  // Add https protocol if missing
-  return `https://${url}`;
+
+  // Lowercase hostname for consistency
+  if (parsed.hostname) parsed.hostname = parsed.hostname.toLowerCase();
+
+  return parsed.toString();
 };
 
 /**
