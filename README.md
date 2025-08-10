@@ -1,73 +1,136 @@
-# Welcome to your Lovable project
+# Portfolio Builder – Secure, Supabase‑powered React App
 
-## Project info
+A modern portfolio builder with authentication, sections/projects editing, sharing, and lightweight analytics. Built with React + Vite + TypeScript, shadcn-ui, Tailwind CSS, and Supabase.
 
-**URL**: https://lovable.dev/projects/cb7a2ea1-bbbc-4da5-9793-3d7529b9d85b
 
-## How can I edit this code?
+## Quick Start
 
-There are several ways of editing your application.
+1) Install dependencies
+- Node.js 18+
+- npm i
 
-**Use Lovable**
+2) Run locally
+- npm run dev
+- App runs on http://localhost:8080
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cb7a2ea1-bbbc-4da5-9793-3d7529b9d85b) and start prompting.
+3) Build
+- npm run build
+- Preview: npm run preview
 
-Changes made via Lovable will be committed automatically to this repo.
 
-**Use your preferred IDE**
+## Tech Stack
+- React 18, TypeScript, Vite
+- Tailwind CSS + shadcn-ui components
+- TanStack Query
+- Supabase (Auth, DB, Edge Functions)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## App Structure (Key Paths)
+- src/pages: Auth, Index (dashboard), Settings, Analytics, SharedPortfolio
+- src/components: UI + portfolio editor widgets
+- src/hooks: data fetching and state (profile, sections, projects)
+- src/contexts: AuthContext, ThemeContext
+- src/integrations/supabase: client and generated types
 
-Follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Authentication
+- Supabase Auth drives session state (src/contexts/AuthContext.tsx)
+- Protected routes: /dashboard, /settings, /analytics
+- Public routes: /auth, /shared/:shareId, 404
+- Set Authentication → URL Configuration in Supabase:
+  - Site URL: your app URL (local or deployed)
+  - Redirect URLs: include your local and deployed URLs
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Supabase Configuration
+- Project ID: ozgiefftrbeypfsrfyws
+- The client is initialized in src/integrations/supabase/client.ts
+- No .env files are used; publishable keys are stored in code (anon key only). For secret keys, use Supabase Edge Function secrets.
+- SQL changes are managed via migrations in supabase/migrations
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Useful dashboard links:
+- SQL Editor: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/sql/new
+- Auth Providers: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/auth/providers
+- Users: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/auth/users
+- Edge Functions: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/functions
+- Storage: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/storage/buckets
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Security: Link Validation and Sanitization
+We validate and normalize URLs in the frontend and enforce in the DB.
 
-**Use GitHub Codespaces**
+Frontend (src/utils/securityUtils.ts)
+- validateAndFormatUrl(url):
+  - Allows protocols: http, https, mailto, tel
+  - Normalizes protocol‑relative URLs ("//example.com" → "https://example.com")
+  - Adds https:// if protocol missing
+  - Returns "" if invalid or unparsable
+- sanitizeText(text): escapes HTML special chars
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Database
+- Trigger function public.validate_links_url() rejects links without allowed protocols
 
-## What technologies are used for this project?
 
-This project is built with:
+## Exact Test Plan + Paste‑Ready URL Examples
+Use these to manually verify behavior in the UI and during code review.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+A) Valid URLs (expected: accepted and normalized if needed)
+1. https://example.com
+2. http://example.com
+3. https://Sub.Domain.Example.com/Path?Q=1#hash → hostname lowercased in output
+4. mailto:user@example.com
+5. tel:+123456789
+6. example.com → becomes https://example.com
+7. www.example.com/path → becomes https://www.example.com/path
+8. //cdn.example.com/lib.js → becomes https://cdn.example.com/lib.js
 
-## How can I deploy this project?
+B) Invalid/Malformed (expected: rejected → empty string in UI; DB trigger would error)
+1. javascript:alert(1)
+2. data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==
+3. ftp://example.com
+4. file:///etc/passwd
+5. chrome-extension://abcdef
+6. blob:https://example.com/uuid
+7. about:blank
+8. <script>alert(1)</script> (use sanitizeText for text fields)
+9. http:/broken.com (bad scheme)
+10. ://missing.scheme
 
-Simply open [Lovable](https://lovable.dev/projects/cb7a2ea1-bbbc-4da5-9793-3d7529b9d85b) and click on Share -> Publish.
+C) Edge Cases (expected behavior in parentheses)
+1. "" (empty) → ""
+2. "   " (whitespace) → ""
+3. EXAMPLE.COM → https://example.com
+4. HTTPS://EXAMPLE.COM → https://example.com
+5. mailto:USER@EXAMPLE.COM → mailto:user@example.com (no host normalization guarantee for local part; function parses URL object when applicable)
+6. tel:001-234-5678 → tel:001-234-5678 (allowed)
 
-## Can I connect a custom domain to my Lovable project?
+Acceptance checklist
+- All in (A) are persisted and open correctly in new tabs
+- All in (B) are blocked by UI (empty result) and DB trigger
+- (C) behave as indicated
 
-Yes, you can!
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## How to Manually Test in the UI
+- Go to Dashboard → edit a project → add/edit a Link
+- Paste examples from sections A, B, C
+- Save and verify behavior (valid saved, invalid blocked)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Scripts
+- dev: vite dev server
+- build: production build
+- preview: preview local build
+
+
+## Deployment
+- Publish via Lovable UI (Share → Publish)
+- Custom domain: Project → Settings → Domains
+
+
+## Troubleshooting
+- Auth redirect issues: set Site URL and Redirect URLs in Supabase
+- If stuck in a loop or seeing errors, check browser console and Supabase logs
+
+Helpful docs
+- Lovable Quickstart: https://docs.lovable.dev/user-guides/quickstart
+- Troubleshooting: https://docs.lovable.dev/tips-tricks/troubleshooting
