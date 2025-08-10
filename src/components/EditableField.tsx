@@ -10,6 +10,8 @@ interface EditableFieldProps {
   className?: string;
   placeholder?: string;
   multiline?: boolean;
+  autoEdit?: boolean;
+  onEditingChange?: (editing: boolean) => void;
 }
 
 const EditableField: React.FC<EditableFieldProps> = ({
@@ -18,7 +20,9 @@ const EditableField: React.FC<EditableFieldProps> = ({
   tag = "p",
   className = "",
   placeholder = "Click to edit",
-  multiline = false
+  multiline = false,
+  autoEdit = false,
+  onEditingChange
 }) => {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(value);
@@ -47,11 +51,24 @@ const EditableField: React.FC<EditableFieldProps> = ({
   };
   
   // Restore scroll position after render
-  useLayoutEffect(() => {
-    if (scrollPosRef.current > 0) {
-      window.scrollTo(0, scrollPosRef.current);
-    }
-  }, [editing, text]);
+useLayoutEffect(() => {
+  if (scrollPosRef.current > 0) {
+    window.scrollTo(0, scrollPosRef.current);
+  }
+}, [editing, text]);
+
+// If requested, automatically enter edit mode and focus
+useEffect(() => {
+  if (autoEdit) {
+    captureScrollPosition();
+    setEditing(true);
+  }
+}, [autoEdit]);
+
+// Notify parent when editing state changes
+useEffect(() => {
+  onEditingChange?.(editing);
+}, [editing, onEditingChange]);
   
   const handleClick = () => {
     captureScrollPosition();

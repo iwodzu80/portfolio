@@ -15,13 +15,14 @@ interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, isEditingMode = true }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [localProject, setLocalProject] = useState<ProjectData>({
-    ...project,
-    features: project.features || [],
-    project_role: project.project_role || ""
-  });
+const [isEditing, setIsEditing] = useState(false);
+const [confirmDelete, setConfirmDelete] = useState(false);
+const [localProject, setLocalProject] = useState<ProjectData>({
+  ...project,
+  features: project.features || [],
+  project_role: project.project_role || ""
+});
+const [lastAddedFeatureId, setLastAddedFeatureId] = useState<string | null>(null);
   
   // Update local state when props change
   useEffect(() => {
@@ -51,17 +52,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
     toast.success("Link added");
   };
 
-  const addFeature = () => {
-    const newFeature: FeatureData = {
-      id: `${localProject.id}-feature-${Date.now()}`,
-      title: "New Feature"
-    };
-    
-    const updatedFeatures = [...localProject.features, newFeature];
-    setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
-    updateField("features", updatedFeatures);
-    toast.success("Feature added");
+const addFeature = () => {
+  const newFeature: FeatureData = {
+    id: `${localProject.id}-feature-${Date.now()}`,
+    title: "New Feature"
   };
+  
+  const updatedFeatures = [...localProject.features, newFeature];
+  setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
+  updateField("features", updatedFeatures);
+  setLastAddedFeatureId(newFeature.id);
+  toast.success("Feature added");
+};
   
   const updateLink = (linkId: string, field: keyof LinkData, value: string) => {
     // If updating URL field, ensure it has a protocol and is validated
@@ -243,13 +245,19 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, 
             >
               {isEditing ? (
                 <>
-                  <EditableField
-                    value={feature.title}
-                    onChange={(value) => updateFeature(feature.id, "title", value)}
-                    tag="span"
-                    className="text-sm bg-gray-100 text-gray-700 py-1 px-3 rounded-full border"
-                    placeholder="Feature name"
-                  />
+<EditableField
+  value={feature.title}
+  onChange={(value) => updateFeature(feature.id, "title", value)}
+  tag="span"
+  className="text-sm bg-gray-100 text-gray-700 py-1 px-3 rounded-full border"
+  placeholder="Feature name"
+  autoEdit={feature.id === lastAddedFeatureId}
+  onEditingChange={(editing) => {
+    if (!editing && lastAddedFeatureId === feature.id) {
+      setLastAddedFeatureId(null);
+    }
+  }}
+/>
                   <button
                     onClick={() => deleteFeature(feature.id)}
                     className="text-red-500 hover:text-red-700 transition-colors ml-1"
