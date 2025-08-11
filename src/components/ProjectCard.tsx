@@ -144,9 +144,11 @@ const addFeature = () => {
             <p className="text-sm text-portfolio-muted italic">{localProject.project_role}</p>
           )}
         </div>
-        <div className="text-portfolio-muted mb-4 text-sm text-justify">
-          {renderDescription(localProject.description)}
-        </div>
+        {localProject.description && localProject.description.trim().length > 0 && (
+          <div className="text-portfolio-muted mb-4 text-sm text-justify">
+            {renderDescription(localProject.description)}
+          </div>
+        )}
         
         {/* Features */}
         {localProject.features.length > 0 && (
