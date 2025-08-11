@@ -96,22 +96,24 @@ const SectionItem: React.FC<SectionItemProps> = React.memo(({
         )}
       </div>
 
-      {isEditingMode ? (
+      <div className="max-w-xl mx-auto px-6">
+        {isEditingMode ? (
         <EditableField
           value={section.description || ""}
           onChange={handleUpdateSectionDescription}
           tag="p"
-          className="text-portfolio-muted mb-6 max-w-prose mx-auto text-justify"
+          className="text-portfolio-muted mb-6"
           placeholder="Section description (optional)"
           multiline
         />
       ) : (
         section.description && section.description.trim().length > 0 && (
-          <p className="text-portfolio-muted mb-6 max-w-prose mx-auto text-justify">
+          <p className="text-portfolio-muted mb-6">
             {section.description}
           </p>
         )
       )}
+      </div>
       
       <ProjectList
         sectionId={section.id}
