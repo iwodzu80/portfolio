@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { SectionData } from "../utils/localStorage";
+import { SectionData } from "@/types/portfolio";
 import SectionItem from "./SectionItem";
 import SectionControls from "./SectionControls";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
