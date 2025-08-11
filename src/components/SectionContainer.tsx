@@ -21,6 +21,7 @@ const SectionContainer: React.FC<SectionContainerProps> = React.memo(({
   
   const {
     handleUpdateSection,
+    handleUpdateSectionDescription,
     handleDeleteSection,
     handleAddSection,
     handleMoveSection
@@ -67,6 +68,7 @@ const SectionContainer: React.FC<SectionContainerProps> = React.memo(({
             isEditingSections={isEditingSections}
             onUpdate={onUpdate}
             onUpdateSection={handleUpdateSection}
+            onUpdateSectionDescription={handleUpdateSectionDescription}
             onDeleteSection={handleDeleteSection}
             onMoveSection={handleMoveSection}
           />

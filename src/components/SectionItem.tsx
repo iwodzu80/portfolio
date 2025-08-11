@@ -13,11 +13,12 @@ interface SectionItemProps {
   isEditingSections: boolean;
   onUpdate: () => void;
   onUpdateSection: (sectionId: string, title: string) => void;
+  onUpdateSectionDescription: (sectionId: string, description: string) => void;
   onDeleteSection: (sectionId: string) => void;
   onMoveSection: (sectionId: string, direction: 'up' | 'down') => void;
 }
 
-const SectionItem: React.FC<SectionItemProps> = React.memo(({
+const SectionItem: React.FC<SectionItemProps> = React.memo(({ 
   section,
   index,
   totalSections,
@@ -25,12 +26,17 @@ const SectionItem: React.FC<SectionItemProps> = React.memo(({
   isEditingSections,
   onUpdate,
   onUpdateSection,
+  onUpdateSectionDescription,
   onDeleteSection,
   onMoveSection
 }) => {
   const handleUpdateSection = useCallback((value: string) => {
     onUpdateSection(section.id, value);
   }, [section.id, onUpdateSection]);
+
+  const handleUpdateSectionDescription = useCallback((value: string) => {
+    onUpdateSectionDescription(section.id, value);
+  }, [section.id, onUpdateSectionDescription]);
 
   const handleMoveUp = useCallback(() => {
     onMoveSection(section.id, 'up');
@@ -89,6 +95,23 @@ const SectionItem: React.FC<SectionItemProps> = React.memo(({
           <h2 className="text-xl font-semibold text-center">{section.title || "Untitled Section"}</h2>
         )}
       </div>
+
+      {isEditingMode ? (
+        <EditableField
+          value={section.description || ""}
+          onChange={handleUpdateSectionDescription}
+          tag="p"
+          className="text-portfolio-muted mb-6 max-w-prose mx-auto text-justify"
+          placeholder="Section description (optional)"
+          multiline
+        />
+      ) : (
+        section.description && section.description.trim().length > 0 && (
+          <p className="text-portfolio-muted mb-6 max-w-prose mx-auto text-justify">
+            {section.description}
+          </p>
+        )
+      )}
       
       <ProjectList
         sectionId={section.id}

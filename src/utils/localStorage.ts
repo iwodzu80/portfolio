@@ -31,6 +31,7 @@ export interface ProjectData {
 export interface SectionData {
   id: string;
   title: string;
+  description?: string;
   projects: ProjectData[];
 }
 
@@ -52,6 +53,7 @@ const defaultData: PortfolioData = {
     {
       id: "section-1",
       title: "My Projects",
+      description: "",
       projects: [
         {
           id: "1",

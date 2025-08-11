@@ -33,5 +33,6 @@ export interface ProjectData {
 export interface SectionData {
   id: string;
   title: string;
+  description?: string;
   projects: ProjectData[];
 }

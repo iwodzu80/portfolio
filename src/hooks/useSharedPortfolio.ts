@@ -71,6 +71,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             .select(`
               id, 
               title,
+              description,
               projects (
                 id, 
                 title, 
@@ -171,6 +172,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             return {
               id: section.id,
               title: sanitizeText(section.title || "Untitled Section"),
+              description: sanitizeText(section.description || ""),
               projects
             };
           }).filter(Boolean) as SectionData[];

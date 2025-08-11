@@ -15,6 +15,7 @@ export const useSectionData = (userId: string | undefined) => {
         .select(`
           id,
           title,
+          description,
           projects:projects(
             id,
             title,
@@ -43,6 +44,7 @@ export const useSectionData = (userId: string | undefined) => {
         const transformedSections: SectionData[] = sectionsData.map(section => ({
           id: section.id,
           title: section.title,
+          description: section.description || "",
           projects: section.projects.map(project => ({
             id: project.id,
             title: project.title,

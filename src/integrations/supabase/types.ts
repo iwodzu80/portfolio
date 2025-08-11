@@ -226,6 +226,7 @@ export type Database = {
       sections: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           title: string
           updated_at: string
@@ -233,6 +234,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           title: string
           updated_at?: string
@@ -240,6 +242,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           title?: string
           updated_at?: string

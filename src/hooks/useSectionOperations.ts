@@ -36,6 +36,29 @@ export const useSectionOperations = (
     }
   };
   
+  const handleUpdateSectionDescription = async (sectionId: string, description: string) => {
+    try {
+      const { error } = await supabase
+        .from('sections')
+        .update({ description, updated_at: new Date().toISOString() })
+        .eq('id', sectionId)
+        .eq('user_id', user?.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      const updatedSections = sections.map(section => 
+        section.id === sectionId ? { ...section, description } : section
+      );
+      
+      setSections(updatedSections);
+      toast.success("Section description updated");
+    } catch (error: any) {
+      console.error("Error updating section description:", error.message);
+      toast.error("Failed to update section description");
+    }
+  };
   const handleDeleteSection = async (sectionId: string) => {
     if (sections.length <= 1) {
       toast.error("You must have at least one section");
@@ -80,6 +103,7 @@ export const useSectionOperations = (
       const newSection: SectionData = {
         id: data.id,
         title: data.title,
+        description: "",
         projects: []
       };
       
@@ -145,6 +169,7 @@ export const useSectionOperations = (
 
   return {
     handleUpdateSection,
+    handleUpdateSectionDescription,
     handleDeleteSection,
     handleAddSection,
     handleMoveSection
