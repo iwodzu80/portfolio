@@ -104,13 +104,13 @@ const SectionItem: React.FC<SectionItemProps> = React.memo(({
           value={section.description || ""}
           onChange={handleUpdateSectionDescription}
           tag="p"
-          className="text-portfolio-muted mb-6"
+          className="text-portfolio-muted mb-6 text-justify"
           placeholder="Section description (optional)"
           multiline
         />
       ) : (
         section.description && section.description.trim().length > 0 && (
-          <p className="text-portfolio-muted mb-6">
+          <p className="text-portfolio-muted mb-6 text-justify">
             {section.description}
           </p>
         )
