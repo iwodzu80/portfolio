@@ -52,48 +52,50 @@ const SectionItem: React.FC<SectionItemProps> = React.memo(({
 
   return (
     <div className="mb-12">
-      <div className="flex items-center justify-center gap-2 mb-4">
-        {isEditingMode ? (
-          <>
-            <EditableField
-              value={section.title}
-              onChange={handleUpdateSection}
-              tag="h2"
-              className="text-xl font-semibold text-center"
-              placeholder="Section Title"
-            />
-            
-            {isEditingSections && (
-              <>
-                <button
-                  onClick={handleMoveUp}
-                  className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
-                  aria-label="Move section up"
-                  disabled={index === 0}
-                >
-                  <ArrowUp size={18} className={index === 0 ? "opacity-30" : ""} />
-                </button>
-                <button
-                  onClick={handleMoveDown}
-                  className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
-                  aria-label="Move section down"
-                  disabled={index === totalSections - 1}
-                >
-                  <ArrowDown size={18} className={index === totalSections - 1 ? "opacity-30" : ""} />
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="text-portfolio-muted hover:text-red-500 transition-colors"
-                  aria-label="Delete section"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </>
-            )}
-          </>
-        ) : (
-          <h2 className="text-xl font-semibold text-center">{section.title || "Untitled Section"}</h2>
-        )}
+      <div className="max-w-xl mx-auto px-6">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          {isEditingMode ? (
+            <>
+              <EditableField
+                value={section.title}
+                onChange={handleUpdateSection}
+                tag="h2"
+                className="text-xl font-semibold text-center"
+                placeholder="Section Title"
+              />
+              
+              {isEditingSections && (
+                <>
+                  <button
+                    onClick={handleMoveUp}
+                    className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                    aria-label="Move section up"
+                    disabled={index === 0}
+                  >
+                    <ArrowUp size={18} className={index === 0 ? "opacity-30" : ""} />
+                  </button>
+                  <button
+                    onClick={handleMoveDown}
+                    className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                    aria-label="Move section down"
+                    disabled={index === totalSections - 1}
+                  >
+                    <ArrowDown size={18} className={index === totalSections - 1 ? "opacity-30" : ""} />
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="text-portfolio-muted hover:text-red-500 transition-colors"
+                    aria-label="Delete section"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </>
+              )}
+            </>
+          ) : (
+            <h2 className="text-xl font-semibold text-center">{section.title || "Untitled Section"}</h2>
+          )}
+        </div>
       </div>
 
       <div className="max-w-xl mx-auto px-6">
