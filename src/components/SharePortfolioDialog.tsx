@@ -63,6 +63,8 @@ const SharePortfolioDialog = () => {
         .from('portfolio_shares')
         .select('*')
         .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
         
       console.log("Share data result:", { data, error });
