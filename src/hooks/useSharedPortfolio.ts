@@ -39,6 +39,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         
         // Sanitize shareId
         const sanitizedShareId = sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, ''));
+        console.log("Sanitized shareId:", sanitizedShareId);
+        console.log("Original shareId:", shareId);
         
         // Make a single optimized query to get both the share record and user ID
         // This eliminates one database roundtrip
@@ -48,7 +50,10 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           .eq('share_id', sanitizedShareId)
           .maybeSingle();
           
+        console.log("Share data query result:", { shareData, shareError });
+          
         if (shareError || !shareData || !shareData.active) {
+          console.log("Share not found or not active:", { shareError, shareData });
           setNotFound(true);
           setIsLoading(false);
           return;
