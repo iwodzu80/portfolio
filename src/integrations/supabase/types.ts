@@ -280,9 +280,7 @@ export type Database = {
     }
     Functions: {
       record_portfolio_view: {
-        Args:
-          | { p_referrer?: string; p_share_id: string; p_user_agent?: string }
-          | { p_share_id: string; p_user_agent?: string }
+        Args: { p_referrer?: string; p_share_id: string; p_user_agent?: string }
         Returns: undefined
       }
     }

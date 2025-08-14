@@ -56,24 +56,30 @@ const SharedPortfolio = React.memo(() => {
       ? `Shared Portfolio: ${sanitizeText(ownerName || "")}`
       : "Shared Portfolio";
     
+    // Record analytics with rate limiting (once per session per portfolio)
     if (!analyticsRecorded.current && sanitizedShareId && sanitizedShareId.length >= 8 && !/[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
-      analyticsRecorded.current = true;
+      const sessionKey = `portfolio_view_${sanitizedShareId}`;
       
-      setTimeout(() => {
-        const recordView = async () => {
-          try {
-            await supabase.rpc('record_portfolio_view', {
-              p_share_id: sanitizedShareId,
-              p_referrer: document.referrer || 'direct',
-              p_user_agent: navigator.userAgent
-            });
-          } catch (err) {
-            console.error("Analytics error:", err);
-          }
-        };
+      if (!sessionStorage.getItem(sessionKey)) {
+        analyticsRecorded.current = true;
+        sessionStorage.setItem(sessionKey, 'true');
         
-        recordView();
-      }, 100);
+        setTimeout(() => {
+          const recordView = async () => {
+            try {
+              await supabase.rpc('record_portfolio_view', {
+                p_share_id: sanitizedShareId,
+                p_referrer: document.referrer || 'direct',
+                p_user_agent: navigator.userAgent
+              });
+            } catch (err) {
+              console.warn("Analytics recording failed:", err);
+            }
+          };
+          
+          recordView();
+        }, 100);
+      }
     }
 
     // Cleanup function to remove the meta tag when component unmounts

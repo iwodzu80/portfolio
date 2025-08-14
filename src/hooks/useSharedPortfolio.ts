@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SectionData, ProjectData, ProfileData } from "@/types/portfolio";
 import { toast } from "sonner";
 import { validateAndFormatUrl, sanitizeText } from "@/utils/securityUtils";
+import { logError } from "@/utils/errorHandler";
 
 export const useSharedPortfolio = (shareId: string | undefined) => {
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -58,10 +59,11 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         // Use Promise.all to execute queries concurrently
         // This significantly reduces total wait time
         const [profileData, sectionsData, userRoleData] = await Promise.all([
-          // Query 1: Fetch profile with minimal fields needed for display
+          // Query 1: Fetch profile with only public fields for shared portfolios
+          // SECURITY: Exclude email and telephone from public shared portfolios
           supabase
             .from('profiles')
-            .select('name, photo, email, telephone, role, tagline, description')
+            .select('name, photo, role, tagline, description')
             .eq('id', userId)
             .single(),
             
@@ -110,8 +112,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           const sanitizedProfileData = {
             name: sanitizeText(data.name || ""),
             photo: data.photo || "", 
-            email: sanitizeText(data.email || ""),
-            telephone: sanitizeText(data.telephone || ""),
+            email: "", // SECURITY: Don't expose email in shared portfolios
+            telephone: "", // SECURITY: Don't expose telephone in shared portfolios
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
             description: sanitizeText(data.description || ""),
@@ -180,7 +182,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           setSections(formattedSections);
         }
       } catch (error: any) {
-        console.error("Error in fetchSharedPortfolio:", error);
+        logError(error, "fetchSharedPortfolio");
       } finally {
         // Only update loading state if the component is still mounted
         if (!controller.signal.aborted) {
