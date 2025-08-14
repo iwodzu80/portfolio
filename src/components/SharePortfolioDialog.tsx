@@ -98,46 +98,75 @@ const SharePortfolioDialog = () => {
     try {
       setIsLoading(true);
       
-      // Generate a new random share ID
-      const newShareId = crypto.randomUUID();
+      const MAX_RETRIES = 5;
+      let attempts = 0;
+      let success = false;
+      let newShareId = '';
       
-      // Check if a share record already exists
-      const { data: existingShare } = await supabase
-        .from('portfolio_shares')
-        .select('share_id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      let error;
-      
-      if (existingShare) {
-        // Update existing record
-        const { error: updateError } = await supabase
-          .from('portfolio_shares')
-          .update({ 
-            share_id: newShareId,
-            active: true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user.id);
+      while (attempts < MAX_RETRIES && !success) {
+        attempts++;
+        
+        // Generate a new random share ID
+        newShareId = crypto.randomUUID();
+        
+        try {
+          // Check if a share record already exists for this user
+          const { data: existingShare } = await supabase
+            .from('portfolio_shares')
+            .select('share_id')
+            .eq('user_id', user.id)
+            .maybeSingle();
           
-        error = updateError;
-      } else {
-        // Create new record
-        const { error: insertError } = await supabase
-          .from('portfolio_shares')
-          .insert({
-            user_id: user.id,
-            share_id: newShareId,
-            active: true
-          });
+          let error;
           
-        error = insertError;
+          if (existingShare) {
+            // Update existing record
+            const { error: updateError } = await supabase
+              .from('portfolio_shares')
+              .update({ 
+                share_id: newShareId,
+                active: true,
+                updated_at: new Date().toISOString()
+              })
+              .eq('user_id', user.id);
+              
+            error = updateError;
+          } else {
+            // Create new record
+            const { error: insertError } = await supabase
+              .from('portfolio_shares')
+              .insert({
+                user_id: user.id,
+                share_id: newShareId,
+                active: true
+              });
+              
+            error = insertError;
+          }
+          
+          if (error) {
+            // Check if this is a unique constraint violation on share_id
+            if (error.code === '23505' && error.message.includes('portfolio_shares_share_id_unique')) {
+              console.log(`Share ID collision detected on attempt ${attempts}, retrying...`);
+              continue; // Try again with a new UUID
+            } else {
+              throw error; // Other errors should not be retried
+            }
+          }
+          
+          success = true;
+        } catch (retryError: any) {
+          if (retryError.code === '23505' && retryError.message.includes('portfolio_shares_share_id_unique')) {
+            console.log(`Share ID collision detected on attempt ${attempts}, retrying...`);
+            continue; // Try again with a new UUID
+          } else {
+            throw retryError; // Other errors should not be retried
+          }
+        }
       }
       
-      if (error) {
-        console.error("Error generating share link:", error);
-        throw error;
+      if (!success) {
+        throw new Error(`Failed to generate unique share ID after ${MAX_RETRIES} attempts`);
       }
       
       setShareId(newShareId);
