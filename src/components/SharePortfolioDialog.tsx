@@ -58,12 +58,15 @@ const SharePortfolioDialog = () => {
     
     setIsLoading(true);
     try {
+      console.log("Loading share data for user:", user.id);
       const { data, error } = await supabase
         .from('portfolio_shares')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
         
+      console.log("Share data result:", { data, error });
+      
       if (error && error.code !== 'PGRST116') {
         console.error("Error loading share data:", error);
         throw error;
