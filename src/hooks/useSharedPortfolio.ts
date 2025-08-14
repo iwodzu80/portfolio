@@ -46,7 +46,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           .from('portfolio_shares')
           .select('user_id, active')
           .eq('share_id', sanitizedShareId)
-          .single();
+          .maybeSingle();
           
         if (shareError || !shareData || !shareData.active) {
           setNotFound(true);
