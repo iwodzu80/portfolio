@@ -101,7 +101,7 @@ const SharePortfolioDialog = () => {
       // Check if a share record already exists
       const { data: existingShare } = await supabase
         .from('portfolio_shares')
-        .select('id')
+        .select('share_id')
         .eq('user_id', user.id)
         .maybeSingle();
       
