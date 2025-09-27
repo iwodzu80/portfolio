@@ -14,112 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      features: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          position: number
-          project_id: string
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          position?: number
-          project_id: string
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          position?: number
-          project_id?: string
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "features_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      links: {
-        Row: {
-          created_at: string
-          id: string
-          position: number
-          project_id: string
-          title: string
-          updated_at: string
-          url: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          position?: number
-          project_id: string
-          title: string
-          updated_at?: string
-          url: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          position?: number
-          project_id?: string
-          title?: string
-          updated_at?: string
-          url?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "links_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       portfolio_analytics: {
         Row: {
+          city: string | null
+          country: string | null
           id: string
-          ip: unknown | null
           referrer: string | null
           share_id: string
           user_agent: string | null
+          user_id: string
           viewed_at: string
+          visitor_ip: string | null
         }
         Insert: {
+          city?: string | null
+          country?: string | null
           id?: string
-          ip?: unknown | null
           referrer?: string | null
           share_id: string
           user_agent?: string | null
+          user_id: string
           viewed_at?: string
+          visitor_ip?: string | null
         }
         Update: {
+          city?: string | null
+          country?: string | null
           id?: string
-          ip?: unknown | null
           referrer?: string | null
           share_id?: string
           user_agent?: string | null
+          user_id?: string
           viewed_at?: string
+          visitor_ip?: string | null
         }
         Relationships: [
           {
@@ -133,26 +60,32 @@ export type Database = {
       }
       portfolio_shares: {
         Row: {
-          active: boolean
           created_at: string
+          description: string | null
           id: string
+          is_active: boolean | null
           share_id: string
+          title: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          active?: boolean
           created_at?: string
+          description?: string | null
           id?: string
-          share_id?: string
+          is_active?: boolean | null
+          share_id: string
+          title?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          active?: boolean
           created_at?: string
+          description?: string | null
           id?: string
+          is_active?: boolean | null
           share_id?: string
+          title?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -165,23 +98,25 @@ export type Database = {
           email: string | null
           id: string
           name: string | null
+          phone: string | null
           photo_url: string | null
           role: string | null
           tagline: string | null
-          telephone: string | null
           updated_at: string
+          user_id: string
         }
         Insert: {
           created_at?: string
           description?: string | null
           email?: string | null
-          id: string
+          id?: string
           name?: string | null
+          phone?: string | null
           photo_url?: string | null
           role?: string | null
           tagline?: string | null
-          telephone?: string | null
           updated_at?: string
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -189,22 +124,103 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string | null
+          phone?: string | null
           photo_url?: string | null
           role?: string | null
           tagline?: string | null
-          telephone?: string | null
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
+      }
+      project_features: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          project_id: string
+          sort_order: number | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          project_id: string
+          sort_order?: number | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          project_id?: string
+          sort_order?: number | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_features_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_links: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          sort_order: number | null
+          title: string
+          type: string | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          sort_order?: number | null
+          title: string
+          type?: string | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          sort_order?: number | null
+          title?: string
+          type?: string | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
           created_at: string
           description: string | null
           id: string
-          position: number
+          image_url: string | null
           role: string | null
           section_id: string
+          sort_order: number | null
           title: string
           updated_at: string
           user_id: string
@@ -213,9 +229,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          position?: number
+          image_url?: string | null
           role?: string | null
           section_id: string
+          sort_order?: number | null
           title: string
           updated_at?: string
           user_id: string
@@ -224,9 +241,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          position?: number
+          image_url?: string | null
           role?: string | null
           section_id?: string
+          sort_order?: number | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -244,24 +262,27 @@ export type Database = {
       sections: {
         Row: {
           created_at: string
+          description: string | null
           id: string
-          position: number
+          sort_order: number | null
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
-          position?: number
+          sort_order?: number | null
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
-          position?: number
+          sort_order?: number | null
           title?: string
           updated_at?: string
           user_id?: string
