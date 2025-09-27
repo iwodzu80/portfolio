@@ -22,7 +22,7 @@ interface ShareData {
   id: string;
   user_id: string;
   share_id: string;
-  active: boolean;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -74,7 +74,7 @@ const SharePortfolioDialog = () => {
       
       if (data) {
         setShareId(data.share_id);
-        setIsActive(data.active);
+        setIsActive(data.is_active);
         const baseUrl = getBaseUrl();
         setShareLink(`${baseUrl}/shared/${data.share_id}`);
       }
@@ -125,7 +125,7 @@ const SharePortfolioDialog = () => {
               .from('portfolio_shares')
               .update({ 
                 share_id: newShareId,
-                active: true,
+                is_active: true,
                 updated_at: new Date().toISOString()
               })
               .eq('user_id', user.id);
@@ -138,7 +138,7 @@ const SharePortfolioDialog = () => {
               .insert({
                 user_id: user.id,
                 share_id: newShareId,
-                active: true
+                is_active: true
               });
               
             error = insertError;
@@ -191,7 +191,7 @@ const SharePortfolioDialog = () => {
       const { error } = await supabase
         .from('portfolio_shares')
         .update({ 
-          active,
+          is_active: active,
           updated_at: new Date().toISOString() 
         })
         .eq('user_id', user.id);

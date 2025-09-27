@@ -20,12 +20,12 @@ export const useSectionData = (userId: string | undefined) => {
             id,
             title,
             description,
-            links:links(
+            links:project_links(
               id,
               title,
               url
             ),
-            features:features(
+            features:project_features(
               id,
               title
             )
@@ -49,15 +49,15 @@ export const useSectionData = (userId: string | undefined) => {
             id: project.id,
             title: project.title,
             description: project.description || "",
-            links: project.links.map(link => ({
+            links: (project as any).project_links?.map((link: any) => ({
               id: link.id,
               title: link.title,
               url: link.url
-            })),
-            features: project.features.map(feature => ({
+            })) || [],
+            features: (project as any).project_features?.map((feature: any) => ({
               id: feature.id,
               title: feature.title
-            }))
+            })) || []
           }))
         }));
         

@@ -46,13 +46,13 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         // This eliminates one database roundtrip
         const { data: shareData, error: shareError } = await supabase
           .from('portfolio_shares')
-          .select('user_id, active')
+          .select('user_id, is_active')
           .eq('share_id', sanitizedShareId)
           .maybeSingle();
           
         console.log("Share data query result:", { shareData, shareError });
           
-        if (shareError || !shareData || !shareData.active) {
+        if (shareError || !shareData || !shareData.is_active) {
           console.log("Share not found or not active:", { shareError, shareData });
           setNotFound(true);
           setIsLoading(false);
@@ -68,8 +68,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           // SECURITY: Exclude email and telephone from public shared portfolios
           supabase
             .from('profiles')
-            .select('name, photo, role, tagline, description')
-            .eq('id', userId)
+            .select('name, photo_url, role, tagline, description')
+            .eq('user_id', userId)
             .single(),
             
           // Query 2: Fetch sections with projects, links, and features (including project_role)
@@ -83,13 +83,13 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                 id, 
                 title, 
                 description,
-                project_role,
-                links (
+                role,
+                project_links (
                   id, 
                   title, 
                   url
                 ),
-                features (
+                project_features (
                   id,
                   title
                 )
@@ -102,7 +102,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           supabase
             .from('profiles')
             .select('role')
-            .eq('id', userId)
+            .eq('user_id', userId)
             .single()
         ]);
         
@@ -116,7 +116,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           
           const sanitizedProfileData = {
             name: sanitizeText(data.name || ""),
-            photo: data.photo || "", 
+            photo: data.photo_url || "", 
             email: "", // SECURITY: Don't expose email in shared portfolios
             telephone: "", // SECURITY: Don't expose telephone in shared portfolios
             role: sanitizeText(data.role || ""),
@@ -149,8 +149,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                   if (!project) return null;
                   
                   // Transform links efficiently
-                  const links = Array.isArray(project.links) 
-                    ? project.links.map(link => ({
+                  const links = Array.isArray(project.project_links) 
+                    ? project.project_links.map(link => ({
                         id: link.id,
                         title: sanitizeText(link.title || ""),
                         url: validateAndFormatUrl(link.url || "")
@@ -158,8 +158,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                     : [];
 
                   // Transform features efficiently
-                  const features = Array.isArray(project.features) 
-                    ? project.features.map(feature => ({
+                  const features = Array.isArray(project.project_features) 
+                    ? project.project_features.map(feature => ({
                         id: feature.id,
                         title: sanitizeText(feature.title || "")
                       }))
@@ -169,7 +169,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                     id: project.id,
                     title: sanitizeText(project.title || "Untitled Project"),
                     description: sanitizeText(project.description || ""),
-                    project_role: project.project_role ? sanitizeText(project.project_role) : undefined,
+                    project_role: project.role ? sanitizeText(project.role) : undefined,
                     links,
                     features
                   };

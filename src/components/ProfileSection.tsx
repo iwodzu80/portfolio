@@ -86,7 +86,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
       
       if (checkError && checkError.code !== 'PGRST116') {
@@ -103,9 +103,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         const { error: insertError } = await supabase
           .from('profiles')
           .insert({
-            id: user.id,
+            user_id: user.id,
             email: user.email,
-            [field]: value
+            [field === 'photo' ? 'photo_url' : field === 'telephone' ? 'phone' : field]: value
           });
         error = insertError;
         
@@ -117,8 +117,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         console.log("Profile exists, updating field:", field);
         const { error: updateError } = await supabase
           .from('profiles')
-          .update(updateData)
-          .eq('id', user.id);
+          .update({
+            [field === 'photo' ? 'photo_url' : field === 'telephone' ? 'phone' : field]: value,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
         error = updateError;
         
         if (!updateError) {

@@ -22,7 +22,10 @@ interface AnalyticsData {
   viewed_at: string;
   referrer: string | null;
   user_agent: string | null;
-  created_at: string;
+  user_id: string;
+  city: string | null;
+  country: string | null;
+  visitor_ip: string | null;
 }
 
 interface ChartData {

@@ -36,9 +36,9 @@ export const useProfileData = (userId: string | undefined) => {
       if (data) {
         const profile: ProfileData = {
           name: data.name || "",
-          photo: data.photo || "",
+          photo: data.photo_url || "",
           email: data.email || "",
-          telephone: data.telephone || "",
+          telephone: data.phone || "",
           role: data.role || "",
           tagline: data.tagline || "",
           description: data.description || ""
@@ -62,11 +62,11 @@ export const useProfileData = (userId: string | undefined) => {
       const { data, error } = await supabase
         .from('profiles')
         .insert({
-          id: userId,
+          user_id: userId,
           email: email,
           name: "",
-          photo: "",
-          telephone: "",
+          photo_url: "",
+          phone: "",
           role: "",
           tagline: "",
           description: ""
@@ -81,9 +81,9 @@ export const useProfileData = (userId: string | undefined) => {
       if (data) {
         const profile: ProfileData = {
           name: data.name || "",
-          photo: data.photo || "",
+          photo: data.photo_url || "",
           email: data.email || "",
-          telephone: data.telephone || "",
+          telephone: data.phone || "",
           role: data.role || "",
           tagline: data.tagline || "",
           description: data.description || ""

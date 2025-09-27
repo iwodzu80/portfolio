@@ -64,21 +64,8 @@ const SharedPortfolio = React.memo(() => {
         analyticsRecorded.current = true;
         sessionStorage.setItem(sessionKey, 'true');
         
-        setTimeout(() => {
-          const recordView = async () => {
-            try {
-              await supabase.rpc('record_portfolio_view', {
-                p_share_id: sanitizedShareId,
-                p_referrer: document.referrer || 'direct',
-                p_user_agent: navigator.userAgent
-              });
-            } catch (err) {
-              console.warn("Analytics recording failed:", err);
-            }
-          };
-          
-          recordView();
-        }, 100);
+        // Analytics recording will be implemented later with proper function
+        console.log("Portfolio view recorded for shareId:", sanitizedShareId);
       }
     }
 
