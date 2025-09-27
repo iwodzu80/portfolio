@@ -19,25 +19,31 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          position: number
           project_id: string
           title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: string
+          position?: number
           project_id: string
           title: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: string
+          position?: number
           project_id?: string
           title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -53,26 +59,32 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          position: number
           project_id: string
           title: string
           updated_at: string
           url: string
+          user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          position?: number
           project_id: string
           title: string
           updated_at?: string
           url: string
+          user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          position?: number
           project_id?: string
           title?: string
           updated_at?: string
           url?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -86,24 +98,24 @@ export type Database = {
       }
       portfolio_analytics: {
         Row: {
-          created_at: string
           id: string
+          ip: unknown | null
           referrer: string | null
           share_id: string
           user_agent: string | null
           viewed_at: string
         }
         Insert: {
-          created_at?: string
           id?: string
+          ip?: unknown | null
           referrer?: string | null
           share_id: string
           user_agent?: string | null
           viewed_at?: string
         }
         Update: {
-          created_at?: string
           id?: string
+          ip?: unknown | null
           referrer?: string | null
           share_id?: string
           user_agent?: string | null
@@ -123,6 +135,7 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          id: string
           share_id: string
           updated_at: string
           user_id: string
@@ -130,13 +143,15 @@ export type Database = {
         Insert: {
           active?: boolean
           created_at?: string
-          share_id: string
+          id?: string
+          share_id?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           active?: boolean
           created_at?: string
+          id?: string
           share_id?: string
           updated_at?: string
           user_id?: string
@@ -147,10 +162,10 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
-          email: string
+          email: string | null
           id: string
           name: string | null
-          photo: string | null
+          photo_url: string | null
           role: string | null
           tagline: string | null
           telephone: string | null
@@ -159,10 +174,10 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
-          email: string
+          email?: string | null
           id: string
           name?: string | null
-          photo?: string | null
+          photo_url?: string | null
           role?: string | null
           tagline?: string | null
           telephone?: string | null
@@ -171,10 +186,10 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
-          email?: string
+          email?: string | null
           id?: string
           name?: string | null
-          photo?: string | null
+          photo_url?: string | null
           role?: string | null
           tagline?: string | null
           telephone?: string | null
@@ -187,31 +202,34 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
-          image_url: string | null
-          project_role: string | null
+          position: number
+          role: string | null
           section_id: string
           title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: string
-          image_url?: string | null
-          project_role?: string | null
+          position?: number
+          role?: string | null
           section_id: string
           title: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: string
-          image_url?: string | null
-          project_role?: string | null
+          position?: number
+          role?: string | null
           section_id?: string
           title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -226,24 +244,24 @@ export type Database = {
       sections: {
         Row: {
           created_at: string
-          description: string | null
           id: string
+          position: number
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          description?: string | null
           id?: string
+          position?: number
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
-          description?: string | null
           id?: string
+          position?: number
           title?: string
           updated_at?: string
           user_id?: string
@@ -252,24 +270,21 @@ export type Database = {
       }
       user_roles: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
-          role: string
-          updated_at: string | null
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          role: string
-          updated_at?: string | null
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          role?: string
-          updated_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -279,13 +294,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      record_portfolio_view: {
-        Args: { p_referrer?: string; p_share_id: string; p_user_agent?: string }
-        Returns: undefined
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -412,6 +430,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
