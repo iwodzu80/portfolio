@@ -23,9 +23,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.email);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
+        // Remove verbose logging in production
         setIsLoading(false);
         
         if (currentSession?.user && window.location.pathname === '/auth') {
@@ -42,9 +42,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      console.log("Initial session:", currentSession?.user?.email);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
+      // Remove verbose logging in production
       setIsLoading(false);
       
       if (currentSession?.user && window.location.pathname === '/auth') {

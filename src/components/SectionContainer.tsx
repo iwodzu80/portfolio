@@ -28,13 +28,9 @@ const SectionContainer: React.FC<SectionContainerProps> = React.memo(({
   } = useSectionOperations(localSections, setLocalSections, onUpdate);
   
   useEffect(() => {
-    console.log("SectionContainer received sections:", sections);
-    console.log("Number of sections in SectionContainer:", sections?.length || 0);
-    
     if (Array.isArray(sections)) {
       setLocalSections(sections);
     } else {
-      console.error("Sections prop is not an array:", sections);
       setLocalSections([]);
     }
   }, [sections]);
@@ -47,13 +43,6 @@ const SectionContainer: React.FC<SectionContainerProps> = React.memo(({
   const toggleEditSections = useCallback(() => {
     setIsEditingSections(prev => !prev);
   }, []);
-  
-  console.log("SectionContainer rendering with safeSections:", safeSections.length);
-  if (safeSections.length > 0) {
-    safeSections.forEach((section, index) => {
-      console.log(`Section ${index + 1}: ${section.title} with ${section.projects?.length || 0} projects`);
-    });
-  }
   
   return (
     <div className="pb-20">
