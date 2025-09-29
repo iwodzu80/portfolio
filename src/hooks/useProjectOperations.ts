@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { ProjectData } from "@/types/portfolio";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { sanitizeText, validateAndFormatUrl } from "@/utils/securityUtils";
 import { useAuth } from "@/contexts/AuthContext";
+import { executeUpdateOperation, executeOperation } from "@/utils/operationHandlers";
 
 export const useProjectOperations = (
   sectionId: string,
@@ -113,9 +113,11 @@ export const useProjectOperations = (
       );
       setLocalProjects(updatedProjects);
       
+      const { toast } = await import("sonner");
       toast.success("Project updated");
     } catch (error: any) {
       console.error("Error updating project:", error.message);
+      const { toast } = await import("sonner");
       toast.error("Failed to update project");
     }
   };
@@ -136,9 +138,11 @@ export const useProjectOperations = (
       // Update local state
       const updatedProjects = localProjects.filter(project => project.id !== id);
       setLocalProjects(updatedProjects);
+      const { toast } = await import("sonner");
       toast.success("Project deleted");
     } catch (error: any) {
       console.error("Error deleting project:", error.message);
+      const { toast } = await import("sonner");
       toast.error("Failed to delete project");
     }
   };
@@ -217,9 +221,11 @@ export const useProjectOperations = (
       
       // Update local state immediately without calling onUpdate
       setLocalProjects(prevProjects => [...prevProjects, insertedProject]);
+      const { toast } = await import("sonner");
       toast.success("Project added");
     } catch (error: any) {
       console.error("Error adding project:", error.message);
+      const { toast } = await import("sonner");
       toast.error("Failed to add project");
     }
   };

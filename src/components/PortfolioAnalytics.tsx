@@ -47,17 +47,27 @@ const PortfolioAnalytics = () => {
       const { data, error } = await supabase
         .from('portfolio_analytics')
         .select('*')
-        .order('viewed_at', { ascending: false });
+        .order('created_at', { ascending: false });
         
       if (error) {
         throw error;
       }
       
       if (data) {
-        setAnalytics(data);
+        // Map Supabase data to match expected AnalyticsData format
+        const mappedData: AnalyticsData[] = data.map(item => ({
+          ...item,
+          viewed_at: item.created_at, // Use created_at as viewed_at
+          user_id: '', // Default empty string
+          city: '', // Default empty string  
+          country: '', // Default empty string
+          visitor_ip: '' // Default empty string
+        }));
+        
+        setAnalytics(mappedData);
         
         // Process data for chart
-        const groupedByDate = data.reduce((acc: Record<string, number>, item: AnalyticsData) => {
+        const groupedByDate = mappedData.reduce((acc: Record<string, number>, item: AnalyticsData) => {
           const date = new Date(item.viewed_at).toLocaleDateString();
           acc[date] = (acc[date] || 0) + 1;
           return acc;
