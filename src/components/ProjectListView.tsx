@@ -18,16 +18,8 @@ const ProjectListView: React.FC<ProjectListViewProps> = React.memo(({
   onDelete,
   isEditingMode
 }) => {
-  console.log(`ProjectListView for section ${sectionId} rendering with projects:`, projects.length);
   
-  const memoizedProjects = useMemo(() => {
-    if (projects.length > 0) {
-      projects.forEach((project, index) => {
-        console.log(`Project ${index + 1} in section ${sectionId}: ${project.title} with ${project.links?.length || 0} links`);
-      });
-    }
-    return projects;
-  }, [projects, sectionId]);
+  const memoizedProjects = useMemo(() => projects, [projects]);
 
   if (memoizedProjects.length === 0) {
     return (
