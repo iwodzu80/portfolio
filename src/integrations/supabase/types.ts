@@ -275,6 +275,33 @@ export type Database = {
         }
         Relationships: []
       }
+      test_migration_workflow: {
+        Row: {
+          created_at: string
+          id: string
+          test_message: string
+          test_number: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          test_message: string
+          test_number?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          test_message?: string
+          test_number?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       test_table: {
         Row: {
           created_at: string
