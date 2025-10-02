@@ -10,91 +10,90 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
-      links: {
-        Row: {
-          created_at: string | null
-          id: string
-          title: string
-          updated_at: string | null
-          url: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          title: string
-          updated_at?: string | null
-          url: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          title?: string
-          updated_at?: string | null
-          url?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       portfolio_analytics: {
         Row: {
-          created_at: string | null
+          city: string | null
+          country: string | null
           id: string
           referrer: string | null
           share_id: string
           user_agent: string | null
+          user_id: string
+          viewed_at: string
+          visitor_ip: string | null
         }
         Insert: {
-          created_at?: string | null
+          city?: string | null
+          country?: string | null
           id?: string
           referrer?: string | null
           share_id: string
           user_agent?: string | null
+          user_id: string
+          viewed_at?: string
+          visitor_ip?: string | null
         }
         Update: {
-          created_at?: string | null
+          city?: string | null
+          country?: string | null
           id?: string
           referrer?: string | null
           share_id?: string
           user_agent?: string | null
+          user_id?: string
+          viewed_at?: string
+          visitor_ip?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_analytics_share_id_fkey"
+            columns: ["share_id"]
+            isOneToOne: false
+            referencedRelation: "portfolio_shares"
+            referencedColumns: ["share_id"]
+          },
+        ]
       }
       portfolio_shares: {
         Row: {
-          created_at: string | null
+          created_at: string
+          description: string | null
           id: string
           is_active: boolean | null
           share_id: string
-          updated_at: string | null
+          title: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
+          description?: string | null
           id?: string
           is_active?: boolean | null
           share_id: string
-          updated_at?: string | null
+          title?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
+          description?: string | null
           id?: string
           is_active?: boolean | null
           share_id?: string
-          updated_at?: string | null
+          title?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          created_at: string | null
+          created_at: string
           description: string | null
           email: string | null
           id: string
@@ -103,11 +102,11 @@ export type Database = {
           photo_url: string | null
           role: string | null
           tagline: string | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           email?: string | null
           id?: string
@@ -116,11 +115,11 @@ export type Database = {
           photo_url?: string | null
           role?: string | null
           tagline?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           email?: string | null
           id?: string
@@ -129,34 +128,37 @@ export type Database = {
           photo_url?: string | null
           role?: string | null
           tagline?: string | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
       project_features: {
         Row: {
-          created_at: string | null
+          created_at: string
+          description: string | null
           id: string
           project_id: string
+          sort_order: number | null
           title: string
-          updated_at: string | null
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
+          description?: string | null
           id?: string
           project_id: string
+          sort_order?: number | null
           title: string
-          updated_at?: string | null
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
+          description?: string | null
           id?: string
           project_id?: string
+          sort_order?: number | null
           title?: string
-          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -171,29 +173,32 @@ export type Database = {
       }
       project_links: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           project_id: string
+          sort_order: number | null
           title: string
-          updated_at: string | null
+          type: string | null
           url: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           project_id: string
+          sort_order?: number | null
           title: string
-          updated_at?: string | null
+          type?: string | null
           url: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           project_id?: string
+          sort_order?: number | null
           title?: string
-          updated_at?: string | null
+          type?: string | null
           url?: string
           user_id?: string
         }
@@ -209,33 +214,39 @@ export type Database = {
       }
       projects: {
         Row: {
-          created_at: string | null
+          created_at: string
           description: string | null
           id: string
+          image_url: string | null
           role: string | null
           section_id: string
+          sort_order: number | null
           title: string
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           role?: string | null
           section_id: string
+          sort_order?: number | null
           title: string
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           role?: string | null
           section_id?: string
+          sort_order?: number | null
           title?: string
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -250,81 +261,51 @@ export type Database = {
       }
       sections: {
         Row: {
-          created_at: string | null
+          created_at: string
           description: string | null
           id: string
+          sort_order: number | null
           title: string
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
+          sort_order?: number | null
           title: string
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
+          sort_order?: number | null
           title?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      test_migration_workflow: {
-        Row: {
-          created_at: string
-          id: string
-          test_message: string
-          test_number: number | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          test_message: string
-          test_number?: number | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          test_message?: string
-          test_number?: number | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
-      test_table: {
+      user_roles: {
         Row: {
           created_at: string
           id: string
-          test_message: string
-          test_number: number | null
-          updated_at: string
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          test_message: string
-          test_number?: number | null
-          updated_at?: string
+          role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
-          test_message?: string
-          test_number?: number | null
-          updated_at?: string
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -334,10 +315,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -464,6 +451,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
