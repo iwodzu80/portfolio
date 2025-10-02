@@ -43,18 +43,25 @@ A modern portfolio builder with authentication, sections/projects editing, shari
 
 
 ## Supabase Configuration
-- Project ID: ozgiefftrbeypfsrfyws
-- The client is initialized in src/integrations/supabase/client.ts
-- Environment variables are stored in .env file (see .env.example for template)
-- **IMPORTANT**: The .env file is included in .gitignore and has been removed from GitHub to prevent exposing database credentials. Each environment (dev/prod branches) must have its own .env file configured locally.
-- SQL changes are managed via migrations in supabase/migrations
+
+**Single Source of Truth for Credentials:**
+- Production Project ID: `shluolqufopjgtapugnx`
+- All Supabase connection configuration is centralized in two files:
+  1. **`src/lib/constants.ts`** - Used by the React app at runtime (contains PROJECT_ID, URL, and ANON_KEY)
+  2. **`supabase/config.toml`** - Used by Supabase CLI for migrations (contains project_id only)
+
+**Important Notes:**
+- Do NOT create `.env` files - they are not used in this project
+- The Supabase client is initialized in `src/integrations/supabase/client.ts` and imports credentials from `src/lib/constants.ts`
+- Both configuration files must be kept in sync manually when changing environments
+- SQL changes are managed via migrations in `supabase/migrations`
 
 Useful dashboard links:
-- SQL Editor: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/sql/new
-- Auth Providers: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/auth/providers
-- Users: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/auth/users
-- Edge Functions: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/functions
-- Storage: https://supabase.com/dashboard/project/ozgiefftrbeypfsrfyws/storage/buckets
+- SQL Editor: https://supabase.com/dashboard/project/shluolqufopjgtapugnx/sql/new
+- Auth Providers: https://supabase.com/dashboard/project/shluolqufopjgtapugnx/auth/providers
+- Users: https://supabase.com/dashboard/project/shluolqufopjgtapugnx/auth/users
+- Edge Functions: https://supabase.com/dashboard/project/shluolqufopjgtapugnx/functions
+- Storage: https://supabase.com/dashboard/project/shluolqufopjgtapugnx/storage/buckets
 
 
 ## Security: Link Validation and Sanitization
