@@ -47,7 +47,7 @@ const PortfolioAnalytics = () => {
       const { data, error } = await supabase
         .from('portfolio_analytics')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('viewed_at', { ascending: false });
         
       if (error) {
         throw error;
@@ -57,11 +57,10 @@ const PortfolioAnalytics = () => {
         // Map Supabase data to match expected AnalyticsData format
         const mappedData: AnalyticsData[] = data.map(item => ({
           ...item,
-          viewed_at: item.created_at, // Use created_at as viewed_at
-          user_id: '', // Default empty string
-          city: '', // Default empty string  
-          country: '', // Default empty string
-          visitor_ip: '' // Default empty string
+          user_id: item.user_id || '', // Default empty string
+          city: item.city || '', // Default empty string  
+          country: item.country || '', // Default empty string
+          visitor_ip: item.visitor_ip || '' // Default empty string
         }));
         
         setAnalytics(mappedData);
