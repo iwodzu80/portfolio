@@ -45,7 +45,8 @@ A modern portfolio builder with authentication, sections/projects editing, shari
 ## Supabase Configuration
 - Project ID: ozgiefftrbeypfsrfyws
 - The client is initialized in src/integrations/supabase/client.ts
-- No .env files are used; publishable keys are stored in code (anon key only). For secret keys, use Supabase Edge Function secrets.
+- Environment variables are stored in .env file (see .env.example for template)
+- **IMPORTANT**: The .env file is included in .gitignore and has been removed from GitHub to prevent exposing database credentials. Each environment (dev/prod branches) must have its own .env file configured locally.
 - SQL changes are managed via migrations in supabase/migrations
 
 Useful dashboard links:
