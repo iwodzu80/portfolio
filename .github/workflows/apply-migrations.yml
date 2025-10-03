@@ -1,0 +1,29 @@
+name: Apply Supabase migrations
+
+on:
+  push:
+    branches: [ main ]         # runs when you merge/push to main
+  workflow_dispatch:            # allow manual runs from the Actions tab
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install the Supabase CLI
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest       # or pin a version
+      # If your supabase/ folder is not at repo root, uncomment the next line and set it:
+      # - run: echo "Using monorepo path"
+      #   working-directory: ./path/to/your/app
+
+      # Link this repo's Supabase project (non-interactive; uses the PAT)
+      - run: supabase link --project-ref "$PROJECT_REF"
+
+      # Apply any new migrations to the linked project
+      - run: supabase db push
