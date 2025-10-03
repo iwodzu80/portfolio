@@ -1,0 +1,55 @@
+name: Supabase - Repair & Baseline
+on:
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: "Migration versions to mark as reverted (space-separated)"
+        required: true
+        default: "20251002092348"   # replace with the version(s) from your latest CI error
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      BASELINE_FILE: supabase/migrations/00000000000001_baseline.sql
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Link to your Supabase project (non-interactive)
+      - name: Link project
+        run: supabase link --project-ref "$PROJECT_REF"
+
+      # 1) Repair the migration ledger in the remote DB
+      - name: Repair remote migration history (mark reverted)
+        run: supabase migration repair --status reverted ${{ github.event.inputs.versions }}
+
+      # 2) Sync local metadata from remote DB
+      - name: Pull remote schema metadata
+        run: supabase db pull
+
+      # 3) Create a baseline migration that matches the current remote schema
+      - name: Create baseline migration
+        run: |
+          mkdir -p supabase/migrations
+          supabase db diff --linked --file "$BASELINE_FILE"
+
+      # 4) Commit & push the baseline to main
+      - name: Commit & push baseline
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$BASELINE_FILE"
+          git commit -m "chore(db): baseline after repair"
+          git push origin HEAD:main
