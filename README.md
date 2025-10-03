@@ -46,24 +46,15 @@ A modern portfolio builder with authentication, sections/projects editing, shari
 
 **Database Credentials:**
 
-**Production Database:**
-- Project ID: `shluolqufopjgtapugnx`
-- URL: `https://shluolqufopjgtapugnx.supabase.co`
-- Anon Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobHVvbHF1Zm9wamd0YXB1Z254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NDgxMTQsImV4cCI6MjA3MDIyNDExNH0.1XJaB_gPl9dPlwqPNfUsXXpg4XUriTI3mLP2HnY1Aok`
-
-**Development Database:**
-- Project ID: `eqwvrhaeozfqgfxcpyff`
-- URL: `https://eqwvrhaeozfqgfxcpyff.supabase.co`
-- Anon Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxd3ZyaGFlb3pmcWdmeGNweWZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NjcyNzAsImV4cCI6MjA3NDU0MzI3MH0.uCmWwsybByH6gg4ARHM9Um8VSxPB_zh4vpJzIlFJr8k`
+**Current Supabase Project:**
+- Project ID: `lvkrxwuhzqxykeksyurl`
+- URL: `https://lvkrxwuhzqxykeksyurl.supabase.co`
+- Anon Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2a3J4d3VoenF4eWtla3N5dXJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MzU0NTEsImV4cCI6MjA3NTAxMTQ1MX0.kNHNmjLNCFBFsWVA6pCrNOD9i07ln5Mp0ZexeoQz5PI`
 
 **Configuration Files:**
 - All Supabase connection configuration is centralized in two files:
   1. **`src/lib/constants.ts`** - Used by the React app at runtime (contains PROJECT_ID, URL, and ANON_KEY)
   2. **`supabase/config.toml`** - Used by Supabase CLI for migrations (contains project_id only)
-
-**Switching Between Environments:**
-- To switch from prod to dev (or vice versa), manually update both configuration files with the appropriate credentials
-- **Currently configured for: PRODUCTION**
 
 **Important Notes:**
 - Do NOT create `.env` files - they are not used in this project
