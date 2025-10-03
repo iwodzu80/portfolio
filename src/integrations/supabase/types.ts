@@ -289,7 +289,7 @@ export type Database = {
         }
         Relationships: []
       }
-      test: {
+      test_table_next: {
         Row: {
           created_at: string
           id: string
