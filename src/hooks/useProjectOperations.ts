@@ -37,7 +37,7 @@ export const useProjectOperations = (
           .update({ 
             title: updatedProject.title, 
             description: updatedProject.description,
-            role: updatedProject.project_role || null,
+            project_role: updatedProject.project_role || null,
             updated_at: new Date().toISOString()
           })
           .eq('id', updatedProject.id)
@@ -153,7 +153,7 @@ export const useProjectOperations = (
             section_id: sectionId,
             title: newProject.title,
             description: newProject.description,
-            role: newProject.project_role || null,
+            project_role: newProject.project_role || null,
             user_id: user?.id || ''
           })
           .select()
@@ -205,7 +205,7 @@ export const useProjectOperations = (
           id: projectData.id,
           title: projectData.title,
           description: projectData.description || "",
-          project_role: projectData.role || "",
+          project_role: projectData.project_role || "",
           links: newProject.links.map((link, idx) => ({
             ...link,
             id: `${projectData.id}-link-${idx}`  // Temporary ID until we fetch from Supabase

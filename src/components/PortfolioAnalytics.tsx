@@ -19,7 +19,7 @@ import { toast } from "sonner";
 interface AnalyticsData {
   id: string;
   share_id: string;
-  viewed_at: string;
+  created_at: string;
   referrer: string | null;
   user_agent: string | null;
   user_id: string;
@@ -47,27 +47,18 @@ const PortfolioAnalytics = () => {
       const { data, error } = await supabase
         .from('portfolio_analytics')
         .select('*')
-        .order('viewed_at', { ascending: false });
+        .order('created_at', { ascending: false });
         
       if (error) {
         throw error;
       }
       
       if (data) {
-        // Map Supabase data to match expected AnalyticsData format
-        const mappedData: AnalyticsData[] = data.map(item => ({
-          ...item,
-          user_id: item.user_id || '', // Default empty string
-          city: item.city || '', // Default empty string  
-          country: item.country || '', // Default empty string
-          visitor_ip: item.visitor_ip || '' // Default empty string
-        }));
-        
-        setAnalytics(mappedData);
+        setAnalytics(data);
         
         // Process data for chart
-        const groupedByDate = mappedData.reduce((acc: Record<string, number>, item: AnalyticsData) => {
-          const date = new Date(item.viewed_at).toLocaleDateString();
+        const groupedByDate = data.reduce((acc: Record<string, number>, item) => {
+          const date = new Date(item.created_at).toLocaleDateString();
           acc[date] = (acc[date] || 0) + 1;
           return acc;
         }, {});
@@ -183,7 +174,7 @@ const PortfolioAnalytics = () => {
               ) : analytics.length > 0 ? (
                 analytics.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell>{new Date(item.viewed_at).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(item.created_at).toLocaleString()}</TableCell>
                     <TableCell>{item.share_id}</TableCell>
                     <TableCell>{item.referrer || 'Direct'}</TableCell>
                     <TableCell className="max-w-[300px] truncate">{item.user_agent || 'Unknown'}</TableCell>
