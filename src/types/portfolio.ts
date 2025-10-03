@@ -1,4 +1,6 @@
 
+export type AppRole = 'admin' | 'moderator' | 'user';
+
 export interface ProfileData {
   name: string;
   photo: string;
@@ -7,7 +9,7 @@ export interface ProfileData {
   role: string;
   tagline: string;
   description: string;
-  userRole?: 'admin' | 'user' | 'viewer';
+  userRole?: AppRole;
 }
 
 export interface LinkData {

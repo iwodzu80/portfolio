@@ -1,8 +1,7 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { ProfileData, SectionData } from "@/types/portfolio";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useSectionData } from "@/hooks/useSectionData";
 import { useDefaultSectionCreator } from "@/hooks/useDefaultSectionCreator";
@@ -16,7 +15,7 @@ export const usePortfolioData = () => {
   const { sections, fetchSections } = useSectionData(user?.id);
   const { createDefaultSection } = useDefaultSectionCreator();
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) {
       navigate("/auth");
       return;
@@ -43,7 +42,7 @@ export const usePortfolioData = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, navigate, fetchProfileData, createProfile, fetchSections, createDefaultSection]);
 
   useEffect(() => {
     if (user) {

@@ -1,5 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const useDefaultSectionCreator = () => {
   const createDefaultSection = async (userId: string) => {
@@ -16,6 +16,7 @@ export const useDefaultSectionCreator = () => {
         
       if (sectionError) {
         console.error("Error creating default section:", sectionError);
+        toast.error("Failed to create default section");
         return false;
       }
       
@@ -33,6 +34,7 @@ export const useDefaultSectionCreator = () => {
         
       if (projectError) {
         console.error("Error creating default project:", projectError);
+        toast.error("Failed to create default project");
         return false;
       }
       
@@ -48,6 +50,7 @@ export const useDefaultSectionCreator = () => {
         
       if (linksError) {
         console.error("Error creating default links:", linksError);
+        toast.error("Failed to create default links");
         return false;
       }
       
@@ -55,6 +58,7 @@ export const useDefaultSectionCreator = () => {
       return true;
     } catch (error: any) {
       console.error("Error in createDefaultSection:", error);
+      toast.error("Failed to initialize portfolio");
       return false;
     }
   };

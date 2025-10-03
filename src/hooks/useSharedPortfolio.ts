@@ -63,7 +63,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         
         // Use Promise.all to execute queries concurrently
         // This significantly reduces total wait time
-        const [profileData, sectionsData, userRoleData] = await Promise.all([
+        const [profileData, sectionsData] = await Promise.all([
           // Query 1: Fetch profile with only public fields for shared portfolios
           // SECURITY: Exclude email and telephone from public shared portfolios
           supabase
@@ -96,14 +96,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
               )
             `)
             .eq('user_id', userId)
-            .order('created_at', { ascending: true }),
-            
-          // Query 3: Fetch user role from profiles (fallback approach)
-          supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', userId)
-            .single()
+            .order('created_at', { ascending: true })
         ]);
         
         // Process profile data
@@ -112,7 +105,6 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         } else if (profileData.data) {
           // Apply sanitization efficiently
           const data = profileData.data;
-          const userRole = userRoleData.data?.role || 'user';
           
           const sanitizedProfileData = {
             name: sanitizeText(data.name || ""),
@@ -121,8 +113,8 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             telephone: "", // SECURITY: Don't expose telephone in shared portfolios
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
-            description: sanitizeText(data.description || ""),
-            userRole: userRole as 'admin' | 'user' | 'viewer'
+            description: sanitizeText(data.description || "")
+            // userRole is not set for shared portfolios (public view)
           };
           
           setProfileData(sanitizedProfileData);
