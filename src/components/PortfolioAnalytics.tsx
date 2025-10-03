@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Table, 
@@ -14,7 +14,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 interface AnalyticsData {
   id: string;

@@ -1,10 +1,11 @@
-
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { ProjectData } from "@/types/portfolio";
 import { supabase } from "@/integrations/supabase/client";
-import { sanitizeText, validateAndFormatUrl } from "@/utils/securityUtils";
 import { useAuth } from "@/contexts/AuthContext";
 import { executeUpdateOperation, executeOperation } from "@/utils/operationHandlers";
+import { updateProjectRelations } from "@/utils/projectHelpers";
+import { withTimestamp } from "@/utils/supabaseHelpers";
 
 export const useProjectOperations = (
   sectionId: string,
@@ -31,78 +32,28 @@ export const useProjectOperations = (
   const handleUpdateProject = async (updatedProject: ProjectData) => {
     await executeOperation(
       async () => {
+        if (!user?.id) throw new Error("User not authenticated");
+        
         // Update project in Supabase
         const { error: projectError } = await supabase
           .from('projects')
-          .update({ 
+          .update(withTimestamp({ 
             title: updatedProject.title, 
             description: updatedProject.description,
             project_role: updatedProject.project_role || null,
-            updated_at: new Date().toISOString()
-          })
+          }))
           .eq('id', updatedProject.id)
           .eq('section_id', sectionId);
           
-        if (projectError) {
-          throw projectError;
-        }
+        if (projectError) throw projectError;
         
-        // Delete existing links for this project
-        const { error: deleteLinksError } = await supabase
-          .from('project_links')
-          .delete()
-          .eq('project_id', updatedProject.id);
-          
-        if (deleteLinksError) {
-          throw deleteLinksError;
-        }
-        
-        // Add updated links
-        if (updatedProject.links.length > 0) {
-          const linksToInsert = updatedProject.links
-            .map(link => ({
-              project_id: updatedProject.id,
-              title: sanitizeText(link.title),
-              url: validateAndFormatUrl(link.url),
-              user_id: user?.id || ''
-            }))
-            .filter(l => l.url !== "");
-          
-          const { error: insertLinksError } = await supabase
-            .from('project_links')
-            .insert(linksToInsert);
-          
-          if (insertLinksError) {
-            throw insertLinksError;
-          }
-        }
-        
-        // Delete existing features for this project
-        const { error: deleteFeaturesError } = await supabase
-          .from('project_features')
-          .delete()
-          .eq('project_id', updatedProject.id);
-          
-        if (deleteFeaturesError) {
-          throw deleteFeaturesError;
-        }
-        
-        // Add updated features
-        if (updatedProject.features.length > 0) {
-          const featuresToInsert = updatedProject.features.map(feature => ({
-            project_id: updatedProject.id,
-            title: feature.title,
-            user_id: user?.id || ''
-          }));
-          
-          const { error: insertFeaturesError } = await supabase
-            .from('project_features')
-            .insert(featuresToInsert);
-            
-          if (insertFeaturesError) {
-            throw insertFeaturesError;
-          }
-        }
+        // Update links and features using helper
+        await updateProjectRelations(
+          updatedProject.id,
+          updatedProject.links,
+          updatedProject.features,
+          user.id
+        );
         
         // Update local state immediately for responsive UI
         const updatedProjects = localProjects.map(project => 
@@ -146,6 +97,8 @@ export const useProjectOperations = (
   const handleAddProject = async (newProject: ProjectData) => {
     await executeOperation(
       async () => {
+        if (!user?.id) throw new Error("User not authenticated");
+        
         // Insert new project in Supabase
         const { data: projectData, error: projectError } = await supabase
           .from('projects')
@@ -154,51 +107,20 @@ export const useProjectOperations = (
             title: newProject.title,
             description: newProject.description,
             project_role: newProject.project_role || null,
-            user_id: user?.id || ''
+            user_id: user.id
           })
           .select()
           .single();
           
-        if (projectError) {
-          throw projectError;
-        }
+        if (projectError) throw projectError;
         
-        // Insert links for the new project
-        if (newProject.links.length > 0) {
-          const linksToInsert = newProject.links
-            .map(link => ({
-              project_id: projectData.id,
-              title: sanitizeText(link.title),
-              url: validateAndFormatUrl(link.url),
-              user_id: user?.id || ''
-            }))
-            .filter(l => l.url !== "");
-          
-          const { error: linksError } = await supabase
-            .from('project_links')
-            .insert(linksToInsert);
-          
-          if (linksError) {
-            throw linksError;
-          }
-        }
-        
-        // Insert features for the new project
-        if (newProject.features.length > 0) {
-          const featuresToInsert = newProject.features.map(feature => ({
-            project_id: projectData.id,
-            title: feature.title,
-            user_id: user?.id || ''
-          }));
-          
-          const { error: featuresError } = await supabase
-            .from('project_features')
-            .insert(featuresToInsert);
-            
-          if (featuresError) {
-            throw featuresError;
-          }
-        }
+        // Insert links and features using helper
+        await updateProjectRelations(
+          projectData.id,
+          newProject.links,
+          newProject.features,
+          user.id
+        );
         
         // Create new project with proper ID from Supabase
         const insertedProject: ProjectData = {
@@ -208,15 +130,15 @@ export const useProjectOperations = (
           project_role: projectData.project_role || "",
           links: newProject.links.map((link, idx) => ({
             ...link,
-            id: `${projectData.id}-link-${idx}`  // Temporary ID until we fetch from Supabase
+            id: `${projectData.id}-link-${idx}`
           })),
           features: newProject.features.map((feature, idx) => ({
             ...feature,
-            id: `${projectData.id}-feature-${idx}`  // Temporary ID until we fetch from Supabase
+            id: `${projectData.id}-feature-${idx}`
           }))
         };
         
-        // Update local state immediately without calling onUpdate
+        // Update local state immediately
         setLocalProjects(prevProjects => [...prevProjects, insertedProject]);
         
         return projectData;

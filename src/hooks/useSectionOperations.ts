@@ -1,7 +1,10 @@
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SectionData } from "@/types/portfolio";
 import { useAuth } from "@/contexts/AuthContext";
 import { executeUpdateOperation, executeOperation } from "@/utils/operationHandlers";
+import { withTimestamp } from "@/utils/supabaseHelpers";
+import { DEFAULT_VALUES } from "@/lib/constants";
 
 export const useSectionOperations = (
   sections: SectionData[],
@@ -15,7 +18,7 @@ export const useSectionOperations = (
       async () => {
         const { error } = await supabase
           .from('sections')
-          .update({ title, updated_at: new Date().toISOString() })
+          .update(withTimestamp({ title }))
           .eq('id', sectionId)
           .eq('user_id', user?.id);
         if (error) throw error;
@@ -38,7 +41,7 @@ export const useSectionOperations = (
       async () => {
         const { error } = await supabase
           .from('sections')
-          .update({ description, updated_at: new Date().toISOString() })
+          .update(withTimestamp({ description }))
           .eq('id', sectionId)
           .eq('user_id', user?.id);
         if (error) throw error;
@@ -57,9 +60,8 @@ export const useSectionOperations = (
   };
 
   const handleDeleteSection = async (sectionId: string) => {
-    if (sections.length <= 1) {
-      const { toast } = await import("sonner");
-      toast.error("You must have at least one section");
+    if (sections.length <= DEFAULT_VALUES.MIN_SECTIONS) {
+      toast.error(`You must have at least ${DEFAULT_VALUES.MIN_SECTIONS} section`);
       return;
     }
     
@@ -90,7 +92,7 @@ export const useSectionOperations = (
           .from('sections')
           .insert({
             user_id: user?.id,
-            title: "New Section"
+            title: DEFAULT_VALUES.NEW_SECTION_TITLE
           })
           .select()
           .single();
