@@ -33,7 +33,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         return;
       }
       
-      if (shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {
+      if (shareId.length < 3 || /[^a-zA-Z0-9-]/.test(shareId)) {
         console.warn("Invalid share ID format:", shareId);
         setNotFound(true);
         setIsLoading(false);

@@ -57,7 +57,7 @@ const SharedPortfolio = React.memo(() => {
       : "Shared Portfolio";
     
     // Record analytics with rate limiting (once per session per portfolio)
-    if (!analyticsRecorded.current && sanitizedShareId && sanitizedShareId.length >= 8 && !/[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
+    if (!analyticsRecorded.current && sanitizedShareId && sanitizedShareId.length >= 3 && !/[^a-zA-Z0-9-]/.test(sanitizedShareId)) {
       const sessionKey = `portfolio_view_${sanitizedShareId}`;
       
       if (!sessionStorage.getItem(sessionKey)) {
@@ -78,7 +78,7 @@ const SharedPortfolio = React.memo(() => {
     };
   }, [shareId, ownerName]);
 
-  if (!shareId || shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {
+  if (!shareId || shareId.length < 3 || /[^a-zA-Z0-9-]/.test(shareId)) {
     return <SharedPortfolioNotFound />;
   }
 
