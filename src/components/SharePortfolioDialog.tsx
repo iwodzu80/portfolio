@@ -37,20 +37,15 @@ const SharePortfolioDialog = () => {
 
   // Dynamic base URL detection
   const getBaseUrl = () => {
-    const currentOrigin = window.location.origin;
+    const hostname = window.location.hostname;
     
-    // Check if we're on Lovable preview
-    if (currentOrigin.includes('lovable.app') || currentOrigin.includes('id-preview')) {
-      return currentOrigin;
-    }
-    
-    // Check if we're on the deployed domain (clickly.it)
-    if (currentOrigin.includes('clickly.it')) {
+    // Check if we're on the custom domain
+    if (hostname === 'clickly.it' || hostname === 'www.clickly.it') {
       return 'https://clickly.it';
     }
     
-    // Default to current origin for any other cases
-    return currentOrigin;
+    // Default to current origin for preview/dev environments
+    return window.location.origin;
   };
   
   const loadShareData = async () => {
