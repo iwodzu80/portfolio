@@ -7,6 +7,8 @@ on:
 
 jobs:
   migrate:
+     # hard guard: only execute when branch is main
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
