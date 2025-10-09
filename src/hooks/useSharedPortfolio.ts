@@ -27,7 +27,14 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
     
     const fetchSharedPortfolio = async () => {
       // Early validation of shareId to prevent unnecessary database queries
-      if (!shareId || shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {
+      if (!shareId) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
+      
+      if (shareId.length < 8 || /[^a-zA-Z0-9-]/.test(shareId)) {
+        console.warn("Invalid share ID format:", shareId);
         setNotFound(true);
         setIsLoading(false);
         return;
