@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
+import { Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Input } from "@/components/ui/input";
@@ -92,7 +93,28 @@ const Auth = () => {
   const isLoading = signInLoading || signUpLoading || resetLoading;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-white sticky top-0 z-50">
+        <nav className="container mx-auto px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="text-3xl font-outfit font-bold bg-gradient-to-r from-portfolio-violet to-portfolio-celadon bg-clip-text text-transparent">
+              clickly.it
+            </span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/">
+              <Button variant="ghost" className="text-foreground hover:text-primary gap-2">
+                <Home className="h-4 w-4" />
+                Back to Home
+              </Button>
+            </Link>
+          </div>
+        </nav>
+      </header>
+
+      {/* Auth Card */}
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Portfolio Manager</CardTitle>
@@ -277,6 +299,7 @@ const Auth = () => {
           </TabsContent>
         </Tabs>
       </Card>
+      </div>
     </div>
   );
 };
