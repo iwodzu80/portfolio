@@ -151,19 +151,60 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="p-8 rounded-xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group"
-              >
-                <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-foreground">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
+          <div className="grid md:grid-cols-4 lg:grid-cols-6 gap-6 auto-rows-fr">
+            {/* Large featured card - Manual Curation */}
+            <div className="md:col-span-2 lg:col-span-3 md:row-span-2 p-10 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-xl transition-all duration-300 group">
+              <div className="h-16 w-16 rounded-xl bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-6 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
+                {features[0].icon}
               </div>
-            ))}
+              <h3 className="text-2xl font-bold mb-3 text-foreground">{features[0].title}</h3>
+              <p className="text-lg text-muted-foreground">{features[0].description}</p>
+            </div>
+
+            {/* Medium card - Drag & Drop */}
+            <div className="md:col-span-2 lg:col-span-3 p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group">
+              <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
+                {features[1].icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{features[1].title}</h3>
+              <p className="text-muted-foreground">{features[1].description}</p>
+            </div>
+
+            {/* Small card - Private Sharing */}
+            <div className="md:col-span-2 lg:col-span-2 p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group">
+              <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
+                {features[2].icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{features[2].title}</h3>
+              <p className="text-muted-foreground">{features[2].description}</p>
+            </div>
+
+            {/* Large featured card - Analytics */}
+            <div className="md:col-span-2 lg:col-span-3 md:row-span-2 p-10 rounded-2xl bg-portfolio-violet text-white hover:shadow-xl transition-all duration-300 group">
+              <div className="h-16 w-16 rounded-xl bg-white/10 flex items-center justify-center text-white mb-6 group-hover:bg-white group-hover:text-portfolio-violet transition-all duration-300">
+                {features[3].icon}
+              </div>
+              <h3 className="text-2xl font-bold mb-3">{features[3].title}</h3>
+              <p className="text-lg text-white/90">{features[3].description}</p>
+            </div>
+
+            {/* Small card - Customization */}
+            <div className="md:col-span-2 lg:col-span-2 p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group">
+              <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
+                {features[4].icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{features[4].title}</h3>
+              <p className="text-muted-foreground">{features[4].description}</p>
+            </div>
+
+            {/* Medium card - Privacy */}
+            <div className="md:col-span-2 lg:col-span-3 p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group">
+              <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
+                {features[5].icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{features[5].title}</h3>
+              <p className="text-muted-foreground">{features[5].description}</p>
+            </div>
           </div>
         </div>
       </section>
