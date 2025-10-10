@@ -241,7 +241,7 @@ const Landing = () => {
           <p className="text-xl text-white/90">
             Join thousands of tech professionals showcasing their best work
           </p>
-          <Link to="/auth">
+          <Link to="/auth" className="inline-block mt-6">
             <Button 
               size="lg" 
               className="gap-2 text-lg px-10 h-14 bg-white text-portfolio-violet hover:bg-portfolio-celadon hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
