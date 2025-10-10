@@ -179,15 +179,6 @@ const Landing = () => {
               <p className="text-muted-foreground">{features[4].description}</p>
             </div>
 
-            {/* Medium card - Privacy */}
-            <div className="md:col-span-2 lg:col-span-3 p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group">
-              <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
-                {features[5].icon}
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-foreground">{features[5].title}</h3>
-              <p className="text-muted-foreground">{features[5].description}</p>
-            </div>
-
             {/* Small card - Private Sharing */}
             <div className="md:col-span-2 lg:col-span-2 p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group">
               <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
@@ -195,6 +186,15 @@ const Landing = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2 text-foreground">{features[2].title}</h3>
               <p className="text-muted-foreground">{features[2].description}</p>
+            </div>
+
+            {/* Medium card - Privacy */}
+            <div className="md:col-span-2 lg:col-span-3 p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group">
+              <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
+                {features[5].icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{features[5].title}</h3>
+              <p className="text-muted-foreground">{features[5].description}</p>
             </div>
 
             {/* Large featured card - Analytics */}
