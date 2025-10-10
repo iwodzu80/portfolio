@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Plus, Pencil, ExternalLink } from "lucide-react";
 import EditableField from "./EditableField";
+import EditableImage from "./EditableImage";
 import { LinkData, ProjectData, FeatureData } from "@/types/portfolio";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
@@ -137,58 +138,108 @@ const addFeature = () => {
   // Read-only mode (view mode)
   if (!isEditingMode) {
     return (
-      <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
-        <div className="mb-3">
-          <h2 className="font-bold text-xl mb-1">{localProject.title}</h2>
-          {localProject.project_role && (
-            <p className="text-sm text-portfolio-muted italic">{localProject.project_role}</p>
-          )}
-        </div>
-        {localProject.description && localProject.description.trim().length > 0 && (
-          <div className="text-portfolio-muted mb-4 text-sm text-justify">
-            {renderDescription(localProject.description)}
+      <div className="bg-portfolio-card rounded-lg shadow-md overflow-hidden my-4 animate-fade-in card-transition">
+        {/* Image Section - Fixed aspect ratio */}
+        {localProject.image_url && (
+          <div className="w-full aspect-[16/9] overflow-hidden bg-gray-100">
+            <img 
+              src={localProject.image_url} 
+              alt={localProject.title}
+              className="w-full h-full object-cover"
+            />
           </div>
         )}
         
-        {/* Features */}
-        {localProject.features.length > 0 && (
-          <div className="features flex flex-wrap gap-2 mb-4">
-            {localProject.features.map((feature) => (
-              <span
-                key={feature.id}
-                className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border"
-              >
-                {feature.title}
-              </span>
-            ))}
+        <div className="p-6">
+          <div className="mb-3">
+            <h2 className="font-bold text-xl mb-1">{localProject.title}</h2>
+            {localProject.project_role && (
+              <p className="text-sm text-portfolio-muted italic">{localProject.project_role}</p>
+            )}
           </div>
-        )}
+          {localProject.description && localProject.description.trim().length > 0 && (
+            <div className="text-portfolio-muted mb-4 text-sm text-justify">
+              {renderDescription(localProject.description)}
+            </div>
+          )}
+          
+          {/* Features */}
+          {localProject.features.length > 0 && (
+            <div className="features flex flex-wrap gap-2 mb-4">
+              {localProject.features.map((feature) => (
+                <span
+                  key={feature.id}
+                  className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border"
+                >
+                  {feature.title}
+                </span>
+              ))}
+            </div>
+          )}
 
-        {/* Links */}
-        {localProject.links.length > 0 && (
-          <div className="links flex flex-wrap gap-2">
-            {localProject.links.map((link) => (
-              <a
-                key={link.id}
-                href={validateAndFormatUrl(link.url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors inline-flex items-center gap-1"
-              >
-                {link.title}
-                <ExternalLink size={14} />
-              </a>
-            ))}
-          </div>
-        )}
+          {/* Links */}
+          {localProject.links.length > 0 && (
+            <div className="links flex flex-wrap gap-2">
+              {localProject.links.map((link) => (
+                <a
+                  key={link.id}
+                  href={validateAndFormatUrl(link.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-portfolio-blue text-white py-1 px-4 rounded-full text-sm hover:bg-portfolio-light-blue transition-colors inline-flex items-center gap-1"
+                >
+                  {link.title}
+                  <ExternalLink size={14} />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
   
   // Edit mode
   return (
-    <div className="bg-portfolio-card rounded-lg shadow-md p-6 my-4 animate-fade-in card-transition">
-      <div className="flex justify-between items-start mb-3">
+    <div className="bg-portfolio-card rounded-lg shadow-md overflow-hidden my-4 animate-fade-in card-transition">
+      {/* Image Section - Fixed aspect ratio */}
+      {(localProject.image_url || isEditing) && (
+        <div className="w-full aspect-[16/9] overflow-hidden bg-gray-100 relative group">
+          {localProject.image_url ? (
+            <EditableImage
+              src={localProject.image_url}
+              alt={localProject.title}
+              onChange={(newImageUrl) => updateField("image_url", newImageUrl)}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div 
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      updateField("image_url", event.target?.result as string);
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                };
+                input.click();
+              }}
+              className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
+            >
+              <Plus size={40} className="text-gray-400" />
+            </div>
+          )}
+        </div>
+      )}
+      
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <EditableField
             value={localProject.title}
@@ -345,6 +396,7 @@ const addFeature = () => {
             <Plus size={14} className="mr-1" /> Add Link
           </button>
         )}
+        </div>
       </div>
     </div>
   );
