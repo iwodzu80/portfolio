@@ -110,7 +110,7 @@ const Landing = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground leading-tight">
-            Showcase Your <span className="text-portfolio-violet">Technical</span> Excellence
+            Professional Portfolios That <span className="text-portfolio-violet">Recruiters Love</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
