@@ -234,7 +234,7 @@ const Landing = () => {
 
       {/* CTA Section */}
       <section className="container mx-auto px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center space-y-8 p-16 rounded-3xl bg-portfolio-violet">
+        <div className="max-w-4xl mx-auto text-center space-y-12 p-16 rounded-3xl bg-portfolio-violet">
           <h2 className="text-4xl md:text-5xl font-bold text-white">
             Ready to Build Your Professional Portfolio?
           </h2>
