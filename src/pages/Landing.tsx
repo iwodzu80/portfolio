@@ -147,13 +147,13 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <div 
                 key={index}
                 className="group p-8 rounded-2xl bg-white border border-border hover:border-portfolio-violet hover:shadow-xl transition-all duration-300"
               >
-                <div className="aspect-video rounded-xl overflow-hidden mb-6">
+                <div className="aspect-square rounded-xl overflow-hidden mb-6">
                   <img 
                     src={feature.image} 
                     alt={feature.title}
