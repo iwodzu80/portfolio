@@ -93,7 +93,7 @@ const Landing = () => {
             <Link to="/auth">
               <Button variant="ghost" className="text-foreground hover:text-primary">Sign In</Button>
             </Link>
-            <Link to="/auth">
+            <Link to="/auth?tab=signup">
               <Button className="bg-portfolio-violet hover:bg-gradient-primary transition-all duration-300 text-white">
                 Get Started
               </Button>
@@ -120,7 +120,7 @@ const Landing = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Link to="/auth">
+            <Link to="/auth?tab=signup">
               <Button size="lg" className="gap-2 text-lg px-10 h-14 bg-portfolio-violet hover:bg-gradient-primary transition-all duration-300 text-white shadow-lg hover:shadow-xl">
                 Start Building Free
                 <ArrowRight className="h-5 w-5" />
@@ -242,7 +242,7 @@ const Landing = () => {
           <p className="text-xl text-white/90">
             Join thousands of tech professionals showcasing their best work
           </p>
-          <Link to="/auth">
+          <Link to="/auth?tab=signup">
             <Button 
               size="lg" 
               className="gap-2 text-lg px-10 h-14 bg-white text-portfolio-violet hover:bg-portfolio-celadon hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"

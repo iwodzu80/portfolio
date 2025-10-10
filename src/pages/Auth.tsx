@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff } from "lucide-react";
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "signup" ? "sign-up" : "sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signUpLoading, setSignUpLoading] = useState(false);
@@ -19,6 +22,13 @@ const Auth = () => {
   const [resetLoading, setResetLoading] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "signup") {
+      setActiveTab("sign-up");
+    }
+  }, [searchParams]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +100,7 @@ const Auth = () => {
         </CardHeader>
 
 
-        <Tabs defaultValue="sign-in" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="sign-in" disabled={isLoading}>Sign In</TabsTrigger>
             <TabsTrigger value="sign-up" disabled={isLoading}>Sign Up</TabsTrigger>
