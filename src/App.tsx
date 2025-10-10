@@ -11,9 +11,11 @@ import Auth from "./pages/Auth";
 import SharedPortfolio from "./pages/SharedPortfolio";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
+import CookiePolicy from "./pages/CookiePolicy";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -25,10 +27,12 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+          <CookieConsent />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/shared/:shareId" element={<SharedPortfolio />} />
+            <Route path="/cookie-policy" element={<CookiePolicy />} />
             
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Index />} />
