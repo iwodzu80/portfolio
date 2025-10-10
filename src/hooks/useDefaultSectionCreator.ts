@@ -9,8 +9,7 @@ export const useDefaultSectionCreator = () => {
         .from('sections')
         .insert({
           user_id: userId,
-          title: "My Projects (Example)",
-          description: "This is an example section - feel free to edit or delete it"
+          title: "My Projects"
         })
         .select('id')
         .single();
@@ -26,9 +25,8 @@ export const useDefaultSectionCreator = () => {
         .from('projects')
         .insert({
           section_id: sectionData.id,
-          title: "Example Project - Portfolio Website",
-          description: "This is an example project. Replace it with your own work! A responsive portfolio website built with React and TailwindCSS.",
-          project_role: "Full Stack Developer",
+          title: "Personal Portfolio",
+          description: "A responsive portfolio website built with React and TailwindCSS.",
           user_id: userId
         })
         .select('id')
@@ -42,8 +40,8 @@ export const useDefaultSectionCreator = () => {
       
       // Insert default links
       const links = [
-        { project_id: projectData.id, title: "GitHub (example)", url: "https://github.com/yourusername/project", user_id: userId },
-        { project_id: projectData.id, title: "Live Demo (example)", url: "https://yourproject.com", user_id: userId }
+        { project_id: projectData.id, title: "GitHub", url: "https://github.com", user_id: userId },
+        { project_id: projectData.id, title: "Live Site", url: "https://example.com", user_id: userId }
       ];
       
       const { error: linksError } = await supabase

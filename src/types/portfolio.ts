@@ -30,6 +30,7 @@ export interface ProjectData {
   links: LinkData[];
   features: FeatureData[];
   project_role?: string;
+  image_url?: string;
 }
 
 export interface SectionData {
