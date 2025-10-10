@@ -13,7 +13,7 @@ import {
   Zap
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import clicklyLogo from "@/assets/clickly-logo.png";
+import clicklyLogo from "@/assets/clickly-logo-new.png";
 
 const Landing = () => {
   const { user } = useAuth();
@@ -84,12 +84,13 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+    <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={clicklyLogo} alt="clickly.it logo" className="h-8 w-auto" />
+            <img src={clicklyLogo} alt="clickly.it logo" className="h-10 w-auto" />
+            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">clickly.it</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/auth">
@@ -105,12 +106,12 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-            <Users className="h-4 w-4" />
-            Join 25,000+ Tech Professionals
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-primary text-white text-sm font-medium shadow-lg">
+            <Sparkles className="h-4 w-4" />
+            Professional Portfolio Platform
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-primary bg-clip-text text-transparent">
             Showcase Your Technical Excellence
           </h1>
           
@@ -121,31 +122,16 @@ const Landing = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link to="/auth">
-              <Button size="lg" className="gap-2 text-lg px-8">
+              <Button size="lg" className="gap-2 text-lg px-8 bg-gradient-primary hover:opacity-90 transition-opacity border-0">
                 Start Building Free
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
             <Link to="/shared/demo">
-              <Button size="lg" variant="outline" className="gap-2 text-lg px-8">
+              <Button size="lg" variant="outline" className="gap-2 text-lg px-8 border-primary/30 hover:bg-primary/5">
                 View Demo Portfolio
               </Button>
             </Link>
-          </div>
-
-          <div className="pt-8 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">99%</div>
-              <div className="text-sm text-muted-foreground">Uptime</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">25K+</div>
-              <div className="text-sm text-muted-foreground">Active Users</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">$800K</div>
-              <div className="text-sm text-muted-foreground">ARR Target</div>
-            </div>
           </div>
         </div>
       </section>
@@ -167,9 +153,9 @@ const Landing = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow"
+                className="p-6 rounded-lg border border-primary/20 bg-card hover:shadow-xl hover:scale-105 transition-all duration-300"
               >
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center text-white mb-4 shadow-md">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
@@ -181,7 +167,7 @@ const Landing = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="container mx-auto px-4 py-20 bg-muted/30 rounded-3xl my-20">
+      <section className="container mx-auto px-4 py-20 bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl my-20 border border-primary/10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -202,15 +188,15 @@ const Landing = () => {
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="max-w-4xl mx-auto text-center space-y-8 p-12 rounded-2xl bg-primary/5 border-2 border-primary/20">
-          <h2 className="text-3xl md:text-5xl font-bold">
+        <div className="max-w-4xl mx-auto text-center space-y-8 p-12 rounded-2xl bg-gradient-primary border-2 border-primary/30 shadow-2xl">
+          <h2 className="text-3xl md:text-5xl font-bold text-white">
             Ready to Build Your Professional Portfolio?
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-white/90">
             Join thousands of tech professionals showcasing their best work
           </p>
           <Link to="/auth">
-            <Button size="lg" className="gap-2 text-lg px-8">
+            <Button size="lg" className="gap-2 text-lg px-8 bg-white text-primary hover:bg-white/90 transition-colors">
               Get Started for Free
               <ArrowRight className="h-5 w-5" />
             </Button>
@@ -219,11 +205,11 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t mt-20">
+      <footer className="border-t mt-20 border-primary/10">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
-              <img src={clicklyLogo} alt="clickly.it" className="h-6 w-auto" />
+              <img src={clicklyLogo} alt="clickly.it" className="h-8 w-auto" />
               <span className="text-sm text-muted-foreground">
                 © 2025 clickly.it. All rights reserved.
               </span>
