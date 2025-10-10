@@ -84,51 +84,53 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="border-b bg-white sticky top-0 z-50">
+        <nav className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={clicklyLogo} alt="clickly.it logo" className="h-10 w-auto" />
-            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">clickly.it</span>
+            <span className="text-xl font-bold text-foreground">clickly.it</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/auth">
-              <Button variant="ghost">Sign In</Button>
+              <Button variant="ghost" className="text-foreground hover:text-primary">Sign In</Button>
             </Link>
             <Link to="/auth">
-              <Button>Get Started</Button>
+              <Button className="bg-portfolio-violet hover:bg-gradient-primary transition-all duration-300 text-white">
+                Get Started
+              </Button>
             </Link>
           </div>
         </nav>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 md:py-32">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-primary text-white text-sm font-medium shadow-lg">
+      <section className="container mx-auto px-6 py-20 md:py-32">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-portfolio-celadon/30 bg-portfolio-celadon/10 text-portfolio-celadon text-sm font-medium">
             <Sparkles className="h-4 w-4" />
             Professional Portfolio Platform
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-primary bg-clip-text text-transparent">
-            Showcase Your Technical Excellence
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground leading-tight">
+            Showcase Your <span className="text-portfolio-violet">Technical</span> Excellence
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Create a professional portfolio that highlights your diverse projects, 
             tracks engagement, and helps you stand out in the tech industry.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
             <Link to="/auth">
-              <Button size="lg" className="gap-2 text-lg px-8 bg-gradient-primary hover:opacity-90 transition-opacity border-0">
+              <Button size="lg" className="gap-2 text-lg px-10 h-14 bg-portfolio-violet hover:bg-gradient-primary transition-all duration-300 text-white shadow-lg hover:shadow-xl">
                 Start Building Free
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
             <Link to="/shared/demo">
-              <Button size="lg" variant="outline" className="gap-2 text-lg px-8 border-primary/30 hover:bg-primary/5">
+              <Button size="lg" variant="outline" className="gap-2 text-lg px-10 h-14 border-2 border-portfolio-violet text-portfolio-violet hover:bg-portfolio-violet hover:text-white transition-all duration-300">
                 View Demo Portfolio
               </Button>
             </Link>
@@ -137,11 +139,11 @@ const Landing = () => {
       </section>
 
       {/* Features Grid */}
-      <section className="container mx-auto px-4 py-20">
+      <section className="container mx-auto px-6 py-20 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything You Need to Shine
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+              Everything You Need to <span className="text-portfolio-celadon">Shine</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Powerful features designed specifically for tech professionals to 
@@ -153,12 +155,12 @@ const Landing = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="p-6 rounded-lg border border-primary/20 bg-card hover:shadow-xl hover:scale-105 transition-all duration-300"
+                className="p-8 rounded-xl bg-white border border-border hover:border-portfolio-violet hover:shadow-lg transition-all duration-300 group"
               >
-                <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center text-white mb-4 shadow-md">
+                <div className="h-12 w-12 rounded-lg bg-portfolio-celadon/10 flex items-center justify-center text-portfolio-celadon mb-4 group-hover:bg-portfolio-violet group-hover:text-white transition-all duration-300">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <h3 className="text-xl font-semibold mb-2 text-foreground">{feature.title}</h3>
                 <p className="text-muted-foreground">{feature.description}</p>
               </div>
             ))}
@@ -167,19 +169,19 @@ const Landing = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="container mx-auto px-4 py-20 bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl my-20 border border-primary/10">
-        <div className="max-w-4xl mx-auto">
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-5xl mx-auto bg-white rounded-3xl border border-border p-12">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Tech Professionals Choose clickly.it
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+              Why Tech Professionals Choose <span className="text-portfolio-violet">clickly.it</span>
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-6">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                <p className="text-lg">{benefit}</p>
+                <CheckCircle2 className="h-6 w-6 text-portfolio-celadon flex-shrink-0 mt-0.5" />
+                <p className="text-lg text-foreground">{benefit}</p>
               </div>
             ))}
           </div>
@@ -187,16 +189,19 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="max-w-4xl mx-auto text-center space-y-8 p-12 rounded-2xl bg-gradient-primary border-2 border-primary/30 shadow-2xl">
-          <h2 className="text-3xl md:text-5xl font-bold text-white">
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center space-y-8 p-16 rounded-3xl bg-portfolio-violet">
+          <h2 className="text-4xl md:text-5xl font-bold text-white">
             Ready to Build Your Professional Portfolio?
           </h2>
           <p className="text-xl text-white/90">
             Join thousands of tech professionals showcasing their best work
           </p>
           <Link to="/auth">
-            <Button size="lg" className="gap-2 text-lg px-8 bg-white text-primary hover:bg-white/90 transition-colors">
+            <Button 
+              size="lg" 
+              className="gap-2 text-lg px-10 h-14 bg-white text-portfolio-violet hover:bg-portfolio-celadon hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
               Get Started for Free
               <ArrowRight className="h-5 w-5" />
             </Button>
@@ -205,8 +210,8 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t mt-20 border-primary/10">
-        <div className="container mx-auto px-4 py-8">
+      <footer className="border-t bg-white">
+        <div className="container mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
               <img src={clicklyLogo} alt="clickly.it" className="h-8 w-auto" />
@@ -215,13 +220,13 @@ const Landing = () => {
               </span>
             </div>
             <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link to="/auth" className="hover:text-primary transition-colors">
+              <Link to="/auth" className="hover:text-portfolio-violet transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/auth" className="hover:text-primary transition-colors">
+              <Link to="/auth" className="hover:text-portfolio-violet transition-colors">
                 Terms of Service
               </Link>
-              <Link to="/auth" className="hover:text-primary transition-colors">
+              <Link to="/auth" className="hover:text-portfolio-violet transition-colors">
                 Contact
               </Link>
             </div>
