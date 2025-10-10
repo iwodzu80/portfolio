@@ -71,12 +71,12 @@ const Landing = () => {
   ];
 
   const benefits = [
-    "Highlight diverse technical projects",
-    "Professional presentation templates",
-    "Skill mapping and guidance",
-    "Secure portfolio sharing",
-    "Real-time engagement tracking",
-    "Mobile-responsive design"
+    "Quick portfolio setup - minutes, not hours",
+    "No coding required - focus on your work, not websites",
+    "Clean, structured format for quick candidate evaluation",
+    "Privacy-first sharing - control who sees your work",
+    "Clear signal-to-noise ratio - showcase what matters",
+    "Works across all tech disciplines and roles"
   ];
 
   return (
@@ -168,22 +168,66 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="max-w-5xl mx-auto bg-white rounded-3xl border border-border p-12">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-              Why Tech Professionals Choose <span className="text-portfolio-violet">clickly.it</span>
+      {/* Dual Value Proposition Section */}
+      <section className="container mx-auto px-6 py-20 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+              Built for <span className="text-portfolio-violet">Professionals</span> and <span className="text-portfolio-celadon">Recruiters</span>
             </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              By focusing on simplicity and user control while embracing a broad definition of demonstrable work, 
+              Clickly helps professionals create compelling portfolios quickly while giving hiring managers 
+              the clear, structured information they need to evaluate candidates effectively.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-portfolio-celadon flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-foreground">{benefit}</p>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* For Professionals */}
+            <div className="bg-white rounded-2xl border border-border p-8 hover:border-portfolio-violet hover:shadow-xl transition-all duration-300">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-portfolio-violet/10 text-portfolio-violet text-sm font-medium mb-6">
+                For Professionals
               </div>
-            ))}
+              <h3 className="text-2xl font-bold mb-6 text-foreground">
+                Showcase Your Best Work, Fast
+              </h3>
+              <div className="space-y-4">
+                {[
+                  "Quick portfolio setup - minutes, not hours",
+                  "No coding required - focus on your work, not websites",
+                  "Privacy-first sharing - control who sees your work",
+                  "Works across all tech disciplines and roles"
+                ].map((benefit, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-portfolio-violet flex-shrink-0 mt-0.5" />
+                    <p className="text-foreground">{benefit}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* For Recruiters */}
+            <div className="bg-white rounded-2xl border border-border p-8 hover:border-portfolio-celadon hover:shadow-xl transition-all duration-300">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-portfolio-celadon/10 text-portfolio-celadon text-sm font-medium mb-6">
+                For Recruiters
+              </div>
+              <h3 className="text-2xl font-bold mb-6 text-foreground">
+                Evaluate Candidates Efficiently
+              </h3>
+              <div className="space-y-4">
+                {[
+                  "Clean, structured format for quick candidate evaluation",
+                  "Clear signal-to-noise ratio - see what matters most",
+                  "Consistent presentation across all candidates",
+                  "Direct access to project links and demonstrations"
+                ].map((benefit, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-portfolio-celadon flex-shrink-0 mt-0.5" />
+                    <p className="text-foreground">{benefit}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
