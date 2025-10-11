@@ -21,6 +21,8 @@ import {
   Trash2
 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Input } from "./ui/input";
 
 interface ProfileSectionProps {
   name: string;
@@ -191,13 +193,14 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     const newLink: SocialLink = {
       id: crypto.randomUUID(),
       platform: "",
-      url: ""
+      url: "",
+      customName: ""
     };
     const updatedLinks = [...localState.social_links, newLink];
     handleProfileUpdate("social_links", updatedLinks);
   };
 
-  const handleUpdateSocialLink = (id: string, field: 'platform' | 'url', value: string) => {
+  const handleUpdateSocialLink = (id: string, field: 'platform' | 'url' | 'customName', value: string) => {
     const updatedLinks = localState.social_links.map(link =>
       link.id === id ? { ...link, [field]: value } : link
     );
@@ -211,10 +214,17 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   const getSocialIcon = (platform: string) => {
     const platformLower = platform.toLowerCase();
-    if (platformLower.includes('linkedin')) return <Linkedin className="w-5 h-5" />;
-    if (platformLower.includes('github')) return <Github className="w-5 h-5" />;
-    if (platformLower.includes('twitter') || platformLower.includes('x')) return <Twitter className="w-5 h-5" />;
+    if (platformLower === 'linkedin') return <Linkedin className="w-5 h-5" />;
+    if (platformLower === 'github') return <Github className="w-5 h-5" />;
+    if (platformLower === 'twitter') return <Twitter className="w-5 h-5" />;
     return <Globe className="w-5 h-5" />;
+  };
+
+  const getSocialDisplayName = (link: SocialLink) => {
+    if (link.platform === 'other') {
+      return link.customName || 'Other';
+    }
+    return link.platform.charAt(0).toUpperCase() + link.platform.slice(1);
   };
 
   // Loading state
@@ -275,7 +285,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
-                  title={link.platform}
+                  title={getSocialDisplayName(link)}
                 >
                   {getSocialIcon(link.platform)}
                 </a>
@@ -397,21 +407,40 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           {localState.social_links && localState.social_links.length > 0 && (
             <div className="space-y-2">
               {localState.social_links.map(link => (
-                <div key={link.id} className="flex gap-2 items-center justify-center">
-                  <input
-                    type="text"
+                <div key={link.id} className="flex gap-2 items-center justify-center flex-wrap">
+                  <Select
                     value={link.platform}
-                    onChange={(e) => handleUpdateSocialLink(link.id, 'platform', e.target.value)}
-                    placeholder="Platform (e.g., LinkedIn)"
-                    className="px-3 py-1 text-sm border border-border rounded bg-background text-foreground w-32"
-                  />
-                  <input
+                    onValueChange={(value) => handleUpdateSocialLink(link.id, 'platform', value)}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Platform" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="linkedin">LinkedIn</SelectItem>
+                      <SelectItem value="github">GitHub</SelectItem>
+                      <SelectItem value="twitter">Twitter</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {link.platform === 'other' && (
+                    <Input
+                      type="text"
+                      value={link.customName || ''}
+                      onChange={(e) => handleUpdateSocialLink(link.id, 'customName', e.target.value)}
+                      placeholder="Custom name"
+                      className="w-32 h-9"
+                    />
+                  )}
+                  
+                  <Input
                     type="url"
                     value={link.url}
                     onChange={(e) => handleUpdateSocialLink(link.id, 'url', e.target.value)}
                     placeholder="https://..."
-                    className="px-3 py-1 text-sm border border-border rounded bg-background text-foreground flex-1 max-w-xs"
+                    className="flex-1 max-w-xs h-9"
                   />
+                  
                   <Button
                     onClick={() => handleDeleteSocialLink(link.id)}
                     variant="ghost"

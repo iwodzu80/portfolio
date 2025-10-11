@@ -5,6 +5,7 @@ export interface SocialLink {
   id: string;
   platform: string;
   url: string;
+  customName?: string; // For when platform is "other"
 }
 
 export interface ProfileData {
