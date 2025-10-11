@@ -1,6 +1,12 @@
 
 export type AppRole = 'admin' | 'moderator' | 'user';
 
+export interface SocialLink {
+  id: string;
+  platform: string;
+  url: string;
+}
+
 export interface ProfileData {
   name: string;
   photo: string;
@@ -10,6 +16,8 @@ export interface ProfileData {
   tagline: string;
   description: string;
   userRole?: AppRole;
+  social_links?: SocialLink[];
+  is_public?: boolean;
 }
 
 export interface LinkData {

@@ -83,10 +83,12 @@ export type Database = {
           description: string | null
           email: string | null
           id: string
+          is_public: boolean | null
           name: string | null
           phone: string | null
           photo_url: string | null
           role: string | null
+          social_links: Json | null
           tagline: string | null
           updated_at: string
           user_id: string
@@ -96,10 +98,12 @@ export type Database = {
           description?: string | null
           email?: string | null
           id?: string
+          is_public?: boolean | null
           name?: string | null
           phone?: string | null
           photo_url?: string | null
           role?: string | null
+          social_links?: Json | null
           tagline?: string | null
           updated_at?: string
           user_id: string
@@ -109,10 +113,12 @@ export type Database = {
           description?: string | null
           email?: string | null
           id?: string
+          is_public?: boolean | null
           name?: string | null
           phone?: string | null
           photo_url?: string | null
           role?: string | null
+          social_links?: Json | null
           tagline?: string | null
           updated_at?: string
           user_id?: string

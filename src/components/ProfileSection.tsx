@@ -4,6 +4,23 @@ import EditableImage from "./EditableImage";
 import EditableField from "./EditableField";
 import { supabase } from "../integrations/supabase/client";
 import { useAuth } from "../contexts/AuthContext";
+import { Button } from "./ui/button";
+import { SocialLink } from "@/types/portfolio";
+import { 
+  Mail, 
+  Phone, 
+  Copy, 
+  Check, 
+  Eye, 
+  EyeOff,
+  Linkedin,
+  Github,
+  Twitter,
+  Globe,
+  Plus,
+  Trash2
+} from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 
 interface ProfileSectionProps {
   name: string;
@@ -13,8 +30,11 @@ interface ProfileSectionProps {
   role: string;
   tagline: string;
   description: string;
+  social_links?: SocialLink[];
+  is_public?: boolean;
   onUpdate: () => void;
   isEditingMode?: boolean;
+  isLoading?: boolean;
 }
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({
@@ -25,8 +45,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   role,
   tagline,
   description,
+  social_links = [],
+  is_public = true,
   onUpdate,
-  isEditingMode = true
+  isEditingMode = true,
+  isLoading = false
 }) => {
   const { user } = useAuth();
   const [localState, setLocalState] = useState({
@@ -36,8 +59,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     telephone,
     role,
     tagline,
-    description
+    description,
+    social_links,
+    is_public
   });
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   
   // Update local state when props change (e.g., on initial load)
   useEffect(() => {
@@ -48,9 +74,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       telephone,
       role,
       tagline,
-      description
+      description,
+      social_links,
+      is_public
     });
-  }, [name, photo, email, telephone, role, tagline, description]);
+  }, [name, photo, email, telephone, role, tagline, description, social_links, is_public]);
   
   // Set document title when name changes
   useEffect(() => {
@@ -61,7 +89,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     }
   }, [localState.name]);
 
-  const handleProfileUpdate = async (field: string, value: string) => {
+  const handleProfileUpdate = async (field: string, value: string | boolean | SocialLink[]) => {
     if (!user) {
       toast.error("You must be logged in to update your profile");
       return;
@@ -76,12 +104,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     try {
       console.log(`Updating profile field ${field} for user ${user.id} with value:`, value);
       
-      // Create data object for update
-      const updateData = {
-        [field]: value,
-        updated_at: new Date().toISOString()
-      };
-      
       // Check if profile exists first
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
@@ -90,7 +112,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         .single();
       
       if (checkError && checkError.code !== 'PGRST116') {
-        // PGRST116 means no rows returned, which is fine
         console.error("Error checking profile existence:", checkError);
         throw checkError;
       }
@@ -134,7 +155,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         throw error;
       }
       
-      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
+      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} updated successfully`);
       
     } catch (error: any) {
       console.error("Error updating profile:", error);
@@ -148,10 +169,69 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         telephone,
         role,
         tagline,
-        description
+        description,
+        social_links,
+        is_public
       });
     }
   };
+
+  const handleCopyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      toast.success("Copied to clipboard!");
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch (error) {
+      toast.error("Failed to copy");
+    }
+  };
+
+  const handleAddSocialLink = () => {
+    const newLink: SocialLink = {
+      id: crypto.randomUUID(),
+      platform: "",
+      url: ""
+    };
+    const updatedLinks = [...localState.social_links, newLink];
+    handleProfileUpdate("social_links", updatedLinks);
+  };
+
+  const handleUpdateSocialLink = (id: string, field: 'platform' | 'url', value: string) => {
+    const updatedLinks = localState.social_links.map(link =>
+      link.id === id ? { ...link, [field]: value } : link
+    );
+    handleProfileUpdate("social_links", updatedLinks);
+  };
+
+  const handleDeleteSocialLink = (id: string) => {
+    const updatedLinks = localState.social_links.filter(link => link.id !== id);
+    handleProfileUpdate("social_links", updatedLinks);
+  };
+
+  const getSocialIcon = (platform: string) => {
+    const platformLower = platform.toLowerCase();
+    if (platformLower.includes('linkedin')) return <Linkedin className="w-5 h-5" />;
+    if (platformLower.includes('github')) return <Github className="w-5 h-5" />;
+    if (platformLower.includes('twitter') || platformLower.includes('x')) return <Twitter className="w-5 h-5" />;
+    return <Globe className="w-5 h-5" />;
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+        <Skeleton className="w-32 h-32 md:w-40 md:h-40 rounded-full" />
+        <div className="mt-6 w-full text-center space-y-3">
+          <Skeleton className="h-8 w-48 mx-auto" />
+          <Skeleton className="h-6 w-32 mx-auto" />
+          <Skeleton className="h-4 w-64 mx-auto" />
+          <Skeleton className="h-4 w-40 mx-auto" />
+          <Skeleton className="h-20 w-full mx-auto mt-4" />
+        </div>
+      </section>
+    );
+  }
 
   // Read-only mode
   if (!isEditingMode) {
@@ -161,23 +241,50 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           <img
             src={localState.photo}
             alt={localState.name}
-            className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-white rounded-full object-cover"
+            className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-border rounded-full object-cover"
           />
         )}
         
         <div className="mt-6 w-full text-center">
-          <h1 className="font-bold text-2xl md:text-3xl mb-2">{localState.name || "Your Name"}</h1>
-          {localState.role && <p className="text-portfolio-blue text-lg mb-2">{localState.role}</p>}
-          {localState.tagline && <p className="text-portfolio-muted mb-4 max-w-prose mx-auto text-justify">{localState.tagline}</p>}
+          <h1 className="font-bold text-2xl md:text-3xl mb-2 text-foreground">{localState.name || "Your Name"}</h1>
+          {localState.role && <p className="text-primary text-lg mb-2">{localState.role}</p>}
+          {localState.tagline && <p className="text-muted-foreground mb-4 max-w-prose mx-auto text-justify">{localState.tagline}</p>}
           
-          <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
-            {localState.email && <span className="text-portfolio-blue">{localState.email}</span>}
+          <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
+            {localState.email && (
+              <a href={`mailto:${localState.email}`} className="text-primary hover:underline inline-flex items-center gap-1">
+                <Mail className="w-4 h-4" />
+                {localState.email}
+              </a>
+            )}
             {localState.email && localState.telephone && <span className="mx-1">•</span>}
-            {localState.telephone && <span>{localState.telephone}</span>}
+            {localState.telephone && (
+              <a href={`tel:${localState.telephone}`} className="hover:underline inline-flex items-center gap-1">
+                <Phone className="w-4 h-4" />
+                {localState.telephone}
+              </a>
+            )}
           </div>
+
+          {localState.social_links && localState.social_links.length > 0 && (
+            <div className="flex justify-center gap-3 mb-4">
+              {localState.social_links.filter(link => link.platform && link.url).map(link => (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  title={link.platform}
+                >
+                  {getSocialIcon(link.platform)}
+                </a>
+              ))}
+            </div>
+          )}
           
           {localState.description && (
-            <p className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify">{localState.description}</p>
+            <p className="text-muted-foreground mt-4 max-w-prose mx-auto text-justify">{localState.description}</p>
           )}
         </div>
       </section>
@@ -187,11 +294,23 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Edit mode
   return (
     <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+      <div className="w-full flex justify-end mb-4">
+        <Button
+          onClick={() => handleProfileUpdate("is_public", !localState.is_public)}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
+          {localState.is_public ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          {localState.is_public ? "Public" : "Private"}
+        </Button>
+      </div>
+
       <EditableImage
         src={localState.photo}
         alt={localState.name}
         onChange={(value) => handleProfileUpdate("photo", value)}
-        className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-white"
+        className="w-32 h-32 md:w-40 md:h-40 shadow-md border-4 border-border"
       />
       
       <div className="mt-6 w-full text-center">
@@ -199,7 +318,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.name}
           onChange={(value) => handleProfileUpdate("name", value)}
           tag="h1"
-          className="font-bold text-2xl md:text-3xl mb-2"
+          className="font-bold text-2xl md:text-3xl mb-2 text-foreground"
           placeholder="Your Name"
         />
         
@@ -207,7 +326,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.role}
           onChange={(value) => handleProfileUpdate("role", value)}
           tag="p"
-          className="text-portfolio-blue text-lg mb-2"
+          className="text-primary text-lg mb-2"
           placeholder="Your Role"
         />
         
@@ -215,33 +334,103 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.tagline}
           onChange={(value) => handleProfileUpdate("tagline", value)}
           tag="p"
-          className="text-portfolio-muted mb-4 max-w-prose mx-auto text-justify"
+          className="text-muted-foreground mb-4 max-w-prose mx-auto text-justify"
           placeholder="Your tagline"
           multiline
         />
         
-        <div className="flex justify-center items-center gap-2 text-sm text-portfolio-muted mb-4">
-          <EditableField
-            value={localState.email}
-            onChange={(value) => handleProfileUpdate("email", value)}
-            tag="span"
-            placeholder="Email"
-            className="text-portfolio-blue"
-          />
+        <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
+          <div className="flex items-center gap-1">
+            <EditableField
+              value={localState.email}
+              onChange={(value) => handleProfileUpdate("email", value)}
+              tag="span"
+              placeholder="Email"
+              className="text-primary"
+            />
+            {localState.email && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={() => handleCopyToClipboard(localState.email, 'email')}
+              >
+                {copiedField === 'email' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              </Button>
+            )}
+          </div>
           <span className="mx-1">•</span>
-          <EditableField
-            value={localState.telephone}
-            onChange={(value) => handleProfileUpdate("telephone", value)}
-            tag="span"
-            placeholder="Telephone"
-          />
+          <div className="flex items-center gap-1">
+            <EditableField
+              value={localState.telephone}
+              onChange={(value) => handleProfileUpdate("telephone", value)}
+              tag="span"
+              placeholder="Telephone"
+            />
+            {localState.telephone && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={() => handleCopyToClipboard(localState.telephone, 'telephone')}
+              >
+                {copiedField === 'telephone' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Social Links Section */}
+        <div className="mt-6 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <h3 className="text-sm font-medium text-foreground">Social Links</h3>
+            <Button
+              onClick={handleAddSocialLink}
+              variant="outline"
+              size="sm"
+              className="h-7 px-2"
+            >
+              <Plus className="w-3 h-3" />
+            </Button>
+          </div>
+          
+          {localState.social_links && localState.social_links.length > 0 && (
+            <div className="space-y-2">
+              {localState.social_links.map(link => (
+                <div key={link.id} className="flex gap-2 items-center justify-center">
+                  <input
+                    type="text"
+                    value={link.platform}
+                    onChange={(e) => handleUpdateSocialLink(link.id, 'platform', e.target.value)}
+                    placeholder="Platform (e.g., LinkedIn)"
+                    className="px-3 py-1 text-sm border border-border rounded bg-background text-foreground w-32"
+                  />
+                  <input
+                    type="url"
+                    value={link.url}
+                    onChange={(e) => handleUpdateSocialLink(link.id, 'url', e.target.value)}
+                    placeholder="https://..."
+                    className="px-3 py-1 text-sm border border-border rounded bg-background text-foreground flex-1 max-w-xs"
+                  />
+                  <Button
+                    onClick={() => handleDeleteSocialLink(link.id)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         
         <EditableField
           value={localState.description}
           onChange={(value) => handleProfileUpdate("description", value)}
           tag="p"
-          className="text-portfolio-muted mt-4 max-w-prose mx-auto text-justify"
+          className="text-muted-foreground mt-4 max-w-prose mx-auto text-justify"
           placeholder="Add a brief description about yourself..."
           multiline
         />

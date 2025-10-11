@@ -84,13 +84,16 @@ const Index = React.memo(() => {
               role={profileData.role}
               tagline={profileData.tagline}
               description={profileData.description}
+              social_links={profileData.social_links}
+              is_public={profileData.is_public}
               onUpdate={loadData}
               isEditingMode={isEditingMode}
+              isLoading={isLoading}
             />
           </Suspense>
         </LazyComponentErrorBoundary>
         
-        <div className="my-4 border-t border-gray-200 max-w-xl mx-auto" />
+        <div className="my-4 border-t border-border max-w-xl mx-auto" />
         
         <LazyComponentErrorBoundary fallback={<SectionSkeleton />}>
           <Suspense fallback={<SectionSkeleton />}>
