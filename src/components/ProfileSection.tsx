@@ -314,59 +314,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Edit mode
   return (
     <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
-      <div className="w-full space-y-3 mb-6 bg-muted/50 p-4 rounded-lg">
-        <h3 className="text-sm font-medium text-foreground">Privacy Settings</h3>
-        
-        <div className="flex items-center justify-between">
-          <label htmlFor="is-public-toggle" className="text-sm text-muted-foreground">
-            Portfolio Visibility
-          </label>
-          <div className="flex items-center gap-2">
-            <Button
-              id="is-public-toggle"
-              onClick={() => handleProfileUpdate("is_public", !localState.is_public)}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              {localState.is_public ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-              {localState.is_public ? "Public" : "Private"}
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <label htmlFor="show-email-toggle" className="text-sm text-muted-foreground">
-            Show Email on Shared Page
-          </label>
-          <Button
-            id="show-email-toggle"
-            onClick={() => handleProfileUpdate("show_email", !localState.show_email)}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            {localState.show_email ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-            {localState.show_email ? "Visible" : "Hidden"}
-          </Button>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <label htmlFor="show-phone-toggle" className="text-sm text-muted-foreground">
-            Show Phone on Shared Page
-          </label>
-          <Button
-            id="show-phone-toggle"
-            onClick={() => handleProfileUpdate("show_phone", !localState.show_phone)}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            {localState.show_phone ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-            {localState.show_phone ? "Visible" : "Hidden"}
-          </Button>
-        </div>
-      </div>
 
       <EditableImage
         src={localState.photo}
@@ -401,7 +348,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           multiline
         />
         
-        <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
+        <div className="flex justify-center items-center text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-1">
             <EditableField
               value={localState.email}
@@ -411,17 +358,28 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               className="text-primary"
             />
             {localState.email && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={() => handleCopyToClipboard(localState.email, 'email')}
-              >
-                {copiedField === 'email' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleCopyToClipboard(localState.email, 'email')}
+                >
+                  {copiedField === 'email' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleProfileUpdate("show_email", !localState.show_email)}
+                  title={localState.show_email ? "Hide email on shared page" : "Show email on shared page"}
+                >
+                  {localState.show_email ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                </Button>
+              </>
             )}
           </div>
-          <span className="mx-1">•</span>
+          <span className="mx-1 flex-shrink-0">•</span>
           <div className="flex items-center gap-1">
             <EditableField
               value={localState.telephone}
@@ -430,14 +388,25 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               placeholder="Telephone"
             />
             {localState.telephone && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={() => handleCopyToClipboard(localState.telephone, 'telephone')}
-              >
-                {copiedField === 'telephone' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleCopyToClipboard(localState.telephone, 'telephone')}
+                >
+                  {copiedField === 'telephone' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleProfileUpdate("show_phone", !localState.show_phone)}
+                  title={localState.show_phone ? "Hide phone on shared page" : "Show phone on shared page"}
+                >
+                  {localState.show_phone ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                </Button>
+              </>
             )}
           </div>
         </div>
