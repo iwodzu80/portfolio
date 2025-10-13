@@ -19,6 +19,8 @@ export interface ProfileData {
   userRole?: AppRole;
   social_links?: SocialLink[];
   is_public?: boolean;
+  show_email?: boolean;
+  show_phone?: boolean;
 }
 
 export interface LinkData {

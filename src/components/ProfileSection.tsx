@@ -34,6 +34,8 @@ interface ProfileSectionProps {
   description: string;
   social_links?: SocialLink[];
   is_public?: boolean;
+  show_email?: boolean;
+  show_phone?: boolean;
   onUpdate: () => void;
   isEditingMode?: boolean;
   isLoading?: boolean;
@@ -49,6 +51,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   description,
   social_links = [],
   is_public = true,
+  show_email = true,
+  show_phone = true,
   onUpdate,
   isEditingMode = true,
   isLoading = false
@@ -63,7 +67,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     tagline,
     description,
     social_links,
-    is_public
+    is_public,
+    show_email,
+    show_phone
   });
   const [copiedField, setCopiedField] = useState<string | null>(null);
   
@@ -78,9 +84,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       tagline,
       description,
       social_links,
-      is_public
+      is_public,
+      show_email,
+      show_phone
     });
-  }, [name, photo, email, telephone, role, tagline, description, social_links, is_public]);
+  }, [name, photo, email, telephone, role, tagline, description, social_links, is_public, show_email, show_phone]);
   
   // Set document title when name changes
   useEffect(() => {
@@ -173,7 +181,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         tagline,
         description,
         social_links,
-        is_public
+        is_public,
+        show_email,
+        show_phone
       });
     }
   };
@@ -304,16 +314,58 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Edit mode
   return (
     <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
-      <div className="w-full flex justify-end mb-4">
-        <Button
-          onClick={() => handleProfileUpdate("is_public", !localState.is_public)}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
-          {localState.is_public ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-          {localState.is_public ? "Public" : "Private"}
-        </Button>
+      <div className="w-full space-y-3 mb-6 bg-muted/50 p-4 rounded-lg">
+        <h3 className="text-sm font-medium text-foreground">Privacy Settings</h3>
+        
+        <div className="flex items-center justify-between">
+          <label htmlFor="is-public-toggle" className="text-sm text-muted-foreground">
+            Portfolio Visibility
+          </label>
+          <div className="flex items-center gap-2">
+            <Button
+              id="is-public-toggle"
+              onClick={() => handleProfileUpdate("is_public", !localState.is_public)}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              {localState.is_public ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              {localState.is_public ? "Public" : "Private"}
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label htmlFor="show-email-toggle" className="text-sm text-muted-foreground">
+            Show Email on Shared Page
+          </label>
+          <Button
+            id="show-email-toggle"
+            onClick={() => handleProfileUpdate("show_email", !localState.show_email)}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            {localState.show_email ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            {localState.show_email ? "Visible" : "Hidden"}
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label htmlFor="show-phone-toggle" className="text-sm text-muted-foreground">
+            Show Phone on Shared Page
+          </label>
+          <Button
+            id="show-phone-toggle"
+            onClick={() => handleProfileUpdate("show_phone", !localState.show_phone)}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            {localState.show_phone ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            {localState.show_phone ? "Visible" : "Hidden"}
+          </Button>
+        </div>
       </div>
 
       <EditableImage

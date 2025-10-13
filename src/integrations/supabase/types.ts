@@ -88,6 +88,8 @@ export type Database = {
           phone: string | null
           photo_url: string | null
           role: string | null
+          show_email: boolean | null
+          show_phone: boolean | null
           social_links: Json | null
           tagline: string | null
           updated_at: string
@@ -103,6 +105,8 @@ export type Database = {
           phone?: string | null
           photo_url?: string | null
           role?: string | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
           social_links?: Json | null
           tagline?: string | null
           updated_at?: string
@@ -118,6 +122,8 @@ export type Database = {
           phone?: string | null
           photo_url?: string | null
           role?: string | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
           social_links?: Json | null
           tagline?: string | null
           updated_at?: string

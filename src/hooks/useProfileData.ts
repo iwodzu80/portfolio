@@ -13,7 +13,9 @@ export const useProfileData = (userId: string | undefined) => {
     tagline: "",
     description: "",
     social_links: [],
-    is_public: true
+    is_public: true,
+    show_email: true,
+    show_phone: true
   });
 
   const fetchProfileData = async () => {
@@ -45,7 +47,9 @@ export const useProfileData = (userId: string | undefined) => {
           tagline: data.tagline || "",
           description: data.description || "",
           social_links: (Array.isArray(data.social_links) ? data.social_links : []) as unknown as SocialLink[],
-          is_public: data.is_public ?? true
+          is_public: data.is_public ?? true,
+          show_email: data.show_email ?? true,
+          show_phone: data.show_phone ?? true
         };
         
         setProfileData(profile);
@@ -92,7 +96,9 @@ export const useProfileData = (userId: string | undefined) => {
           tagline: data.tagline || "",
           description: data.description || "",
           social_links: (Array.isArray(data.social_links) ? data.social_links : []) as unknown as SocialLink[],
-          is_public: data.is_public ?? true
+          is_public: data.is_public ?? true,
+          show_email: data.show_email ?? true,
+          show_phone: data.show_phone ?? true
         };
         
         setProfileData(profile);

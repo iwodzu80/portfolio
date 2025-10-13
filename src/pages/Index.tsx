@@ -86,6 +86,8 @@ const Index = React.memo(() => {
               description={profileData.description}
               social_links={profileData.social_links}
               is_public={profileData.is_public}
+              show_email={profileData.show_email}
+              show_phone={profileData.show_phone}
               onUpdate={loadData}
               isEditingMode={isEditingMode}
               isLoading={isLoading}
