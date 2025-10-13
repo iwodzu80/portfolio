@@ -13,8 +13,6 @@ import {
   Check, 
   Eye, 
   EyeOff,
-  Lock,
-  Unlock,
   Linkedin,
   Github,
   Twitter,
@@ -316,7 +314,59 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Edit mode
   return (
     <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
-      <h2 className="text-xl font-semibold mb-6 text-foreground">Profile</h2>
+      <div className="w-full space-y-3 mb-6 bg-muted/50 p-4 rounded-lg">
+        <h3 className="text-sm font-medium text-foreground">Privacy Settings</h3>
+        
+        <div className="flex items-center justify-between">
+          <label htmlFor="is-public-toggle" className="text-sm text-muted-foreground">
+            Portfolio Visibility
+          </label>
+          <div className="flex items-center gap-2">
+            <Button
+              id="is-public-toggle"
+              onClick={() => handleProfileUpdate("is_public", !localState.is_public)}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              {localState.is_public ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              {localState.is_public ? "Public" : "Private"}
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label htmlFor="show-email-toggle" className="text-sm text-muted-foreground">
+            Show Email on Shared Page
+          </label>
+          <Button
+            id="show-email-toggle"
+            onClick={() => handleProfileUpdate("show_email", !localState.show_email)}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            {localState.show_email ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            {localState.show_email ? "Visible" : "Hidden"}
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label htmlFor="show-phone-toggle" className="text-sm text-muted-foreground">
+            Show Phone on Shared Page
+          </label>
+          <Button
+            id="show-phone-toggle"
+            onClick={() => handleProfileUpdate("show_phone", !localState.show_phone)}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            {localState.show_phone ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            {localState.show_phone ? "Visible" : "Hidden"}
+          </Button>
+        </div>
+      </div>
 
       <EditableImage
         src={localState.photo}
@@ -361,26 +411,14 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               className="text-primary"
             />
             {localState.email && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => handleCopyToClipboard(localState.email, 'email')}
-                  title="Copy email"
-                >
-                  {copiedField === 'email' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => handleProfileUpdate("show_email", !localState.show_email)}
-                  title={localState.show_email ? "Hide on shared page" : "Show on shared page"}
-                >
-                  {localState.show_email ? <Unlock className="w-3 h-3 text-green-600" /> : <Lock className="w-3 h-3 text-muted-foreground" />}
-                </Button>
-              </>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={() => handleCopyToClipboard(localState.email, 'email')}
+              >
+                {copiedField === 'email' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              </Button>
             )}
           </div>
           <span className="mx-1">•</span>
@@ -392,26 +430,14 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               placeholder="Telephone"
             />
             {localState.telephone && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => handleCopyToClipboard(localState.telephone, 'telephone')}
-                  title="Copy phone"
-                >
-                  {copiedField === 'telephone' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => handleProfileUpdate("show_phone", !localState.show_phone)}
-                  title={localState.show_phone ? "Hide on shared page" : "Show on shared page"}
-                >
-                  {localState.show_phone ? <Unlock className="w-3 h-3 text-green-600" /> : <Lock className="w-3 h-3 text-muted-foreground" />}
-                </Button>
-              </>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={() => handleCopyToClipboard(localState.telephone, 'telephone')}
+              >
+                {copiedField === 'telephone' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              </Button>
             )}
           </div>
         </div>
@@ -489,33 +515,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           placeholder="Add a brief description about yourself..."
           multiline
         />
-
-        {/* Privacy Settings Section */}
-        <div className="w-full mt-8 pt-6 border-t border-border">
-          <h3 className="text-lg font-semibold mb-4 text-foreground">Privacy</h3>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <label htmlFor="is-public-toggle" className="text-sm font-medium text-foreground">
-                  Portfolio Visibility
-                </label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Make your portfolio accessible via share link
-                </p>
-              </div>
-              <Button
-                id="is-public-toggle"
-                onClick={() => handleProfileUpdate("is_public", !localState.is_public)}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                {localState.is_public ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                {localState.is_public ? "Public" : "Private"}
-              </Button>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
