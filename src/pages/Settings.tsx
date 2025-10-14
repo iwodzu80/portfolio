@@ -296,7 +296,7 @@ const Settings = () => {
         <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
           <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
           
-          <div className="mb-8">
+          <div className="mb-6">
             <h2 className="text-lg font-semibold mb-4">Account Information</h2>
             <div className="flex flex-col space-y-2">
               <div>
@@ -306,7 +306,7 @@ const Settings = () => {
             </div>
           </div>
 
-          <div className="border-t pt-6 mb-8">
+          <div className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Privacy Settings</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
