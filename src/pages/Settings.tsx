@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
-import { ArrowLeft, Check, Loader2, Copy, Link as LinkIcon, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Copy, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Form,
@@ -44,9 +44,6 @@ const Settings = () => {
   const [shareLink, setShareLink] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [isUpdatingSlug, setIsUpdatingSlug] = useState(false);
-  const [isPublic, setIsPublic] = useState(true);
-  const [showEmail, setShowEmail] = useState(true);
-  const [showPhone, setShowPhone] = useState(true);
   
   const form = useForm<z.infer<typeof passwordSchema>>({
     resolver: zodResolver(passwordSchema),
@@ -102,68 +99,8 @@ const Settings = () => {
     }
   };
 
-  const loadPrivacySettings = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_public, show_email, show_phone')
-        .eq('user_id', user.id)
-        .maybeSingle();
-        
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-      
-      if (data) {
-        setIsPublic(data.is_public ?? true);
-        setShowEmail(data.show_email ?? true);
-        setShowPhone(data.show_phone ?? true);
-      }
-    } catch (error: any) {
-      console.error("Error fetching privacy settings:", error);
-    }
-  };
-
-  const updatePrivacySetting = async (field: string, value: boolean) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          [field]: value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      toast.success("Privacy setting updated");
-    } catch (error: any) {
-      console.error("Error updating privacy setting:", error);
-      toast.error("Failed to update privacy setting");
-    }
-  };
-
-  const handlePrivacyToggle = async (field: 'is_public' | 'show_email' | 'show_phone', currentValue: boolean) => {
-    const newValue = !currentValue;
-    
-    if (field === 'is_public') {
-      setIsPublic(newValue);
-    } else if (field === 'show_email') {
-      setShowEmail(newValue);
-    } else if (field === 'show_phone') {
-      setShowPhone(newValue);
-    }
-    
-    await updatePrivacySetting(field, newValue);
-  };
-
   useEffect(() => {
     loadShareData();
-    loadPrivacySettings();
   }, [user]);
 
   const handleSlugUpdate = async (values: z.infer<typeof shareSlugSchema>) => {
@@ -302,56 +239,6 @@ const Settings = () => {
               <div>
                 <span className="text-sm text-gray-500">Email</span>
                 <p className="font-medium">{user?.email}</p>
-              </div>
-
-              <div className="pt-4 border-t space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium">Portfolio Visibility</label>
-                    <p className="text-xs text-gray-500">Make your portfolio public or private</p>
-                  </div>
-                  <Button
-                    onClick={() => handlePrivacyToggle('is_public', isPublic)}
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
-                    {isPublic ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    {isPublic ? "Public" : "Private"}
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium">Show Email on Shared Page</label>
-                    <p className="text-xs text-gray-500">Control email visibility on your shared portfolio</p>
-                  </div>
-                  <Button
-                    onClick={() => handlePrivacyToggle('show_email', showEmail)}
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
-                    {showEmail ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    {showEmail ? "Visible" : "Hidden"}
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium">Show Phone on Shared Page</label>
-                    <p className="text-xs text-gray-500">Control phone visibility on your shared portfolio</p>
-                  </div>
-                  <Button
-                    onClick={() => handlePrivacyToggle('show_phone', showPhone)}
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
-                    {showPhone ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    {showPhone ? "Visible" : "Hidden"}
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
