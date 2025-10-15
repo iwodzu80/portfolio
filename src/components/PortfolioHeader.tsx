@@ -289,12 +289,12 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
             {isEditingMode ? (
               <>
                 <Eye size={18} />
-                View Mode
+                View
               </>
             ) : (
               <>
                 <Pencil size={18} />
-                Edit Mode
+                Edit
               </>
             )}
           </Button>
