@@ -428,9 +428,8 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" size="icon">
                 <UserRound size={18} />
-                Account
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
