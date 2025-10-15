@@ -10,7 +10,6 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import SharedPortfolio from "./pages/SharedPortfolio";
 import Settings from "./pages/Settings";
-import Sharing from "./pages/Sharing";
 import Analytics from "./pages/Analytics";
 import CookiePolicy from "./pages/CookiePolicy";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -38,7 +37,6 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Index />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/sharing" element={<Sharing />} />
               <Route path="/analytics" element={<Analytics />} />
             </Route>
             
