@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff, Shield } from "lucide-react";
+import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff, Share2, Copy, RotateCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import SharePortfolioDialog from "@/components/SharePortfolioDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +37,10 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
   const [isPublic, setIsPublic] = useState(true);
   const [showEmail, setShowEmail] = useState(true);
   const [showPhone, setShowPhone] = useState(true);
+  const [shareLink, setShareLink] = useState("");
+  const [isShareActive, setIsShareActive] = useState(true);
+  const [shareId, setShareId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadPrivacySettings = async () => {
     if (!user) return;
@@ -95,8 +101,169 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
     await updatePrivacySetting(field, newValue);
   };
 
+  const getBaseUrl = () => {
+    const hostname = window.location.hostname;
+    if (hostname === 'clickly.it' || hostname === 'www.clickly.it') {
+      return 'https://clickly.it';
+    }
+    return window.location.origin;
+  };
+
+  const loadShareData = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('portfolio_shares')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      
+      if (data) {
+        setShareId(data.share_id);
+        setIsShareActive(data.is_active);
+        const baseUrl = getBaseUrl();
+        setShareLink(`${baseUrl}/shared/${data.share_id}`);
+      }
+    } catch (error: any) {
+      console.error("Error fetching share data:", error);
+      toast.error("Failed to load sharing settings");
+    }
+  };
+
+  const generateNewShareId = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoading(true);
+      
+      const MAX_RETRIES = 5;
+      let attempts = 0;
+      let success = false;
+      let newShareId = '';
+      
+      while (attempts < MAX_RETRIES && !success) {
+        attempts++;
+        newShareId = crypto.randomUUID();
+        
+        try {
+          const { data: existingShare } = await supabase
+            .from('portfolio_shares')
+            .select('share_id')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
+          let error;
+          
+          if (existingShare) {
+            const { error: updateError } = await supabase
+              .from('portfolio_shares')
+              .update({ 
+                share_id: newShareId,
+                is_active: true,
+                updated_at: new Date().toISOString()
+              })
+              .eq('user_id', user.id);
+            error = updateError;
+          } else {
+            const { error: insertError } = await supabase
+              .from('portfolio_shares')
+              .insert({
+                user_id: user.id,
+                share_id: newShareId,
+                is_active: true
+              });
+            error = insertError;
+          }
+          
+          if (error) {
+            if (error.code === '23505' && error.message.includes('portfolio_shares_share_id_unique')) {
+              continue;
+            } else {
+              throw error;
+            }
+          }
+          
+          success = true;
+        } catch (retryError: any) {
+          if (retryError.code === '23505' && retryError.message.includes('portfolio_shares_share_id_unique')) {
+            continue;
+          } else {
+            throw retryError;
+          }
+        }
+      }
+      
+      if (!success) {
+        throw new Error(`Failed to generate unique share ID after ${MAX_RETRIES} attempts`);
+      }
+      
+      setShareId(newShareId);
+      const baseUrl = getBaseUrl();
+      setShareLink(`${baseUrl}/shared/${newShareId}`);
+      setIsShareActive(true);
+      toast.success("New share link generated");
+    } catch (error: any) {
+      console.error("Error generating share ID:", error);
+      toast.error("Failed to generate share link");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleShareActive = async (active: boolean) => {
+    if (!user || !shareId) return;
+    
+    try {
+      setIsLoading(true);
+      
+      const { error } = await supabase
+        .from('portfolio_shares')
+        .update({ 
+          is_active: active,
+          updated_at: new Date().toISOString() 
+        })
+        .eq('user_id', user.id);
+        
+      if (error) throw error;
+      
+      setIsShareActive(active);
+      toast.success(active ? "Share link activated" : "Share link deactivated");
+    } catch (error: any) {
+      console.error("Error toggling share status:", error);
+      toast.error("Failed to update sharing status");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      toast.success("Share link copied to clipboard");
+    } catch (error) {
+      const textArea = document.createElement("textarea");
+      textArea.value = shareLink;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast.success("Share link copied to clipboard");
+      } catch (fallbackError) {
+        toast.error("Failed to copy link");
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
   useEffect(() => {
     loadPrivacySettings();
+    loadShareData();
   }, [user]);
 
   return (
@@ -108,7 +275,6 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
           </span>
         </Link>
         <div className="flex items-center gap-2">
-          <SharePortfolioDialog />
           <Button
             onClick={() => setIsEditingMode(!isEditingMode)}
             variant="outline"
@@ -131,13 +297,72 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
-                <Shield size={18} />
-                Privacy
+                <Share2 size={18} />
+                Share
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-80">
-              <div className="space-y-4">
+            <PopoverContent align="end" className="w-96">
+              <div className="space-y-6">
                 <div>
+                  <h4 className="font-semibold text-sm mb-3">Share Portfolio</h4>
+                  {isLoading ? (
+                    <div className="flex justify-center py-4">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label htmlFor="share-active">Share Link Active</Label>
+                          <p className="text-xs text-muted-foreground">
+                            {isShareActive ? "Portfolio is publicly accessible" : "Share link disabled"}
+                          </p>
+                        </div>
+                        <Switch
+                          id="share-active"
+                          checked={isShareActive}
+                          onCheckedChange={toggleShareActive}
+                          disabled={!shareId || isLoading}
+                        />
+                      </div>
+                      
+                      {shareId && (
+                        <div className="space-y-2">
+                          <Label htmlFor="share-link">Link</Label>
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              id="share-link"
+                              value={shareLink}
+                              readOnly
+                              className="flex-1 text-sm"
+                            />
+                            <Button 
+                              size="icon" 
+                              variant="outline" 
+                              onClick={copyToClipboard} 
+                              title="Copy to clipboard"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <Button 
+                        variant="secondary" 
+                        onClick={generateNewShareId} 
+                        disabled={isLoading}
+                        className="w-full flex items-center justify-center"
+                        size="sm"
+                      >
+                        <RotateCw size={16} className="mr-2" />
+                        {shareId ? "Generate New Link" : "Create Share Link"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t pt-4">
                   <h4 className="font-semibold text-sm mb-3">Privacy Settings</h4>
                   <div className="space-y-1">
                     <div 
