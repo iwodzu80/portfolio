@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3 } from "lucide-react";
+import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import SharePortfolioDialog from "@/components/SharePortfolioDialog";
@@ -13,6 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface PortfolioHeaderProps {
   isEditingMode: boolean;
@@ -23,8 +25,74 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
   isEditingMode, 
   setIsEditingMode 
 }) => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const [isPublic, setIsPublic] = useState(true);
+  const [showEmail, setShowEmail] = useState(true);
+  const [showPhone, setShowPhone] = useState(true);
+
+  const loadPrivacySettings = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_public, show_email, show_phone')
+        .eq('user_id', user.id)
+        .maybeSingle();
+        
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      
+      if (data) {
+        setIsPublic(data.is_public ?? true);
+        setShowEmail(data.show_email ?? true);
+        setShowPhone(data.show_phone ?? true);
+      }
+    } catch (error: any) {
+      console.error("Error fetching privacy settings:", error);
+    }
+  };
+
+  const updatePrivacySetting = async (field: string, value: boolean) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          [field]: value,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast.success("Privacy setting updated");
+    } catch (error: any) {
+      console.error("Error updating privacy setting:", error);
+      toast.error("Failed to update privacy setting");
+    }
+  };
+
+  const handlePrivacyToggle = async (field: 'is_public' | 'show_email' | 'show_phone', currentValue: boolean) => {
+    const newValue = !currentValue;
+    
+    if (field === 'is_public') {
+      setIsPublic(newValue);
+    } else if (field === 'show_email') {
+      setShowEmail(newValue);
+    } else if (field === 'show_phone') {
+      setShowPhone(newValue);
+    }
+    
+    await updatePrivacySetting(field, newValue);
+  };
+
+  useEffect(() => {
+    loadPrivacySettings();
+  }, [user]);
 
   return (
     <header className="border-b bg-card sticky top-0 z-50 mb-6">
@@ -61,11 +129,39 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
                 Account
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuItem onClick={() => navigate("/settings")}>
                 <SettingsIcon size={16} className="mr-2" />
                 Settings
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <div className="px-2 py-1.5">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">Privacy Settings</p>
+                <div className="space-y-2">
+                  <div 
+                    className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-sm px-2 py-1.5 transition-colors"
+                    onClick={() => handlePrivacyToggle('is_public', isPublic)}
+                  >
+                    <span className="text-sm">Portfolio Visibility</span>
+                    {isPublic ? <Eye size={16} className="text-muted-foreground" /> : <EyeOff size={16} className="text-muted-foreground" />}
+                  </div>
+                  <div 
+                    className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-sm px-2 py-1.5 transition-colors"
+                    onClick={() => handlePrivacyToggle('show_email', showEmail)}
+                  >
+                    <span className="text-sm">Show Email</span>
+                    {showEmail ? <Eye size={16} className="text-muted-foreground" /> : <EyeOff size={16} className="text-muted-foreground" />}
+                  </div>
+                  <div 
+                    className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-sm px-2 py-1.5 transition-colors"
+                    onClick={() => handlePrivacyToggle('show_phone', showPhone)}
+                  >
+                    <span className="text-sm">Show Phone</span>
+                    {showPhone ? <Eye size={16} className="text-muted-foreground" /> : <EyeOff size={16} className="text-muted-foreground" />}
+                  </div>
+                </div>
+              </div>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate("/analytics")}>
                 <BarChart3 size={16} className="mr-2" />
                 View Analytics
