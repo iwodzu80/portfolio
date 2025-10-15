@@ -296,65 +296,62 @@ const Settings = () => {
         <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
           <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
           
-          <div className="mb-6">
+          <div className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Account Information</h2>
-            <div className="flex flex-col space-y-2">
+            <div className="space-y-4">
               <div>
                 <span className="text-sm text-gray-500">Email</span>
                 <p className="font-medium">{user?.email}</p>
               </div>
-            </div>
-          </div>
 
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Privacy Settings</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-sm font-medium">Portfolio Visibility</label>
-                  <p className="text-xs text-gray-500">Make your portfolio public or private</p>
+              <div className="pt-4 border-t space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium">Portfolio Visibility</label>
+                    <p className="text-xs text-gray-500">Make your portfolio public or private</p>
+                  </div>
+                  <Button
+                    onClick={() => handlePrivacyToggle('is_public', isPublic)}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    {isPublic ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    {isPublic ? "Public" : "Private"}
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => handlePrivacyToggle('is_public', isPublic)}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  {isPublic ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  {isPublic ? "Public" : "Private"}
-                </Button>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-sm font-medium">Show Email on Shared Page</label>
-                  <p className="text-xs text-gray-500">Control email visibility on your shared portfolio</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium">Show Email on Shared Page</label>
+                    <p className="text-xs text-gray-500">Control email visibility on your shared portfolio</p>
+                  </div>
+                  <Button
+                    onClick={() => handlePrivacyToggle('show_email', showEmail)}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    {showEmail ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    {showEmail ? "Visible" : "Hidden"}
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => handlePrivacyToggle('show_email', showEmail)}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  {showEmail ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  {showEmail ? "Visible" : "Hidden"}
-                </Button>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-sm font-medium">Show Phone on Shared Page</label>
-                  <p className="text-xs text-gray-500">Control phone visibility on your shared portfolio</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium">Show Phone on Shared Page</label>
+                    <p className="text-xs text-gray-500">Control phone visibility on your shared portfolio</p>
+                  </div>
+                  <Button
+                    onClick={() => handlePrivacyToggle('show_phone', showPhone)}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    {showPhone ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    {showPhone ? "Visible" : "Hidden"}
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => handlePrivacyToggle('show_phone', showPhone)}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  {showPhone ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  {showPhone ? "Visible" : "Hidden"}
-                </Button>
               </div>
             </div>
           </div>
