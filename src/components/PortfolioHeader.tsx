@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff } from "lucide-react";
+import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import SharePortfolioDialog from "@/components/SharePortfolioDialog";
@@ -13,6 +13,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -122,6 +127,75 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
             )}
           </Button>
           <ThemeToggle />
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Shield size={18} />
+                Privacy
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-sm mb-3">Privacy Settings</h4>
+                  <div className="space-y-1">
+                    <div 
+                      className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-md px-3 py-2.5 transition-colors group"
+                      onClick={() => handlePrivacyToggle('is_public', isPublic)}
+                    >
+                      <span className="text-sm font-medium">Portfolio Visibility</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium ${isPublic ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground'}`}>
+                          {isPublic ? 'Public' : 'Private'}
+                        </span>
+                        {isPublic ? (
+                          <Eye size={16} className="text-green-600 dark:text-green-500" />
+                        ) : (
+                          <EyeOff size={16} className="text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-md px-3 py-2.5 transition-colors group"
+                      onClick={() => handlePrivacyToggle('show_email', showEmail)}
+                    >
+                      <span className="text-sm font-medium">Email on Shared Page</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium ${showEmail ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground'}`}>
+                          {showEmail ? 'Visible' : 'Hidden'}
+                        </span>
+                        {showEmail ? (
+                          <Eye size={16} className="text-green-600 dark:text-green-500" />
+                        ) : (
+                          <EyeOff size={16} className="text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-md px-3 py-2.5 transition-colors group"
+                      onClick={() => handlePrivacyToggle('show_phone', showPhone)}
+                    >
+                      <span className="text-sm font-medium">Phone on Shared Page</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium ${showPhone ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground'}`}>
+                          {showPhone ? 'Visible' : 'Hidden'}
+                        </span>
+                        {showPhone ? (
+                          <Eye size={16} className="text-green-600 dark:text-green-500" />
+                        ) : (
+                          <EyeOff size={16} className="text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
@@ -129,70 +203,11 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
                 Account
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-72">
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem onClick={() => navigate("/settings")}>
                 <SettingsIcon size={16} className="mr-2" />
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              
-              <div className="px-2 py-2">
-                <p className="text-xs font-semibold text-muted-foreground mb-3 px-2">Privacy Settings</p>
-                <div className="space-y-1">
-                  <div 
-                    className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-md px-3 py-2.5 transition-colors group"
-                    onClick={() => handlePrivacyToggle('is_public', isPublic)}
-                  >
-                    <span className="text-sm font-medium">Portfolio Visibility</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-medium ${isPublic ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground'}`}>
-                        {isPublic ? 'Public' : 'Private'}
-                      </span>
-                      {isPublic ? (
-                        <Eye size={16} className="text-green-600 dark:text-green-500" />
-                      ) : (
-                        <EyeOff size={16} className="text-muted-foreground" />
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div 
-                    className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-md px-3 py-2.5 transition-colors group"
-                    onClick={() => handlePrivacyToggle('show_email', showEmail)}
-                  >
-                    <span className="text-sm font-medium">Email on Shared Page</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-medium ${showEmail ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground'}`}>
-                        {showEmail ? 'Visible' : 'Hidden'}
-                      </span>
-                      {showEmail ? (
-                        <Eye size={16} className="text-green-600 dark:text-green-500" />
-                      ) : (
-                        <EyeOff size={16} className="text-muted-foreground" />
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div 
-                    className="flex items-center justify-between cursor-pointer hover:bg-accent rounded-md px-3 py-2.5 transition-colors group"
-                    onClick={() => handlePrivacyToggle('show_phone', showPhone)}
-                  >
-                    <span className="text-sm font-medium">Phone on Shared Page</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-medium ${showPhone ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground'}`}>
-                        {showPhone ? 'Visible' : 'Hidden'}
-                      </span>
-                      {showPhone ? (
-                        <Eye size={16} className="text-green-600 dark:text-green-500" />
-                      ) : (
-                        <EyeOff size={16} className="text-muted-foreground" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate("/analytics")}>
                 <BarChart3 size={16} className="mr-2" />
                 View Analytics
