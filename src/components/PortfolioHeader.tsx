@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff, Share2, Copy, RotateCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -14,6 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import {
   Popover,
@@ -34,6 +37,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
 }) => {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [isPublic, setIsPublic] = useState(true);
   const [showEmail, setShowEmail] = useState(true);
   const [showPhone, setShowPhone] = useState(true);
@@ -292,7 +296,6 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
               </>
             )}
           </Button>
-          <ThemeToggle />
           
           <Popover>
             <PopoverTrigger asChild>
@@ -429,6 +432,13 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Theme</DropdownMenuLabel>
+              <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
+                <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate("/settings")}>
                 <SettingsIcon size={16} className="mr-2" />
                 Settings
