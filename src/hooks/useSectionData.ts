@@ -53,12 +53,12 @@ export const useSectionData = (userId: string | undefined) => {
             description: project.description || "",
             project_role: project.project_role || "",
             key_learnings: project.key_learnings || [],
-            links: (project as any).project_links?.map((link: any) => ({
+            links: (project as any).links?.map((link: any) => ({
               id: link.id,
               title: link.title,
               url: link.url
             })) || [],
-            features: (project as any).project_features?.map((feature: any) => ({
+            features: (project as any).features?.map((feature: any) => ({
               id: feature.id,
               title: feature.title
             })) || []
