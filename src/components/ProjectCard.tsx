@@ -59,14 +59,14 @@ const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | nu
 const addFeature = () => {
   const newFeature: FeatureData = {
     id: `${localProject.id}-feature-${Date.now()}`,
-    title: "New Feature"
+    title: "New learning"
   };
   
   const updatedFeatures = [...localProject.features, newFeature];
   setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
   updateField("features", updatedFeatures);
   setLastAddedFeatureId(newFeature.id);
-  toast.success("Feature added");
+  toast.success("Learning added");
 };
   
   const updateLink = (linkId: string, field: keyof LinkData, value: string) => {
@@ -101,7 +101,7 @@ const addFeature = () => {
     const updatedFeatures = localProject.features.filter(feature => feature.id !== featureId);
     setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
     updateField("features", updatedFeatures);
-    toast.success("Feature removed");
+    toast.success("Learning removed");
   };
 
   const addKeyLearning = () => {
@@ -201,7 +201,7 @@ const addFeature = () => {
             </div>
           )}
           
-          {/* Features */}
+          {/* Key Learnings */}
           {localProject.features.length > 0 && (
             <div className="features flex flex-wrap gap-2 mb-4">
               {localProject.features.map((feature) => (
@@ -376,7 +376,7 @@ const addFeature = () => {
         )}
       </div>
       
-      {/* Features Section */}
+      {/* Key Learnings Section */}
       <div className="features mb-4">
         <div className="flex flex-wrap gap-2 mb-2">
           {localProject.features.map((feature) => (
@@ -391,7 +391,7 @@ const addFeature = () => {
   onChange={(value) => updateFeature(feature.id, "title", value)}
   tag="span"
   className="text-sm bg-gray-100 text-gray-700 py-1 px-3 rounded-full border"
-  placeholder="Feature name"
+  placeholder="Learning"
   autoEdit={feature.id === lastAddedFeatureId}
   onEditingChange={(editing) => {
     if (!editing && lastAddedFeatureId === feature.id) {
@@ -420,7 +420,7 @@ const addFeature = () => {
             onClick={addFeature}
             className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
           >
-            <Plus size={14} className="mr-1" /> Add Feature
+            <Plus size={14} className="mr-1" /> Add Learning
           </button>
         )}
       </div>
