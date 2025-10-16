@@ -20,6 +20,8 @@ export const useSectionData = (userId: string | undefined) => {
             id,
             title,
             description,
+            project_role,
+            key_learnings,
             links:project_links(
               id,
               title,
@@ -49,6 +51,8 @@ export const useSectionData = (userId: string | undefined) => {
             id: project.id,
             title: project.title,
             description: project.description || "",
+            project_role: project.project_role || "",
+            key_learnings: project.key_learnings || [],
             links: (project as any).project_links?.map((link: any) => ({
               id: link.id,
               title: link.title,
