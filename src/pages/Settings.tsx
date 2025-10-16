@@ -5,8 +5,19 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Form,
   FormControl,
@@ -31,8 +42,10 @@ const passwordSchema = z.object({
 
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   
   const form = useForm<z.infer<typeof passwordSchema>>({
     resolver: zodResolver(passwordSchema),
@@ -74,6 +87,27 @@ const Settings = () => {
       toast.error(`Error changing password: ${error.message}`);
     } finally {
       setIsChangingPassword(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeletingAccount(true);
+      
+      const { error } = await supabase.rpc('delete_user');
+      
+      if (error) {
+        toast.error("Failed to delete account: " + error.message);
+        return;
+      }
+      
+      toast.success("Account deleted successfully");
+      await signOut();
+      navigate("/auth");
+    } catch (error: any) {
+      toast.error("Error deleting account: " + error.message);
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -176,6 +210,57 @@ const Settings = () => {
                 </Button>
               </form>
             </Form>
+          </div>
+
+          <div className="border-t pt-6">
+            <h2 className="text-lg font-semibold mb-4 text-destructive">Danger Zone</h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Once you delete your account, there is no going back. All your data including portfolio, projects, and analytics will be permanently deleted.
+                </p>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="destructive"
+                      disabled={isDeletingAccount}
+                    >
+                      {isDeletingAccount ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Deleting Account...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete Account
+                        </>
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your account
+                        and remove all your data from our servers including your portfolio, projects, 
+                        sections, and analytics data.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteAccount}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Yes, delete my account
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
           </div>
         </div>
       </div>
