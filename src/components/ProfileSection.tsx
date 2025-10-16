@@ -343,7 +343,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.tagline}
           onChange={(value) => handleProfileUpdate("tagline", value)}
           tag="p"
-          className="text-muted-foreground mb-4 max-w-prose mx-auto text-center"
+          className="text-muted-foreground mb-4 max-w-prose mx-auto text-justify"
           placeholder="Your tagline"
           multiline
         />
