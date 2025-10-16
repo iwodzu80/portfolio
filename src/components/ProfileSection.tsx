@@ -88,7 +88,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       show_email,
       show_phone
     });
-  }, [name, photo, email, telephone, role, tagline, description, social_links, is_public, show_email, show_phone]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, photo, email, telephone, role, tagline, description, JSON.stringify(social_links), is_public, show_email, show_phone]);
   
   // Set document title when name changes
   useEffect(() => {
