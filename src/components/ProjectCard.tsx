@@ -331,11 +331,12 @@ const addFeature = () => {
         {localProject.key_learnings && localProject.key_learnings.length > 0 && (
           <div className="mb-3">
             <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
-            <ul className="list-disc list-inside space-y-2 text-left">
+            <div className="space-y-2 text-left">
               {localProject.key_learnings.map((learning, index) => (
-                <li key={index} className="text-sm text-portfolio-muted">
+                <div key={index} className="flex items-start gap-2">
+                  <span className="text-portfolio-muted mt-0.5">•</span>
                   {isEditing ? (
-                    <div className="flex items-baseline gap-2">
+                    <>
                       <EditableField
                         value={learning}
                         onChange={(value) => updateKeyLearning(index, value)}
@@ -351,17 +352,17 @@ const addFeature = () => {
                       />
                       <button
                         onClick={() => deleteKeyLearning(index)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
+                        className="text-red-500 hover:text-red-700 transition-colors flex-shrink-0"
                       >
                         <X size={14} />
                       </button>
-                    </div>
+                    </>
                   ) : (
-                    learning
+                    <span className="text-sm text-portfolio-muted">{learning}</span>
                   )}
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
         

@@ -48,36 +48,31 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         console.log("Sanitized shareId:", sanitizedShareId);
         console.log("Original shareId:", shareId);
         
-        // Make a single optimized query to get both the share record and user ID
-        // This eliminates one database roundtrip
-        const { data: shareData, error: shareError } = await supabase
-          .from('portfolio_shares')
-          .select('user_id, is_active')
-          .eq('share_id', sanitizedShareId)
-          .maybeSingle();
+        // Use the secure SECURITY DEFINER function to get user_id without exposing enumeration
+        const { data: userId, error: userError } = await supabase
+          .rpc('get_user_from_share', { share_id_param: sanitizedShareId });
           
-        console.log("Share data query result:", { shareData, shareError });
+        console.log("User from share result:", { userId, userError });
           
-        if (shareError || !shareData || !shareData.is_active) {
-          console.log("Share not found or not active:", { shareError, shareData });
+        if (userError || !userId) {
+          console.log("Share not found or not active:", { userError, userId });
           setNotFound(true);
           setIsLoading(false);
           return;
         }
         
-        const userId = shareData.user_id;
-        
         // Use Promise.all to execute queries concurrently
         // This significantly reduces total wait time
         const [profileData, sectionsData] = await Promise.all([
-          // Query 1: Fetch profile including privacy settings
+          // Query 1: Fetch profile using the secure public_profiles view
+          // This view automatically filters email/phone based on privacy settings
           supabase
-            .from('profiles')
+            .from('public_profiles')
             .select('name, photo_url, email, phone, role, tagline, description, social_links, show_email, show_phone')
             .eq('user_id', userId)
             .single(),
             
-          // Query 2: Fetch sections with projects, links, and features (including project_role)
+          // Query 2: Fetch sections with projects, links, and features (including project_role and key_learnings)
           supabase
             .from('sections')
             .select(`
@@ -89,6 +84,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                 title, 
                 description,
                 project_role,
+                key_learnings,
                 project_links (
                   id, 
                   title, 
@@ -109,15 +105,14 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
           console.error("Error fetching profile:", profileData.error);
         } else if (profileData.data) {
           // Apply sanitization efficiently
+          // Note: email and phone are already filtered by the public_profiles view based on privacy settings
           const data = profileData.data;
-          const showEmail = data.show_email ?? true;
-          const showPhone = data.show_phone ?? true;
           
           const sanitizedProfileData = {
             name: sanitizeText(data.name || ""),
             photo: data.photo_url || "", 
-            email: showEmail ? sanitizeText(data.email || "") : "",
-            telephone: showPhone ? sanitizeText(data.phone || "") : "",
+            email: sanitizeText(data.email || ""),
+            telephone: sanitizeText(data.phone || ""),
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
             description: sanitizeText(data.description || ""),
@@ -174,6 +169,9 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                     title: sanitizeText(project.title || "Untitled Project"),
                     description: sanitizeText(project.description || ""),
                     project_role: project.project_role ? sanitizeText(project.project_role) : undefined,
+                    key_learnings: Array.isArray(project.key_learnings) 
+                      ? project.key_learnings.map(learning => sanitizeText(learning))
+                      : [],
                     links,
                     features
                   };
