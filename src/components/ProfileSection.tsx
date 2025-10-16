@@ -268,7 +268,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         <div className="mt-6 w-full text-center">
           <h1 className="font-bold text-2xl md:text-3xl mb-2 text-foreground">{localState.name || "Your Name"}</h1>
           {localState.role && <p className="text-primary text-lg mb-2">{localState.role}</p>}
-          {localState.tagline && <p className="text-muted-foreground mb-4 max-w-prose mx-auto text-justify">{localState.tagline}</p>}
+          {localState.tagline && <p className="text-muted-foreground mb-4 max-w-prose mx-auto text-center">{localState.tagline}</p>}
           
           <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
             {localState.email && (
@@ -343,7 +343,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           value={localState.tagline}
           onChange={(value) => handleProfileUpdate("tagline", value)}
           tag="p"
-          className="text-muted-foreground mb-4 max-w-prose mx-auto text-justify"
+          className="text-muted-foreground mb-4 max-w-prose mx-auto text-center"
           placeholder="Your tagline"
           multiline
         />
