@@ -271,20 +271,24 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           {localState.role && <p className="text-primary text-lg mb-2">{localState.role}</p>}
           {localState.tagline && <p className="text-muted-foreground mb-4 max-w-prose mx-auto text-center">{localState.tagline}</p>}
           
-          <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
-            {localState.email && (
-              <a href={`mailto:${localState.email}`} className="text-primary hover:underline inline-flex items-center gap-1">
-                <Mail className="w-4 h-4" />
-                {localState.email}
-              </a>
-            )}
-            {localState.email && localState.telephone && <span className="self-center leading-none">•</span>}
-            {localState.telephone && (
-              <a href={`tel:${localState.telephone}`} className="hover:underline inline-flex items-center gap-1">
-                <Phone className="w-4 h-4" />
-                {localState.telephone}
-              </a>
-            )}
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-sm text-muted-foreground mb-4 max-w-2xl mx-auto">
+            <div className="flex justify-end items-center gap-1">
+              {localState.email && (
+                <a href={`mailto:${localState.email}`} className="text-primary hover:underline inline-flex items-center gap-1">
+                  <Mail className="w-4 h-4" />
+                  {localState.email}
+                </a>
+              )}
+            </div>
+            {localState.email && localState.telephone && <span className="flex items-center justify-center">•</span>}
+            <div className="flex justify-start items-center gap-1">
+              {localState.telephone && (
+                <a href={`tel:${localState.telephone}`} className="hover:underline inline-flex items-center gap-1">
+                  <Phone className="w-4 h-4" />
+                  {localState.telephone}
+                </a>
+              )}
+            </div>
           </div>
 
           {localState.social_links && localState.social_links.length > 0 && (
