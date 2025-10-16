@@ -99,7 +99,7 @@ const Auth = () => {
         {/* Header with Logo */}
         <div className="px-8 py-6">
           <Link to="/" className="inline-flex items-center gap-2">
-            <span className="text-2xl font-outfit font-bold bg-gradient-to-r from-portfolio-violet to-portfolio-celadon bg-clip-text text-transparent">
+            <span className="text-4xl font-outfit font-bold bg-gradient-to-r from-portfolio-violet to-portfolio-celadon bg-clip-text text-transparent">
               clickly.it
             </span>
           </Link>
