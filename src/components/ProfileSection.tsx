@@ -353,8 +353,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           multiline
         />
         
-        <div className="flex justify-center items-center text-sm text-muted-foreground mb-4">
-          <div className="flex items-center gap-1">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-sm text-muted-foreground mb-4 max-w-2xl mx-auto">
+          <div className="flex justify-end items-center gap-1">
             <EditableField
               value={localState.email}
               onChange={(value) => handleProfileUpdate("email", value)}
@@ -384,8 +384,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               </>
             )}
           </div>
-          <span className="mx-1 flex-shrink-0 inline-flex items-center">•</span>
-          <div className="flex items-center gap-1">
+          <span className="flex items-center justify-center">•</span>
+          <div className="flex justify-start items-center gap-1">
             <EditableField
               value={localState.telephone}
               onChange={(value) => handleProfileUpdate("telephone", value)}
