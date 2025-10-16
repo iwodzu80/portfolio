@@ -322,12 +322,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          description: string | null
+          email: string | null
+          name: string | null
+          phone: string | null
+          photo_url: string | null
+          role: string | null
+          show_email: boolean | null
+          show_phone: boolean | null
+          social_links: Json | null
+          tagline: string | null
+          user_id: string | null
+        }
+        Insert: {
+          description?: string | null
+          email?: never
+          name?: string | null
+          phone?: never
+          photo_url?: string | null
+          role?: string | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
+          social_links?: Json | null
+          tagline?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          description?: string | null
+          email?: never
+          name?: string | null
+          phone?: never
+          photo_url?: string | null
+          role?: string | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
+          social_links?: Json | null
+          tagline?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_user: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_user_from_share: {
+        Args: { share_id_param: string }
+        Returns: string
       }
       has_role: {
         Args: {
