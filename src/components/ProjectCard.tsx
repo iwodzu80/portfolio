@@ -193,14 +193,11 @@ const addFeature = () => {
           {localProject.key_learnings && localProject.key_learnings.length > 0 && (
             <div className="mb-4">
               <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
-              <div className="space-y-1">
+              <ul className="list-disc list-inside space-y-1 text-left">
                 {localProject.key_learnings.map((learning, index) => (
-                  <div key={index} className="flex items-start">
-                    <div className="text-portfolio-blue mr-2">•</div>
-                    <div className="text-sm text-portfolio-muted">{learning}</div>
-                  </div>
+                  <li key={index} className="text-sm text-portfolio-muted">{learning}</li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
           
@@ -334,12 +331,11 @@ const addFeature = () => {
         {localProject.key_learnings && localProject.key_learnings.length > 0 && (
           <div className="mb-3">
             <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
-            <div className="space-y-2">
+            <ul className="list-disc list-inside space-y-2 text-left">
               {localProject.key_learnings.map((learning, index) => (
-                <div key={index} className="flex items-start gap-2">
-                  <div className="text-portfolio-blue mt-1">•</div>
+                <li key={index} className="text-sm text-portfolio-muted">
                   {isEditing ? (
-                    <>
+                    <div className="flex items-baseline gap-2">
                       <EditableField
                         value={learning}
                         onChange={(value) => updateKeyLearning(index, value)}
@@ -359,13 +355,13 @@ const addFeature = () => {
                       >
                         <X size={14} />
                       </button>
-                    </>
+                    </div>
                   ) : (
-                    <div className="text-sm text-portfolio-muted flex-1">{learning}</div>
+                    learning
                   )}
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
         
