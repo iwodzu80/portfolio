@@ -278,7 +278,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {localState.email}
               </a>
             )}
-            {localState.email && localState.telephone && <span className="mx-1 inline-flex items-center">•</span>}
+            {localState.email && localState.telephone && <span className="inline-flex items-center">•</span>}
             {localState.telephone && (
               <a href={`tel:${localState.telephone}`} className="hover:underline inline-flex items-center gap-1">
                 <Phone className="w-4 h-4" />
