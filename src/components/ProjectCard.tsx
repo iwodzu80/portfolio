@@ -203,15 +203,18 @@ const addFeature = () => {
           
           {/* Key Learnings */}
           {localProject.features.length > 0 && (
-            <div className="features flex flex-wrap gap-2 mb-4">
-              {localProject.features.map((feature) => (
-                <span
-                  key={feature.id}
-                  className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border"
-                >
-                  {feature.title}
-                </span>
-              ))}
+            <div className="mb-4">
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+              <div className="flex flex-wrap gap-2">
+                {localProject.features.map((feature) => (
+                  <span
+                    key={feature.id}
+                    className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border"
+                  >
+                    {feature.title}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 
@@ -378,6 +381,9 @@ const addFeature = () => {
       
       {/* Key Learnings Section */}
       <div className="features mb-4">
+        {localProject.features.length > 0 && (
+          <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+        )}
         <div className="flex flex-wrap gap-2 mb-2">
           {localProject.features.map((feature) => (
             <div 
