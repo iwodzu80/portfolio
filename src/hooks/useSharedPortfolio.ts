@@ -72,7 +72,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             .eq('user_id', userId)
             .single(),
             
-          // Query 2: Fetch sections with projects, links, and features (including project_role)
+          // Query 2: Fetch sections with projects, links, and features (including project_role and key_learnings)
           supabase
             .from('sections')
             .select(`
@@ -84,6 +84,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                 title, 
                 description,
                 project_role,
+                key_learnings,
                 project_links (
                   id, 
                   title, 
@@ -168,6 +169,9 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                     title: sanitizeText(project.title || "Untitled Project"),
                     description: sanitizeText(project.description || ""),
                     project_role: project.project_role ? sanitizeText(project.project_role) : undefined,
+                    key_learnings: Array.isArray(project.key_learnings) 
+                      ? project.key_learnings.map(learning => sanitizeText(learning))
+                      : [],
                     links,
                     features
                   };
