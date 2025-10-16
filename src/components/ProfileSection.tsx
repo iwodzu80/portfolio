@@ -449,16 +449,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                     </SelectContent>
                   </Select>
                   
-                  {link.platform === 'other' && (
-                    <Input
-                      type="text"
-                      value={link.customName || ''}
-                      onChange={(e) => handleUpdateSocialLink(link.id, 'customName', e.target.value)}
-                      placeholder="Custom name"
-                      className="w-32 h-9"
-                    />
-                  )}
-                  
                   <Input
                     type="url"
                     value={link.url}
