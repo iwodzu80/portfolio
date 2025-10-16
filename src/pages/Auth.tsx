@@ -95,28 +95,21 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Auth Forms */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="border-b bg-background">
-          <nav className="px-8 py-4">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-outfit font-bold bg-gradient-to-r from-portfolio-violet to-portfolio-celadon bg-clip-text text-transparent">
-                clickly.it
-              </span>
-            </Link>
-          </nav>
-        </header>
+      <div className="flex-1 flex flex-col bg-background">
+        {/* Header with Logo */}
+        <div className="px-8 py-6">
+          <Link to="/" className="inline-flex items-center gap-2">
+            <span className="text-2xl font-outfit font-bold bg-gradient-to-r from-portfolio-violet to-portfolio-celadon bg-clip-text text-transparent">
+              clickly.it
+            </span>
+          </Link>
+        </div>
 
-        {/* Auth Content */}
-        <div className="flex-1 flex items-center justify-center px-8 py-12">
-          <div className="w-full max-w-md space-y-8">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-semibold">Welcome</h1>
-              <p className="text-muted-foreground">Sign in to continue to your portfolio</p>
-            </div>
-
+        {/* Auth Content - Centered */}
+        <div className="flex-1 flex items-center justify-center px-8 pb-12">
+          <div className="w-full max-w-sm space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
                 <TabsTrigger value="sign-in" disabled={isLoading}>Sign In</TabsTrigger>
                 <TabsTrigger value="sign-up" disabled={isLoading}>Sign Up</TabsTrigger>
               </TabsList>
@@ -281,14 +274,7 @@ const Auth = () => {
               </TabsContent>
             </Tabs>
 
-            <div className="relative">
-              <Separator />
-              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground">
-                Need help?
-              </span>
-            </div>
-
-            <div className="text-center">
+            <div className="pt-4">
               <Link to="/">
                 <Button variant="link" className="text-sm text-muted-foreground gap-2">
                   <Home className="h-4 w-4" />
@@ -300,15 +286,13 @@ const Auth = () => {
         </div>
       </div>
 
-      {/* Right Side - Gradient Background with Logo and Mission */}
+      {/* Right Side - Gradient Background with Mission */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-portfolio-violet via-portfolio-purple to-portfolio-celadon items-center justify-center p-12">
         <div className="text-center space-y-8 max-w-lg">
           <div className="flex justify-center">
-            <img 
-              src="/src/assets/clickly-logo-new.png" 
-              alt="Clickly Logo" 
-              className="h-20 w-auto"
-            />
+            <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+              <span className="text-5xl font-outfit font-bold text-white">C</span>
+            </div>
           </div>
           <div className="space-y-4">
             <h2 className="text-4xl font-bold text-white leading-tight">
@@ -316,7 +300,7 @@ const Auth = () => {
               Build Your Brand
             </h2>
             <p className="text-xl text-white/90">
-              Create stunning portfolios in minutes
+              Create stunning portfolios that captivate clients and showcase your best work in minutes.
             </p>
           </div>
         </div>
