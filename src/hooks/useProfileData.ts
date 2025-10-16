@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileData } from "@/types/portfolio";
+import { ProfileData, SocialLink } from "@/types/portfolio";
 
 export const useProfileData = (userId: string | undefined) => {
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -11,7 +11,11 @@ export const useProfileData = (userId: string | undefined) => {
     telephone: "",
     role: "",
     tagline: "",
-    description: ""
+    description: "",
+    social_links: [],
+    is_public: true,
+    show_email: true,
+    show_phone: true
   });
 
   const fetchProfileData = async () => {
@@ -41,7 +45,11 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: data.phone || "",
           role: data.role || "",
           tagline: data.tagline || "",
-          description: data.description || ""
+          description: data.description || "",
+          social_links: (Array.isArray(data.social_links) ? data.social_links : []) as unknown as SocialLink[],
+          is_public: data.is_public ?? true,
+          show_email: data.show_email ?? true,
+          show_phone: data.show_phone ?? true
         };
         
         setProfileData(profile);
@@ -86,7 +94,11 @@ export const useProfileData = (userId: string | undefined) => {
           telephone: data.phone || "",
           role: data.role || "",
           tagline: data.tagline || "",
-          description: data.description || ""
+          description: data.description || "",
+          social_links: (Array.isArray(data.social_links) ? data.social_links : []) as unknown as SocialLink[],
+          is_public: data.is_public ?? true,
+          show_email: data.show_email ?? true,
+          show_phone: data.show_phone ?? true
         };
         
         setProfileData(profile);

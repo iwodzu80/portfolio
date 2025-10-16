@@ -70,11 +70,10 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         // Use Promise.all to execute queries concurrently
         // This significantly reduces total wait time
         const [profileData, sectionsData] = await Promise.all([
-          // Query 1: Fetch profile with only public fields for shared portfolios
-          // SECURITY: Exclude email and telephone from public shared portfolios
+          // Query 1: Fetch profile including privacy settings
           supabase
             .from('profiles')
-            .select('name, photo_url, role, tagline, description')
+            .select('name, photo_url, email, phone, role, tagline, description, social_links, show_email, show_phone')
             .eq('user_id', userId)
             .single(),
             
@@ -111,16 +110,23 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         } else if (profileData.data) {
           // Apply sanitization efficiently
           const data = profileData.data;
+          const showEmail = data.show_email ?? true;
+          const showPhone = data.show_phone ?? true;
           
           const sanitizedProfileData = {
             name: sanitizeText(data.name || ""),
             photo: data.photo_url || "", 
-            email: "", // SECURITY: Don't expose email in shared portfolios
-            telephone: "", // SECURITY: Don't expose telephone in shared portfolios
+            email: showEmail ? sanitizeText(data.email || "") : "",
+            telephone: showPhone ? sanitizeText(data.phone || "") : "",
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
-            description: sanitizeText(data.description || "")
-            // userRole is not set for shared portfolios (public view)
+            description: sanitizeText(data.description || ""),
+            social_links: (Array.isArray(data.social_links) ? data.social_links : []).map((link: any) => ({
+              id: sanitizeText(link.id || ""),
+              platform: sanitizeText(link.platform || ""),
+              url: validateAndFormatUrl(link.url || ""),
+              customName: link.customName ? sanitizeText(link.customName) : undefined,
+            }))
           };
           
           setProfileData(sanitizedProfileData);
