@@ -105,12 +105,12 @@ const addFeature = () => {
   };
 
   const addKeyLearning = () => {
-    const newLearning = "New key learning";
+    const newLearning = "New tech";
     const updatedLearnings = [...(localProject.key_learnings || []), newLearning];
     setLocalProject(prev => ({ ...prev, key_learnings: updatedLearnings }));
     updateField("key_learnings", updatedLearnings);
     setLastAddedLearningIndex(updatedLearnings.length - 1);
-    toast.success("Key learning added");
+    toast.success("Tech added");
   };
 
   const updateKeyLearning = (index: number, value: string) => {
@@ -124,7 +124,7 @@ const addFeature = () => {
     const updatedLearnings = (localProject.key_learnings || []).filter((_, i) => i !== index);
     setLocalProject(prev => ({ ...prev, key_learnings: updatedLearnings }));
     updateField("key_learnings", updatedLearnings);
-    toast.success("Key learning removed");
+    toast.success("Tech removed");
   };
 
   const handleDeleteProject = () => {
@@ -189,10 +189,10 @@ const addFeature = () => {
             </div>
           )}
           
-          {/* Key Learnings */}
+          {/* Tech Used */}
           {localProject.key_learnings && localProject.key_learnings.length > 0 && (
             <div className="mb-4">
-              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Tech Used</h3>
               <ul className="list-disc list-inside space-y-1 text-left">
                 {localProject.key_learnings.map((learning, index) => (
                   <li key={index} className="text-sm text-portfolio-muted">{learning}</li>
@@ -326,11 +326,11 @@ const addFeature = () => {
         </div>
       )}
       
-      {/* Key Learnings Section */}
+      {/* Tech Used Section */}
       <div className="key-learnings mb-4">
         {localProject.key_learnings && localProject.key_learnings.length > 0 && (
           <div className="mb-3">
-            <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+            <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Tech Used</h3>
             <div className="space-y-2 text-left">
               {localProject.key_learnings.map((learning, index) => (
                 <div key={index} className="flex items-start gap-2">
@@ -342,7 +342,7 @@ const addFeature = () => {
                         onChange={(value) => updateKeyLearning(index, value)}
                         tag="span"
                         className="text-sm text-portfolio-muted flex-1"
-                        placeholder="Key learning"
+                        placeholder="Technology"
                         autoEdit={lastAddedLearningIndex === index}
                         onEditingChange={(editing) => {
                           if (!editing && lastAddedLearningIndex === index) {
@@ -371,7 +371,7 @@ const addFeature = () => {
             onClick={addKeyLearning}
             className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
           >
-            <Plus size={14} className="mr-1" /> Add Key Learning
+            <Plus size={14} className="mr-1" /> Add Tech
           </button>
         )}
       </div>
