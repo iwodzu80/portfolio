@@ -267,8 +267,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         
         <div className="mt-6 w-full text-center">
           <h1 className="font-bold text-2xl md:text-3xl mb-2 text-foreground">{localState.name || "Your Name"}</h1>
+          {localState.role && <p className="text-primary text-lg mb-2">{localState.role}</p>}
+          {localState.tagline && <p className="text-muted-foreground mb-4 max-w-prose mx-auto text-center">{localState.tagline}</p>}
           
-          <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground mb-2 flex-wrap">
+          <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
             {localState.email && (
               <a href={`mailto:${localState.email}`} className="text-primary hover:underline inline-flex items-center gap-1">
                 <Mail className="w-4 h-4" />
@@ -283,9 +285,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               </a>
             )}
           </div>
-          
-          {localState.role && <p className="text-primary text-lg mb-2">{localState.role}</p>}
-          {localState.tagline && <p className="text-muted-foreground mb-4 max-w-prose mx-auto text-center">{localState.tagline}</p>}
 
           {localState.social_links && localState.social_links.length > 0 && (
             <div className="flex justify-center gap-3 mb-4">
@@ -332,7 +331,24 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           placeholder="Your Name"
         />
         
-        <div className="flex justify-center items-center text-sm text-muted-foreground mb-2">
+        <EditableField
+          value={localState.role}
+          onChange={(value) => handleProfileUpdate("role", value)}
+          tag="p"
+          className="text-primary text-lg mb-2"
+          placeholder="Your Role"
+        />
+        
+        <EditableField
+          value={localState.tagline}
+          onChange={(value) => handleProfileUpdate("tagline", value)}
+          tag="p"
+          className="text-muted-foreground mb-4 max-w-prose mx-auto text-center"
+          placeholder="Your tagline"
+          multiline
+        />
+        
+        <div className="flex justify-center items-center text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-1">
             <EditableField
               value={localState.email}
@@ -394,23 +410,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             )}
           </div>
         </div>
-        
-        <EditableField
-          value={localState.role}
-          onChange={(value) => handleProfileUpdate("role", value)}
-          tag="p"
-          className="text-primary text-lg mb-2"
-          placeholder="Your Role"
-        />
-        
-        <EditableField
-          value={localState.tagline}
-          onChange={(value) => handleProfileUpdate("tagline", value)}
-          tag="p"
-          className="text-muted-foreground mb-4 max-w-prose mx-auto text-center"
-          placeholder="Your tagline"
-          multiline
-        />
 
         {/* Social Links Section */}
         <div className="mt-6 mb-4">
