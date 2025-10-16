@@ -288,14 +288,12 @@ const Auth = () => {
 
       {/* Right Side - Gradient Background with Mission */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-portfolio-violet via-portfolio-purple to-portfolio-celadon items-center justify-center p-12">
-        <div className="text-center space-y-6 max-w-lg">
-          <h2 className="text-4xl font-bold text-white leading-tight">
-            Showcase Your Work,<br />
-            Build Your Brand
+        <div className="text-center space-y-2 max-w-lg">
+          <h2 className="text-4xl font-bold text-white leading-relaxed">
+            Create stunning portfolio<br />
+            Showcase your best work<br />
+            <span className="text-5xl font-extrabold">Stand out</span>
           </h2>
-          <p className="text-xl text-white/90">
-            Create stunning portfolios that captivate clients and showcase your best work in minutes.
-          </p>
         </div>
       </div>
     </div>
