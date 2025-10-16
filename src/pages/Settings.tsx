@@ -94,7 +94,8 @@ const Settings = () => {
     try {
       setIsDeletingAccount(true);
       
-      const { error } = await supabase.rpc('delete_user');
+      // Call the delete_user function which will delete the user and all related data
+      const { error } = await supabase.auth.admin.deleteUser(user?.id || '');
       
       if (error) {
         toast.error("Failed to delete account: " + error.message);
