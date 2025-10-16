@@ -21,7 +21,8 @@ export const useProjectOperations = (
       const projectsWithFeatures = initialProjects.map(project => ({
         ...project,
         features: project.features || [],
-        project_role: project.project_role || ""
+        project_role: project.project_role || "",
+        key_learnings: project.key_learnings || []
       }));
       setLocalProjects(projectsWithFeatures);
     } else {
@@ -41,6 +42,7 @@ export const useProjectOperations = (
             title: updatedProject.title, 
             description: updatedProject.description,
             project_role: updatedProject.project_role || null,
+            key_learnings: updatedProject.key_learnings || []
           }))
           .eq('id', updatedProject.id)
           .eq('section_id', sectionId);
@@ -107,6 +109,7 @@ export const useProjectOperations = (
             title: newProject.title,
             description: newProject.description,
             project_role: newProject.project_role || null,
+            key_learnings: newProject.key_learnings || [],
             user_id: user.id
           })
           .select()
@@ -128,6 +131,7 @@ export const useProjectOperations = (
           title: projectData.title,
           description: projectData.description || "",
           project_role: projectData.project_role || "",
+          key_learnings: projectData.key_learnings || [],
           links: newProject.links.map((link, idx) => ({
             ...link,
             id: `${projectData.id}-link-${idx}`

@@ -21,20 +21,23 @@ const [confirmDelete, setConfirmDelete] = useState(false);
 const [localProject, setLocalProject] = useState<ProjectData>({
   ...project,
   features: project.features || [],
-  project_role: project.project_role || ""
+  project_role: project.project_role || "",
+  key_learnings: project.key_learnings || []
 });
 const [lastAddedFeatureId, setLastAddedFeatureId] = useState<string | null>(null);
+const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | null>(null);
   
   // Update local state when props change
   useEffect(() => {
     setLocalProject({
       ...project,
       features: project.features || [],
-      project_role: project.project_role || ""
+      project_role: project.project_role || "",
+      key_learnings: project.key_learnings || []
     });
   }, [project]);
   
-  const updateField = (field: keyof ProjectData, value: string | LinkData[] | FeatureData[]) => {
+  const updateField = (field: keyof ProjectData, value: string | LinkData[] | FeatureData[] | string[]) => {
     const updatedProject = { ...localProject, [field]: value };
     setLocalProject(updatedProject);
     onUpdate(updatedProject);
@@ -101,6 +104,29 @@ const addFeature = () => {
     toast.success("Feature removed");
   };
 
+  const addKeyLearning = () => {
+    const newLearning = "New key learning";
+    const updatedLearnings = [...(localProject.key_learnings || []), newLearning];
+    setLocalProject(prev => ({ ...prev, key_learnings: updatedLearnings }));
+    updateField("key_learnings", updatedLearnings);
+    setLastAddedLearningIndex(updatedLearnings.length - 1);
+    toast.success("Key learning added");
+  };
+
+  const updateKeyLearning = (index: number, value: string) => {
+    const updatedLearnings = [...(localProject.key_learnings || [])];
+    updatedLearnings[index] = value;
+    setLocalProject(prev => ({ ...prev, key_learnings: updatedLearnings }));
+    updateField("key_learnings", updatedLearnings);
+  };
+
+  const deleteKeyLearning = (index: number) => {
+    const updatedLearnings = (localProject.key_learnings || []).filter((_, i) => i !== index);
+    setLocalProject(prev => ({ ...prev, key_learnings: updatedLearnings }));
+    updateField("key_learnings", updatedLearnings);
+    toast.success("Key learning removed");
+  };
+
   const handleDeleteProject = () => {
     if (confirmDelete) {
       onDelete(localProject.id);
@@ -160,6 +186,21 @@ const addFeature = () => {
           {localProject.description && localProject.description.trim().length > 0 && (
             <div className="text-portfolio-muted mb-4 text-sm text-justify">
               {renderDescription(localProject.description)}
+            </div>
+          )}
+          
+          {/* Key Learnings */}
+          {localProject.key_learnings && localProject.key_learnings.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+              <div className="space-y-1">
+                {localProject.key_learnings.map((learning, index) => (
+                  <div key={index} className="flex items-start">
+                    <div className="text-portfolio-blue mr-2">•</div>
+                    <div className="text-sm text-portfolio-muted">{learning}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           
@@ -287,6 +328,56 @@ const addFeature = () => {
           Tip: Use "- " or "* " at the start of a line to create bullet points
         </div>
       )}
+      
+      {/* Key Learnings Section */}
+      <div className="key-learnings mb-4">
+        {localProject.key_learnings && localProject.key_learnings.length > 0 && (
+          <div className="mb-3">
+            <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+            <div className="space-y-2">
+              {localProject.key_learnings.map((learning, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="text-portfolio-blue mt-1">•</div>
+                  {isEditing ? (
+                    <>
+                      <EditableField
+                        value={learning}
+                        onChange={(value) => updateKeyLearning(index, value)}
+                        tag="span"
+                        className="text-sm text-portfolio-muted flex-1"
+                        placeholder="Key learning"
+                        autoEdit={lastAddedLearningIndex === index}
+                        onEditingChange={(editing) => {
+                          if (!editing && lastAddedLearningIndex === index) {
+                            setLastAddedLearningIndex(null);
+                          }
+                        }}
+                      />
+                      <button
+                        onClick={() => deleteKeyLearning(index)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <div className="text-sm text-portfolio-muted flex-1">{learning}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {isEditing && (
+          <button
+            onClick={addKeyLearning}
+            className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
+          >
+            <Plus size={14} className="mr-1" /> Add Key Learning
+          </button>
+        )}
+      </div>
       
       {/* Features Section */}
       <div className="features mb-4">

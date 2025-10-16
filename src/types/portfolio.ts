@@ -42,6 +42,7 @@ export interface ProjectData {
   features: FeatureData[];
   project_role?: string;
   image_url?: string;
+  key_learnings?: string[];
 }
 
 export interface SectionData {

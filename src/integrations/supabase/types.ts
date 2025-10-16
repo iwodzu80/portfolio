@@ -209,6 +209,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          key_learnings: string[] | null
           project_role: string | null
           section_id: string
           title: string
@@ -219,6 +220,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          key_learnings?: string[] | null
           project_role?: string | null
           section_id: string
           title: string
@@ -229,6 +231,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          key_learnings?: string[] | null
           project_role?: string | null
           section_id?: string
           title?: string
