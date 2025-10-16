@@ -277,7 +277,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 {localState.email}
               </a>
             )}
-            {localState.email && localState.telephone && <span className="mx-1">•</span>}
+            {localState.email && localState.telephone && <span className="mx-1 inline-flex items-center">•</span>}
             {localState.telephone && (
               <a href={`tel:${localState.telephone}`} className="hover:underline inline-flex items-center gap-1">
                 <Phone className="w-4 h-4" />
@@ -379,7 +379,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
               </>
             )}
           </div>
-          <span className="mx-1 flex-shrink-0">•</span>
+          <span className="mx-1 flex-shrink-0 inline-flex items-center">•</span>
           <div className="flex items-center gap-1">
             <EditableField
               value={localState.telephone}
