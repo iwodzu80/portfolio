@@ -3,10 +3,11 @@ import React, { useState, useEffect } from "react";
 import { X, Plus, Pencil, ExternalLink } from "lucide-react";
 import EditableField from "./EditableField";
 import EditableImage from "./EditableImage";
+import { RichTextEditor } from "./RichTextEditor";
 import { LinkData, ProjectData, FeatureData } from "@/types/portfolio";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { validateAndFormatUrl } from "@/utils/securityUtils";
+import { validateAndFormatUrl, sanitizeHtml } from "@/utils/securityUtils";
 
 interface ProjectCardProps {
   project: ProjectData;
@@ -184,9 +185,10 @@ const addFeature = () => {
             )}
           </div>
           {localProject.description && localProject.description.trim().length > 0 && (
-            <div className="text-portfolio-muted mb-4 text-sm text-justify">
-              {renderDescription(localProject.description)}
-            </div>
+            <div 
+              className="text-portfolio-muted mb-4 text-sm prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(localProject.description) }}
+            />
           )}
           
           {/* Tech Used */}
@@ -314,20 +316,12 @@ const addFeature = () => {
         </div>
       </div>
       
-      <EditableField
-        value={localProject.description}
+      <RichTextEditor
+        content={localProject.description}
         onChange={(value) => updateField("description", value)}
-        tag="p"
-        className="text-portfolio-muted mb-4 text-sm text-justify"
-        placeholder="Project Description (Use '- ' or '* ' at the start of a line for bullet points)"
-        multiline
+        placeholder="Project description"
+        className="mb-4"
       />
-      
-      {isEditing && (
-        <div className="text-xs text-gray-500 mb-3 italic">
-          Tip: Use "- " or "* " at the start of a line to create bullet points
-        </div>
-      )}
       
       {/* Tech Used Section */}
       <div className="key-learnings mb-4">

@@ -2,8 +2,10 @@
 import React, { useCallback } from "react";
 import ProjectList from "./ProjectList";
 import EditableField from "./EditableField";
+import { RichTextEditor } from "./RichTextEditor";
 import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import { SectionData } from "@/types/portfolio";
+import { sanitizeHtml } from "@/utils/securityUtils";
 
 interface SectionItemProps {
   section: SectionData;
@@ -100,19 +102,18 @@ const SectionItem: React.FC<SectionItemProps> = React.memo(({
 
       <div className="max-w-xl mx-auto px-6">
         {isEditingMode ? (
-        <EditableField
-          value={section.description || ""}
+        <RichTextEditor
+          content={section.description || ""}
           onChange={handleUpdateSectionDescription}
-          tag="p"
-          className="text-portfolio-muted mb-6 text-justify"
           placeholder="Section description (optional)"
-          multiline
+          className="mb-6"
         />
       ) : (
         section.description && section.description.trim().length > 0 && (
-          <p className="text-portfolio-muted mb-6 text-justify">
-            {section.description}
-          </p>
+          <div 
+            className="text-portfolio-muted mb-6 prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.description) }}
+          />
         )
       )}
       </div>

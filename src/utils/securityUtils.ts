@@ -57,3 +57,23 @@ export const sanitizeText = (text: string): string => {
     .replace(/'/g, '&#039;');
 };
 
+/**
+ * Sanitizes HTML content using DOMPurify
+ * Allows safe HTML tags while removing potentially dangerous content
+ */
+export const sanitizeHtml = (html: string): string => {
+  if (!html) return '';
+  
+  // Import DOMPurify dynamically to avoid SSR issues
+  if (typeof window !== 'undefined') {
+    const DOMPurify = require('dompurify');
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+      ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+      ALLOW_DATA_ATTR: false,
+    });
+  }
+  
+  return html;
+};
+
