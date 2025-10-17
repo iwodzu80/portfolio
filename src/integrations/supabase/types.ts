@@ -212,6 +212,8 @@ export type Database = {
           key_learnings: string[] | null
           project_role: string | null
           section_id: string
+          show_key_learnings: boolean | null
+          show_tech_used: boolean | null
           title: string
           updated_at: string
           user_id: string
@@ -223,6 +225,8 @@ export type Database = {
           key_learnings?: string[] | null
           project_role?: string | null
           section_id: string
+          show_key_learnings?: boolean | null
+          show_tech_used?: boolean | null
           title: string
           updated_at?: string
           user_id: string
@@ -234,6 +238,8 @@ export type Database = {
           key_learnings?: string[] | null
           project_role?: string | null
           section_id?: string
+          show_key_learnings?: boolean | null
+          show_tech_used?: boolean | null
           title?: string
           updated_at?: string
           user_id?: string

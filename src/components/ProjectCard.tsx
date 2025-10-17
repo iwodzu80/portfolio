@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { X, Plus, Pencil, ExternalLink } from "lucide-react";
+import { X, Plus, Pencil, ExternalLink, EyeOff, Eye } from "lucide-react";
 import EditableField from "./EditableField";
 import EditableImage from "./EditableImage";
 import { RichTextEditor } from "./RichTextEditor";
@@ -23,7 +23,9 @@ const [localProject, setLocalProject] = useState<ProjectData>({
   ...project,
   features: project.features || [],
   project_role: project.project_role || "",
-  key_learnings: project.key_learnings || []
+  key_learnings: project.key_learnings || [],
+  show_tech_used: project.show_tech_used ?? true,
+  show_key_learnings: project.show_key_learnings ?? true
 });
 const [lastAddedFeatureId, setLastAddedFeatureId] = useState<string | null>(null);
 const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | null>(null);
@@ -34,11 +36,13 @@ const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | nu
       ...project,
       features: project.features || [],
       project_role: project.project_role || "",
-      key_learnings: project.key_learnings || []
+      key_learnings: project.key_learnings || [],
+      show_tech_used: project.show_tech_used ?? true,
+      show_key_learnings: project.show_key_learnings ?? true
     });
   }, [project]);
   
-  const updateField = (field: keyof ProjectData, value: string | LinkData[] | FeatureData[] | string[]) => {
+  const updateField = (field: keyof ProjectData, value: string | LinkData[] | FeatureData[] | string[] | boolean) => {
     const updatedProject = { ...localProject, [field]: value };
     setLocalProject(updatedProject);
     onUpdate(updatedProject);
@@ -192,7 +196,7 @@ const addFeature = () => {
           )}
           
           {/* Tech Used */}
-          {localProject.key_learnings && localProject.key_learnings.length > 0 && (
+          {localProject.show_tech_used && localProject.key_learnings && localProject.key_learnings.length > 0 && (
             <div className="mb-4">
               <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Tech Used</h3>
               <ul className="list-disc list-inside space-y-1 text-left">
@@ -204,7 +208,7 @@ const addFeature = () => {
           )}
           
           {/* Key Learnings */}
-          {localProject.features.length > 0 && (
+          {localProject.show_key_learnings && localProject.features.length > 0 && (
             <div className="mb-4">
               <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
               <div className="flex flex-wrap gap-2">
@@ -327,7 +331,18 @@ const addFeature = () => {
       <div className="key-learnings mb-4">
         {localProject.key_learnings && localProject.key_learnings.length > 0 && (
           <div className="mb-3">
-            <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Tech Used</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-semibold text-sm text-portfolio-blue">Tech Used</h3>
+              {isEditing && (
+                <button
+                  onClick={() => updateField("show_tech_used", !localProject.show_tech_used)}
+                  className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                  title={localProject.show_tech_used ? "Hide section" : "Show section"}
+                >
+                  {localProject.show_tech_used ? <Eye size={16} /> : <EyeOff size={16} />}
+                </button>
+              )}
+            </div>
             <div className="space-y-2 text-left">
               {localProject.key_learnings.map((learning, index) => (
                 <div key={index} className="flex items-start gap-2">
@@ -376,7 +391,18 @@ const addFeature = () => {
       {/* Key Learnings Section */}
       <div className="features mb-4">
         {localProject.features.length > 0 && (
-          <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-semibold text-sm text-portfolio-blue">Key Learnings</h3>
+            {isEditing && (
+              <button
+                onClick={() => updateField("show_key_learnings", !localProject.show_key_learnings)}
+                className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                title={localProject.show_key_learnings ? "Hide section" : "Show section"}
+              >
+                {localProject.show_key_learnings ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            )}
+          </div>
         )}
         <div className="flex flex-wrap gap-2 mb-2">
           {localProject.features.map((feature) => (

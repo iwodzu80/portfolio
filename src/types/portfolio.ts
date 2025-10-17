@@ -43,6 +43,8 @@ export interface ProjectData {
   project_role?: string;
   image_url?: string;
   key_learnings?: string[];
+  show_tech_used?: boolean;
+  show_key_learnings?: boolean;
 }
 
 export interface SectionData {
