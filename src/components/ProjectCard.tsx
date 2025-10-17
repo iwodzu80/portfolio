@@ -17,7 +17,10 @@ interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, isEditingMode = true }) => {
-const [isEditing, setIsEditing] = useState(false);
+const [isEditing, setIsEditing] = useState(() => {
+  const saved = localStorage.getItem(`project-edit-${project.id}`);
+  return saved === 'true';
+});
 const [confirmDelete, setConfirmDelete] = useState(false);
 const [localProject, setLocalProject] = useState<ProjectData>({
   ...project,
@@ -29,6 +32,11 @@ const [localProject, setLocalProject] = useState<ProjectData>({
 });
 const [lastAddedFeatureId, setLastAddedFeatureId] = useState<string | null>(null);
 const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | null>(null);
+
+// Persist edit state to localStorage
+useEffect(() => {
+  localStorage.setItem(`project-edit-${project.id}`, String(isEditing));
+}, [isEditing, project.id]);
   
   // Update local state when props change
   useEffect(() => {
