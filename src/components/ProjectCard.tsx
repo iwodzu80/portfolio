@@ -37,6 +37,14 @@ const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | nu
 useEffect(() => {
   localStorage.setItem(`project-edit-${project.id}`, String(isEditing));
 }, [isEditing, project.id]);
+
+// Restore edit state when project ID changes (navigating between tabs)
+useEffect(() => {
+  const saved = localStorage.getItem(`project-edit-${project.id}`);
+  if (saved !== null) {
+    setIsEditing(saved === 'true');
+  }
+}, [project.id]);
   
   // Update local state when props change
   useEffect(() => {
