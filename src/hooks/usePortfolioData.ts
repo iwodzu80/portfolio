@@ -8,6 +8,7 @@ import { useDefaultSectionCreator } from "@/hooks/useDefaultSectionCreator";
 
 export const usePortfolioData = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -15,13 +16,17 @@ export const usePortfolioData = () => {
   const { sections, fetchSections } = useSectionData(user?.id);
   const { createDefaultSection } = useDefaultSectionCreator();
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (force = false) => {
     if (!user) {
       navigate("/auth");
       return;
     }
 
-    setIsLoading(true);
+    // Only show loading on first load or forced refresh
+    if (!hasLoadedOnce || force) {
+      setIsLoading(true);
+    }
+    
     try {
       const profile = await fetchProfileData();
       
@@ -37,18 +42,20 @@ export const usePortfolioData = () => {
           await fetchSections();
         }
       }
+      
+      setHasLoadedOnce(true);
     } catch (error: any) {
       console.error("Error loading data:", error.message);
     } finally {
       setIsLoading(false);
     }
-  }, [user, navigate, fetchProfileData, createProfile, fetchSections, createDefaultSection]);
+  }, [user, navigate, fetchProfileData, createProfile, fetchSections, createDefaultSection, hasLoadedOnce]);
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasLoadedOnce) {
       loadData();
     }
-  }, [user]);
+  }, [user, hasLoadedOnce]);
 
   return {
     profileData,
