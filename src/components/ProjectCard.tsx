@@ -219,7 +219,7 @@ const addFeature = () => {
                 {localProject.key_learnings.map((learning, index) => (
                   <span
                     key={index}
-                    className="bg-portfolio-violet/20 text-portfolio-violet py-1 px-3 rounded-full text-sm border border-portfolio-violet/30 font-medium"
+                    className="bg-portfolio-violet text-white py-1 px-3 rounded-full text-sm font-medium"
                   >
                     {learning}
                   </span>
@@ -236,7 +236,7 @@ const addFeature = () => {
                 {localProject.features.map((feature) => (
                   <span
                     key={feature.id}
-                    className="bg-portfolio-celadon/20 text-portfolio-celadon py-1 px-3 rounded-full text-sm border border-portfolio-celadon/30 font-medium"
+                    className="bg-portfolio-celadon text-white py-1 px-3 rounded-full text-sm font-medium"
                   >
                     {feature.title}
                   </span>
@@ -376,7 +376,7 @@ const addFeature = () => {
                     value={learning}
                     onChange={(value) => updateKeyLearning(index, value)}
                     tag="span"
-                    className="text-sm bg-portfolio-violet/20 text-portfolio-violet py-1 px-3 rounded-full border border-portfolio-violet/30 font-medium"
+                    className="text-sm bg-portfolio-violet text-white py-1 px-3 rounded-full font-medium"
                     placeholder="Technology"
                     autoEdit={lastAddedLearningIndex === index}
                     onEditingChange={(editing) => {
@@ -393,7 +393,7 @@ const addFeature = () => {
                   </button>
                 </>
               ) : (
-                <span className="bg-portfolio-violet/20 text-portfolio-violet py-1 px-3 rounded-full text-sm border border-portfolio-violet/30 font-medium">
+                <span className="bg-portfolio-violet text-white py-1 px-3 rounded-full text-sm font-medium">
                   {learning}
                 </span>
               )}
@@ -439,7 +439,7 @@ const addFeature = () => {
   value={feature.title}
   onChange={(value) => updateFeature(feature.id, "title", value)}
   tag="span"
-  className="text-sm bg-portfolio-celadon/20 text-portfolio-celadon py-1 px-3 rounded-full border border-portfolio-celadon/30 font-medium"
+  className="text-sm bg-portfolio-celadon text-white py-1 px-3 rounded-full font-medium"
   placeholder="Learning"
   autoEdit={feature.id === lastAddedFeatureId}
   onEditingChange={(editing) => {
@@ -456,7 +456,7 @@ const addFeature = () => {
                   </button>
                 </>
               ) : (
-                <span className="bg-portfolio-celadon/20 text-portfolio-celadon py-1 px-3 rounded-full text-sm border border-portfolio-celadon/30 font-medium">
+                <span className="bg-portfolio-celadon text-white py-1 px-3 rounded-full text-sm font-medium">
                   {feature.title}
                 </span>
               )}
