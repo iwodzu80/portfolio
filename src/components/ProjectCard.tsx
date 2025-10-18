@@ -215,11 +215,16 @@ const addFeature = () => {
           {localProject.show_tech_used && localProject.key_learnings && localProject.key_learnings.length > 0 && (
             <div className="mb-4">
               <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Tech Used</h3>
-              <ul className="list-disc list-inside space-y-1 text-left">
+              <div className="flex flex-wrap gap-2">
                 {localProject.key_learnings.map((learning, index) => (
-                  <li key={index} className="text-sm text-portfolio-muted">{learning}</li>
+                  <span
+                    key={index}
+                    className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border"
+                  >
+                    {learning}
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
           
@@ -346,53 +351,55 @@ const addFeature = () => {
       {/* Tech Used Section */}
       <div className="key-learnings mb-4">
         {localProject.key_learnings && localProject.key_learnings.length > 0 && (
-          <div className="mb-3">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-sm text-portfolio-blue">Tech Used</h3>
-              {isEditing && (
-                <button
-                  onClick={() => updateField("show_tech_used", !localProject.show_tech_used)}
-                  className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
-                  title={localProject.show_tech_used ? "Hide section" : "Show section"}
-                >
-                  {localProject.show_tech_used ? <Eye size={16} /> : <EyeOff size={16} />}
-                </button>
-              )}
-            </div>
-            <div className="space-y-2 text-left">
-              {localProject.key_learnings.map((learning, index) => (
-                <div key={index} className="flex items-start gap-2">
-                  <span className="text-portfolio-muted mt-0.5">•</span>
-                  {isEditing ? (
-                    <>
-                      <EditableField
-                        value={learning}
-                        onChange={(value) => updateKeyLearning(index, value)}
-                        tag="span"
-                        className="text-sm text-portfolio-muted flex-1"
-                        placeholder="Technology"
-                        autoEdit={lastAddedLearningIndex === index}
-                        onEditingChange={(editing) => {
-                          if (!editing && lastAddedLearningIndex === index) {
-                            setLastAddedLearningIndex(null);
-                          }
-                        }}
-                      />
-                      <button
-                        onClick={() => deleteKeyLearning(index)}
-                        className="text-red-500 hover:text-red-700 transition-colors flex-shrink-0"
-                      >
-                        <X size={14} />
-                      </button>
-                    </>
-                  ) : (
-                    <span className="text-sm text-portfolio-muted">{learning}</span>
-                  )}
-                </div>
-              ))}
-            </div>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-semibold text-sm text-portfolio-blue">Tech Used</h3>
+            {isEditing && (
+              <button
+                onClick={() => updateField("show_tech_used", !localProject.show_tech_used)}
+                className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                title={localProject.show_tech_used ? "Hide section" : "Show section"}
+              >
+                {localProject.show_tech_used ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            )}
           </div>
         )}
+        <div className="flex flex-wrap gap-2 mb-2">
+          {localProject.key_learnings && localProject.key_learnings.map((learning, index) => (
+            <div 
+              key={index} 
+              className="flex items-center gap-1"
+            >
+              {isEditing ? (
+                <>
+                  <EditableField
+                    value={learning}
+                    onChange={(value) => updateKeyLearning(index, value)}
+                    tag="span"
+                    className="text-sm bg-gray-100 text-gray-700 py-1 px-3 rounded-full border"
+                    placeholder="Technology"
+                    autoEdit={lastAddedLearningIndex === index}
+                    onEditingChange={(editing) => {
+                      if (!editing && lastAddedLearningIndex === index) {
+                        setLastAddedLearningIndex(null);
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => deleteKeyLearning(index)}
+                    className="text-red-500 hover:text-red-700 transition-colors ml-1"
+                  >
+                    <X size={12} />
+                  </button>
+                </>
+              ) : (
+                <span className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border">
+                  {learning}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
         
         {isEditing && (
           <button
