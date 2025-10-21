@@ -241,7 +241,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Loading state
   if (isLoading) {
     return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 px-6">
         <Skeleton className="w-32 h-32 md:w-40 md:h-40 rounded-full" />
         <div className="mt-6 w-full text-center space-y-3">
           <Skeleton className="h-8 w-48 mx-auto" />
@@ -257,7 +257,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Read-only mode
   if (!isEditingMode) {
     return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 px-6">
         {localState.photo && (
           <img
             src={localState.photo}
@@ -318,7 +318,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   // Edit mode
   return (
-    <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+    <section className="flex flex-col items-center max-w-xl mx-auto mb-6 px-6">
 
       <EditableImage
         src={localState.photo}
