@@ -32,11 +32,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           navigate("/dashboard");
         }
         
-        // Handle sign out event
+        // Handle sign out event - but don't redirect if on shared portfolio
         if (event === 'SIGNED_OUT') {
           setSession(null);
           setUser(null);
-          navigate("/auth");
+          // Only redirect to auth if not on a public shared portfolio page
+          if (!window.location.pathname.startsWith('/shared/')) {
+            navigate("/auth");
+          }
         }
       }
     );
