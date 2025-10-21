@@ -4,6 +4,7 @@ import EditableImage from "./EditableImage";
 import EditableField from "./EditableField";
 import { supabase } from "../integrations/supabase/client";
 import { useAuth } from "../contexts/AuthContext";
+import { sanitizeHtml } from "@/utils/securityUtils";
 import { Button } from "./ui/button";
 import { SocialLink } from "@/types/portfolio";
 import { 
@@ -309,7 +310,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           )}
           
           {localState.description && (
-            <p className="text-muted-foreground mt-4 max-w-prose mx-auto text-justify">{localState.description}</p>
+            <div 
+              className="text-muted-foreground mt-4 max-w-prose mx-auto prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(localState.description) }}
+            />
           )}
         </div>
       </section>
