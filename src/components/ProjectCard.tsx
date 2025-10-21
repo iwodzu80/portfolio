@@ -28,7 +28,8 @@ const [localProject, setLocalProject] = useState<ProjectData>({
   project_role: project.project_role || "",
   key_learnings: project.key_learnings || [],
   show_tech_used: project.show_tech_used ?? true,
-  show_key_learnings: project.show_key_learnings ?? true
+  show_key_learnings: project.show_key_learnings ?? true,
+  show_links: project.show_links ?? true
 });
 const [lastAddedFeatureId, setLastAddedFeatureId] = useState<string | null>(null);
 const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | null>(null);
@@ -54,7 +55,8 @@ useEffect(() => {
       project_role: project.project_role || "",
       key_learnings: project.key_learnings || [],
       show_tech_used: project.show_tech_used ?? true,
-      show_key_learnings: project.show_key_learnings ?? true
+      show_key_learnings: project.show_key_learnings ?? true,
+      show_links: project.show_links ?? true
     });
   }, [project]);
   
@@ -246,7 +248,7 @@ const addFeature = () => {
           )}
 
           {/* Links */}
-          {localProject.links.length > 0 && (
+          {localProject.show_links && localProject.links.length > 0 && (
             <div className="links">
               <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Relevant links</h3>
               <div className="flex flex-wrap gap-2">
@@ -480,7 +482,18 @@ const addFeature = () => {
       {/* Links Section */}
       <div className="links">
         {localProject.links.length > 0 && (
-          <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Relevant links</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-semibold text-sm text-portfolio-blue">Relevant links</h3>
+            {isEditing && (
+              <button
+                onClick={() => updateField("show_links", !localProject.show_links)}
+                className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                title={localProject.show_links ? "Hide section" : "Show section"}
+              >
+                {localProject.show_links ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            )}
+          </div>
         )}
         {localProject.links.map((link) => (
           <div 
