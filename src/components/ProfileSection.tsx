@@ -354,16 +354,17 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         />
         
         <div className="flex justify-center items-center text-sm text-muted-foreground mb-4">
-          <div className="flex items-center gap-1 flex-1 justify-end max-w-md">
-            <EditableField
-              value={localState.email}
-              onChange={(value) => handleProfileUpdate("email", value)}
-              tag="span"
-              placeholder="Email"
-              className="text-primary"
-            />
-            {localState.email && (
-              <>
+          {localState.show_email && localState.email && localState.show_phone && localState.telephone ? (
+            // Both email and phone visible - use grid layout
+            <>
+              <div className="flex items-center gap-1 flex-1 justify-end max-w-md">
+                <EditableField
+                  value={localState.email}
+                  onChange={(value) => handleProfileUpdate("email", value)}
+                  tag="span"
+                  placeholder="Email"
+                  className="text-primary"
+                />
                 <Button
                   variant="ghost"
                   size="sm"
@@ -381,19 +382,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 >
                   {localState.show_email ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                 </Button>
-              </>
-            )}
-          </div>
-          <span className="mx-4 flex-shrink-0">•</span>
-          <div className="flex items-center gap-1 flex-1 justify-start max-w-md">
-            <EditableField
-              value={localState.telephone}
-              onChange={(value) => handleProfileUpdate("telephone", value)}
-              tag="span"
-              placeholder="Telephone"
-            />
-            {localState.telephone && (
-              <>
+              </div>
+              <span className="mx-4 flex-shrink-0">•</span>
+              <div className="flex items-center gap-1 flex-1 justify-start max-w-md">
+                <EditableField
+                  value={localState.telephone}
+                  onChange={(value) => handleProfileUpdate("telephone", value)}
+                  tag="span"
+                  placeholder="Telephone"
+                />
                 <Button
                   variant="ghost"
                   size="sm"
@@ -411,9 +408,69 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                 >
                   {localState.show_phone ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                 </Button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          ) : (
+            // Only one contact visible - center it
+            <div className="flex items-center gap-1 justify-center">
+              {localState.email && (
+                <>
+                  <EditableField
+                    value={localState.email}
+                    onChange={(value) => handleProfileUpdate("email", value)}
+                    tag="span"
+                    placeholder="Email"
+                    className="text-primary"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handleCopyToClipboard(localState.email, 'email')}
+                  >
+                    {copiedField === 'email' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handleProfileUpdate("show_email", !localState.show_email)}
+                    title={localState.show_email ? "Hide email on shared page" : "Show email on shared page"}
+                  >
+                    {localState.show_email ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                  </Button>
+                </>
+              )}
+              {localState.telephone && localState.email && <span className="mx-2">•</span>}
+              {localState.telephone && (
+                <>
+                  <EditableField
+                    value={localState.telephone}
+                    onChange={(value) => handleProfileUpdate("telephone", value)}
+                    tag="span"
+                    placeholder="Telephone"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handleCopyToClipboard(localState.telephone, 'telephone')}
+                  >
+                    {copiedField === 'telephone' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handleProfileUpdate("show_phone", !localState.show_phone)}
+                    title={localState.show_phone ? "Hide phone on shared page" : "Show phone on shared page"}
+                  >
+                    {localState.show_phone ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Social Links Section */}
