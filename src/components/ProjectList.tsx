@@ -28,7 +28,7 @@ const ProjectList: React.FC<ProjectListProps> = React.memo(({
   const memoizedProjects = useMemo(() => safeProjects, [safeProjects]);
 
   return (
-    <section className="max-w-2xl mx-auto px-6">
+    <section className="max-w-xl mx-auto px-6">
       <ProjectListView
         sectionId={sectionId}
         projects={memoizedProjects}
