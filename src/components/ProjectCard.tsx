@@ -247,7 +247,9 @@ const addFeature = () => {
 
           {/* Links */}
           {localProject.links.length > 0 && (
-            <div className="links flex flex-wrap gap-2">
+            <div className="links">
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Relevant links</h3>
+              <div className="flex flex-wrap gap-2">
               {localProject.links.map((link) => (
                 <a
                   key={link.id}
@@ -260,6 +262,7 @@ const addFeature = () => {
                   <ExternalLink size={14} />
                 </a>
               ))}
+              </div>
             </div>
           )}
         </div>
@@ -476,6 +479,9 @@ const addFeature = () => {
 
       {/* Links Section */}
       <div className="links">
+        {localProject.links.length > 0 && (
+          <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Relevant links</h3>
+        )}
         {localProject.links.map((link) => (
           <div 
             key={link.id} 
