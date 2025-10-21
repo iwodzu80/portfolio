@@ -231,7 +231,7 @@ const addFeature = () => {
           {/* Key Learnings */}
           {localProject.show_key_learnings && localProject.features.length > 0 && (
             <div className="mb-4">
-              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-celadon">Key Learnings</h3>
               <div className="flex flex-wrap gap-2">
                 {localProject.features.map((feature) => (
                   <span
@@ -418,7 +418,7 @@ const addFeature = () => {
       <div className="features mb-4">
         {localProject.features.length > 0 && (
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="font-semibold text-sm text-portfolio-blue">Key Learnings</h3>
+            <h3 className="font-semibold text-sm text-portfolio-celadon">Key Learnings</h3>
             {isEditing && (
               <button
                 onClick={() => updateField("show_key_learnings", !localProject.show_key_learnings)}
