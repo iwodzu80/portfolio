@@ -121,7 +121,9 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
               platform: sanitizeText(link.platform || ""),
               url: validateAndFormatUrl(link.url || ""),
               customName: link.customName ? sanitizeText(link.customName) : undefined,
-            }))
+            })),
+            show_email: data.show_email,
+            show_phone: data.show_phone
           };
           
           setProfileData(sanitizedProfileData);
