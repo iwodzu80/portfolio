@@ -52,7 +52,7 @@ const EditableImage: React.FC<EditableImageProps> = ({
 
   return (
     <div
-      className="relative inline-block cursor-pointer"
+      className="relative cursor-pointer mx-auto"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onClick={handleClick}
