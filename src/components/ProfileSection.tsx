@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
 import EditableField from "./EditableField";
+import { RichTextEditor } from "./RichTextEditor";
 import { supabase } from "../integrations/supabase/client";
 import { useAuth } from "../contexts/AuthContext";
 import { sanitizeHtml } from "@/utils/securityUtils";
@@ -475,13 +476,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           )}
         </div>
         
-        <EditableField
-          value={localState.description}
+        <RichTextEditor
+          content={localState.description}
           onChange={(value) => handleProfileUpdate("description", value)}
-          tag="p"
-          className="text-muted-foreground mt-4 max-w-prose mx-auto text-justify"
           placeholder="Add a brief description about yourself..."
-          multiline
+          className="mt-4 max-w-prose mx-auto"
         />
       </div>
     </section>
