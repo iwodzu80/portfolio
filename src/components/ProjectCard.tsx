@@ -208,7 +208,7 @@ const addFeature = () => {
           </div>
           {localProject.description && localProject.description.trim().length > 0 && (
             <div 
-              className="text-portfolio-muted mb-4 text-sm prose prose-sm max-w-none"
+              className="text-portfolio-muted mb-4 text-sm prose prose-sm max-w-none [&_p]:text-inherit [&_h1]:text-inherit [&_h2]:text-inherit [&_h3]:text-inherit"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(localProject.description) }}
             />
           )}

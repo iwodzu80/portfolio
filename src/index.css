@@ -91,6 +91,23 @@
   :focus-visible {
     @apply outline-none ring-2 ring-portfolio-blue ring-offset-2;
   }
+
+  /* TipTap text alignment support */
+  [style*="text-align: left"] {
+    text-align: left !important;
+  }
+  
+  [style*="text-align: center"] {
+    text-align: center !important;
+  }
+  
+  [style*="text-align: right"] {
+    text-align: right !important;
+  }
+  
+  [style*="text-align: justify"] {
+    text-align: justify !important;
+  }
 }
 
 /* Custom utility classes */
