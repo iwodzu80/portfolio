@@ -25,25 +25,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (event, currentSession) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-        // Remove verbose logging in production
         setIsLoading(false);
         
-        // Only handle navigation if not on public routes
+        // Check if on public routes - don't redirect
         const isPublicRoute = window.location.pathname.startsWith('/shared/') || 
                               window.location.pathname === '/cookie-policy' ||
                               window.location.pathname === '/';
         
-        if (!isPublicRoute) {
-          if (currentSession?.user && window.location.pathname === '/auth') {
-            navigate("/dashboard");
-          }
-          
-          // Handle sign out event - redirect to auth
-          if (event === 'SIGNED_OUT') {
-            setSession(null);
-            setUser(null);
-            navigate("/auth");
-          }
+        // Skip all navigation logic for public routes
+        if (isPublicRoute) {
+          return;
+        }
+        
+        // Redirect authenticated users from /auth to dashboard
+        if (currentSession?.user && window.location.pathname === '/auth') {
+          navigate("/dashboard");
+        }
+        
+        // Handle sign out event - redirect to auth (but not from public routes)
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          navigate("/auth");
         }
       }
     );
@@ -51,15 +54,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
-      // Remove verbose logging in production
       setIsLoading(false);
       
-      // Only navigate if not on public routes
+      // Check if on public routes - don't redirect
       const isPublicRoute = window.location.pathname.startsWith('/shared/') || 
                             window.location.pathname === '/cookie-policy' ||
                             window.location.pathname === '/';
       
-      if (!isPublicRoute && currentSession?.user && window.location.pathname === '/auth') {
+      // Skip navigation for public routes
+      if (isPublicRoute) {
+        return;
+      }
+      
+      // Redirect authenticated users from /auth to dashboard
+      if (currentSession?.user && window.location.pathname === '/auth') {
         navigate("/dashboard");
       }
     });
