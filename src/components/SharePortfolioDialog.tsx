@@ -267,7 +267,7 @@ const SharePortfolioDialog = () => {
               
               {shareId && (
                 <div className="space-y-2">
-                  <Label htmlFor="share-link">Share Link</Label>
+                  <Label htmlFor="share-link">Current Share Link</Label>
                   <div className="flex items-center space-x-2">
                     <Input
                       id="share-link"
@@ -284,6 +284,9 @@ const SharePortfolioDialog = () => {
                       <Copy className="h-4 w-4" />
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    This is your active portfolio share link. Generating a new link will replace this one.
+                  </p>
                 </div>
               )}
               
