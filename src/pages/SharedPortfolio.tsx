@@ -110,6 +110,9 @@ const SharedPortfolio = React.memo(() => {
             role={profileData.role}
             tagline={profileData.tagline}
             description={profileData.description}
+            social_links={profileData.social_links}
+            show_email={profileData.show_email}
+            show_phone={profileData.show_phone}
             onUpdate={() => {}}
             isEditingMode={false}
           />

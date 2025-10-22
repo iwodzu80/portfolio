@@ -57,8 +57,16 @@ const LazyComponentErrorBoundary = ({ children, fallback }: { children: React.Re
 };
 
 const Index = React.memo(() => {
-  const [isEditingMode, setIsEditingMode] = useState(false);
+  const [isEditingMode, setIsEditingMode] = useState(() => {
+    const saved = localStorage.getItem('portfolio-edit-mode');
+    return saved === 'true';
+  });
   const { profileData, sections, isLoading, loadData } = usePortfolioData();
+
+  // Persist edit mode state to localStorage
+  React.useEffect(() => {
+    localStorage.setItem('portfolio-edit-mode', String(isEditingMode));
+  }, [isEditingMode]);
 
   if (isLoading) {
     return <LoadingSpinner />;

@@ -4,6 +4,24 @@ import { supabase } from "@/integrations/supabase/client";
 export const useDefaultSectionCreator = () => {
   const createDefaultSection = async (userId: string) => {
     try {
+      // Check if default content has already been created
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('default_content_created')
+        .eq('user_id', userId)
+        .single();
+        
+      if (profileError) {
+        console.error("Error checking profile:", profileError);
+        return false;
+      }
+      
+      // Skip if default content already created
+      if (profile?.default_content_created) {
+        console.log("Default content already created for this user");
+        return true;
+      }
+      
       // Insert default section
       const { data: sectionData, error: sectionError } = await supabase
         .from('sections')
@@ -52,6 +70,17 @@ export const useDefaultSectionCreator = () => {
         console.error("Error creating default links:", linksError);
         toast.error("Failed to create default links");
         return false;
+      }
+      
+      // Mark default content as created
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ default_content_created: true })
+        .eq('user_id', userId);
+        
+      if (updateError) {
+        console.error("Error updating profile flag:", updateError);
+        // Don't return false here - the content was created successfully
       }
       
       console.log("Default section created successfully");

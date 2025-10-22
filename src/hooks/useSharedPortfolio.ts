@@ -115,13 +115,15 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             telephone: sanitizeText(data.phone || ""),
             role: sanitizeText(data.role || ""),
             tagline: sanitizeText(data.tagline || ""),
-            description: sanitizeText(data.description || ""),
+            description: data.description || "", // Keep HTML for sanitizeHtml rendering
             social_links: (Array.isArray(data.social_links) ? data.social_links : []).map((link: any) => ({
               id: sanitizeText(link.id || ""),
               platform: sanitizeText(link.platform || ""),
               url: validateAndFormatUrl(link.url || ""),
               customName: link.customName ? sanitizeText(link.customName) : undefined,
-            }))
+            })),
+            show_email: data.show_email,
+            show_phone: data.show_phone
           };
           
           setProfileData(sanitizedProfileData);
@@ -167,7 +169,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
                   return {
                     id: project.id,
                     title: sanitizeText(project.title || "Untitled Project"),
-                    description: sanitizeText(project.description || ""),
+                    description: project.description || "", // Keep HTML for sanitizeHtml rendering
                     project_role: project.project_role ? sanitizeText(project.project_role) : undefined,
                     key_learnings: Array.isArray(project.key_learnings) 
                       ? project.key_learnings.map(learning => sanitizeText(learning))
@@ -181,7 +183,7 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
             return {
               id: section.id,
               title: sanitizeText(section.title || "Untitled Section"),
-              description: sanitizeText(section.description || ""),
+              description: section.description || "", // Keep HTML for sanitizeHtml rendering
               projects
             };
           }).filter(Boolean) as SectionData[];

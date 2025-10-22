@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from "react";
-import { X, Plus, Pencil, ExternalLink } from "lucide-react";
+import { X, Plus, Pencil, ExternalLink, EyeOff, Eye } from "lucide-react";
 import EditableField from "./EditableField";
 import EditableImage from "./EditableImage";
+import { RichTextEditor } from "./RichTextEditor";
 import { LinkData, ProjectData, FeatureData } from "@/types/portfolio";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { validateAndFormatUrl } from "@/utils/securityUtils";
+import { validateAndFormatUrl, sanitizeHtml } from "@/utils/securityUtils";
 
 interface ProjectCardProps {
   project: ProjectData;
@@ -16,16 +17,35 @@ interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete, isEditingMode = true }) => {
-const [isEditing, setIsEditing] = useState(false);
+const [isEditing, setIsEditing] = useState(() => {
+  const saved = localStorage.getItem(`project-edit-${project.id}`);
+  return saved === 'true';
+});
 const [confirmDelete, setConfirmDelete] = useState(false);
 const [localProject, setLocalProject] = useState<ProjectData>({
   ...project,
   features: project.features || [],
   project_role: project.project_role || "",
-  key_learnings: project.key_learnings || []
+  key_learnings: project.key_learnings || [],
+  show_tech_used: project.show_tech_used ?? true,
+  show_key_learnings: project.show_key_learnings ?? true,
+  show_links: project.show_links ?? true
 });
 const [lastAddedFeatureId, setLastAddedFeatureId] = useState<string | null>(null);
 const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | null>(null);
+
+// Persist edit state to localStorage
+useEffect(() => {
+  localStorage.setItem(`project-edit-${project.id}`, String(isEditing));
+}, [isEditing, project.id]);
+
+// Restore edit state when project ID changes (navigating between tabs)
+useEffect(() => {
+  const saved = localStorage.getItem(`project-edit-${project.id}`);
+  if (saved !== null) {
+    setIsEditing(saved === 'true');
+  }
+}, [project.id]);
   
   // Update local state when props change
   useEffect(() => {
@@ -33,11 +53,14 @@ const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | nu
       ...project,
       features: project.features || [],
       project_role: project.project_role || "",
-      key_learnings: project.key_learnings || []
+      key_learnings: project.key_learnings || [],
+      show_tech_used: project.show_tech_used ?? true,
+      show_key_learnings: project.show_key_learnings ?? true,
+      show_links: project.show_links ?? true
     });
   }, [project]);
   
-  const updateField = (field: keyof ProjectData, value: string | LinkData[] | FeatureData[] | string[]) => {
+  const updateField = (field: keyof ProjectData, value: string | LinkData[] | FeatureData[] | string[] | boolean) => {
     const updatedProject = { ...localProject, [field]: value };
     setLocalProject(updatedProject);
     onUpdate(updatedProject);
@@ -59,14 +82,14 @@ const [lastAddedLearningIndex, setLastAddedLearningIndex] = useState<number | nu
 const addFeature = () => {
   const newFeature: FeatureData = {
     id: `${localProject.id}-feature-${Date.now()}`,
-    title: "New Feature"
+    title: "New learning"
   };
   
   const updatedFeatures = [...localProject.features, newFeature];
   setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
   updateField("features", updatedFeatures);
   setLastAddedFeatureId(newFeature.id);
-  toast.success("Feature added");
+  toast.success("Learning added");
 };
   
   const updateLink = (linkId: string, field: keyof LinkData, value: string) => {
@@ -101,16 +124,16 @@ const addFeature = () => {
     const updatedFeatures = localProject.features.filter(feature => feature.id !== featureId);
     setLocalProject(prev => ({ ...prev, features: updatedFeatures }));
     updateField("features", updatedFeatures);
-    toast.success("Feature removed");
+    toast.success("Learning removed");
   };
 
   const addKeyLearning = () => {
-    const newLearning = "New key learning";
+    const newLearning = "New tech";
     const updatedLearnings = [...(localProject.key_learnings || []), newLearning];
     setLocalProject(prev => ({ ...prev, key_learnings: updatedLearnings }));
     updateField("key_learnings", updatedLearnings);
     setLastAddedLearningIndex(updatedLearnings.length - 1);
-    toast.success("Key learning added");
+    toast.success("Tech added");
   };
 
   const updateKeyLearning = (index: number, value: string) => {
@@ -124,7 +147,7 @@ const addFeature = () => {
     const updatedLearnings = (localProject.key_learnings || []).filter((_, i) => i !== index);
     setLocalProject(prev => ({ ...prev, key_learnings: updatedLearnings }));
     updateField("key_learnings", updatedLearnings);
-    toast.success("Key learning removed");
+    toast.success("Tech removed");
   };
 
   const handleDeleteProject = () => {
@@ -184,40 +207,51 @@ const addFeature = () => {
             )}
           </div>
           {localProject.description && localProject.description.trim().length > 0 && (
-            <div className="text-portfolio-muted mb-4 text-sm text-justify">
-              {renderDescription(localProject.description)}
+            <div 
+              className="text-portfolio-muted mb-4 text-sm prose prose-sm max-w-none [&_p]:text-inherit [&_h1]:text-inherit [&_h2]:text-inherit [&_h3]:text-inherit"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(localProject.description) }}
+            />
+          )}
+          
+          {/* Tech Used */}
+          {localProject.show_tech_used && localProject.key_learnings && localProject.key_learnings.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Tech Used</h3>
+              <div className="flex flex-wrap gap-2">
+                {localProject.key_learnings.map((learning, index) => (
+                  <span
+                    key={index}
+                    className="bg-portfolio-violet text-white py-1 px-3 rounded-full text-sm font-medium"
+                  >
+                    {learning}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
           
           {/* Key Learnings */}
-          {localProject.key_learnings && localProject.key_learnings.length > 0 && (
+          {localProject.show_key_learnings && localProject.features.length > 0 && (
             <div className="mb-4">
-              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
-              <ul className="list-disc list-inside space-y-1 text-left">
-                {localProject.key_learnings.map((learning, index) => (
-                  <li key={index} className="text-sm text-portfolio-muted">{learning}</li>
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-celadon">Key Learnings</h3>
+              <div className="flex flex-wrap gap-2">
+                {localProject.features.map((feature) => (
+                  <span
+                    key={feature.id}
+                    className="bg-portfolio-celadon text-white py-1 px-3 rounded-full text-sm font-medium"
+                  >
+                    {feature.title}
+                  </span>
                 ))}
-              </ul>
-            </div>
-          )}
-          
-          {/* Features */}
-          {localProject.features.length > 0 && (
-            <div className="features flex flex-wrap gap-2 mb-4">
-              {localProject.features.map((feature) => (
-                <span
-                  key={feature.id}
-                  className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border"
-                >
-                  {feature.title}
-                </span>
-              ))}
+              </div>
             </div>
           )}
 
           {/* Links */}
-          {localProject.links.length > 0 && (
-            <div className="links flex flex-wrap gap-2">
+          {localProject.show_links && localProject.links.length > 0 && (
+            <div className="links">
+              <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Relevant links</h3>
+              <div className="flex flex-wrap gap-2">
               {localProject.links.map((link) => (
                 <a
                   key={link.id}
@@ -230,6 +264,7 @@ const addFeature = () => {
                   <ExternalLink size={14} />
                 </a>
               ))}
+              </div>
             </div>
           )}
         </div>
@@ -311,73 +346,92 @@ const addFeature = () => {
         </div>
       </div>
       
-      <EditableField
-        value={localProject.description}
+      <RichTextEditor
+        content={localProject.description}
         onChange={(value) => updateField("description", value)}
-        tag="p"
-        className="text-portfolio-muted mb-4 text-sm text-justify"
-        placeholder="Project Description (Use '- ' or '* ' at the start of a line for bullet points)"
-        multiline
+        placeholder="Project description"
+        className="mb-4"
       />
       
-      {isEditing && (
-        <div className="text-xs text-gray-500 mb-3 italic">
-          Tip: Use "- " or "* " at the start of a line to create bullet points
-        </div>
-      )}
-      
-      {/* Key Learnings Section */}
+      {/* Tech Used Section */}
       <div className="key-learnings mb-4">
         {localProject.key_learnings && localProject.key_learnings.length > 0 && (
-          <div className="mb-3">
-            <h3 className="font-semibold text-sm mb-2 text-portfolio-blue">Key Learnings</h3>
-            <div className="space-y-2 text-left">
-              {localProject.key_learnings.map((learning, index) => (
-                <div key={index} className="flex items-start gap-2">
-                  <span className="text-portfolio-muted mt-0.5">•</span>
-                  {isEditing ? (
-                    <>
-                      <EditableField
-                        value={learning}
-                        onChange={(value) => updateKeyLearning(index, value)}
-                        tag="span"
-                        className="text-sm text-portfolio-muted flex-1"
-                        placeholder="Key learning"
-                        autoEdit={lastAddedLearningIndex === index}
-                        onEditingChange={(editing) => {
-                          if (!editing && lastAddedLearningIndex === index) {
-                            setLastAddedLearningIndex(null);
-                          }
-                        }}
-                      />
-                      <button
-                        onClick={() => deleteKeyLearning(index)}
-                        className="text-red-500 hover:text-red-700 transition-colors flex-shrink-0"
-                      >
-                        <X size={14} />
-                      </button>
-                    </>
-                  ) : (
-                    <span className="text-sm text-portfolio-muted">{learning}</span>
-                  )}
-                </div>
-              ))}
-            </div>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-semibold text-sm text-portfolio-blue">Tech Used</h3>
+            {isEditing && (
+              <button
+                onClick={() => updateField("show_tech_used", !localProject.show_tech_used)}
+                className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                title={localProject.show_tech_used ? "Hide section" : "Show section"}
+              >
+                {localProject.show_tech_used ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            )}
           </div>
         )}
+        <div className="flex flex-wrap gap-2 mb-2">
+          {localProject.key_learnings && localProject.key_learnings.map((learning, index) => (
+            <div 
+              key={index} 
+              className="flex items-center gap-1"
+            >
+              {isEditing ? (
+                <>
+                  <EditableField
+                    value={learning}
+                    onChange={(value) => updateKeyLearning(index, value)}
+                    tag="span"
+                    className="text-sm bg-portfolio-violet text-white py-1 px-3 rounded-full font-medium"
+                    placeholder="Technology"
+                    autoEdit={lastAddedLearningIndex === index}
+                    onEditingChange={(editing) => {
+                      if (!editing && lastAddedLearningIndex === index) {
+                        setLastAddedLearningIndex(null);
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => deleteKeyLearning(index)}
+                    className="text-red-500 hover:text-red-700 transition-colors ml-1"
+                  >
+                    <X size={12} />
+                  </button>
+                </>
+              ) : (
+                <span className="bg-portfolio-violet text-white py-1 px-3 rounded-full text-sm font-medium">
+                  {learning}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
         
         {isEditing && (
           <button
             onClick={addKeyLearning}
             className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
           >
-            <Plus size={14} className="mr-1" /> Add Key Learning
+            <Plus size={14} className="mr-1" /> Add Tech
           </button>
         )}
       </div>
       
-      {/* Features Section */}
+      {/* Key Learnings Section */}
       <div className="features mb-4">
+        {localProject.features.length > 0 && (
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-semibold text-sm text-portfolio-celadon">Key Learnings</h3>
+            {isEditing && (
+              <button
+                onClick={() => updateField("show_key_learnings", !localProject.show_key_learnings)}
+                className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                title={localProject.show_key_learnings ? "Hide section" : "Show section"}
+              >
+                {localProject.show_key_learnings ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            )}
+          </div>
+        )}
         <div className="flex flex-wrap gap-2 mb-2">
           {localProject.features.map((feature) => (
             <div 
@@ -390,8 +444,8 @@ const addFeature = () => {
   value={feature.title}
   onChange={(value) => updateFeature(feature.id, "title", value)}
   tag="span"
-  className="text-sm bg-gray-100 text-gray-700 py-1 px-3 rounded-full border"
-  placeholder="Feature name"
+  className="text-sm bg-portfolio-celadon text-white py-1 px-3 rounded-full font-medium"
+  placeholder="Learning"
   autoEdit={feature.id === lastAddedFeatureId}
   onEditingChange={(editing) => {
     if (!editing && lastAddedFeatureId === feature.id) {
@@ -407,7 +461,7 @@ const addFeature = () => {
                   </button>
                 </>
               ) : (
-                <span className="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-sm border">
+                <span className="bg-portfolio-celadon text-white py-1 px-3 rounded-full text-sm font-medium">
                   {feature.title}
                 </span>
               )}
@@ -420,13 +474,27 @@ const addFeature = () => {
             onClick={addFeature}
             className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
           >
-            <Plus size={14} className="mr-1" /> Add Feature
+            <Plus size={14} className="mr-1" /> Add Learning
           </button>
         )}
       </div>
 
       {/* Links Section */}
       <div className="links">
+        {localProject.links.length > 0 && (
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-semibold text-sm text-portfolio-blue">Relevant links</h3>
+            {isEditing && (
+              <button
+                onClick={() => updateField("show_links", !localProject.show_links)}
+                className="text-portfolio-muted hover:text-portfolio-blue transition-colors"
+                title={localProject.show_links ? "Hide section" : "Show section"}
+              >
+                {localProject.show_links ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            )}
+          </div>
+        )}
         {localProject.links.map((link) => (
           <div 
             key={link.id} 

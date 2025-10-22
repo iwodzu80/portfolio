@@ -28,15 +28,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Remove verbose logging in production
         setIsLoading(false);
         
-        if (currentSession?.user && window.location.pathname === '/auth') {
-          navigate("/dashboard");
-        }
+        // Only handle navigation if not on public routes
+        const isPublicRoute = window.location.pathname.startsWith('/shared/') || 
+                              window.location.pathname === '/cookie-policy' ||
+                              window.location.pathname === '/';
         
-        // Handle sign out event
-        if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
-          navigate("/auth");
+        if (!isPublicRoute) {
+          if (currentSession?.user && window.location.pathname === '/auth') {
+            navigate("/dashboard");
+          }
+          
+          // Handle sign out event - redirect to auth
+          if (event === 'SIGNED_OUT') {
+            setSession(null);
+            setUser(null);
+            navigate("/auth");
+          }
         }
       }
     );
@@ -47,7 +54,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Remove verbose logging in production
       setIsLoading(false);
       
-      if (currentSession?.user && window.location.pathname === '/auth') {
+      // Only navigate if not on public routes
+      const isPublicRoute = window.location.pathname.startsWith('/shared/') || 
+                            window.location.pathname === '/cookie-policy' ||
+                            window.location.pathname === '/';
+      
+      if (!isPublicRoute && currentSession?.user && window.location.pathname === '/auth') {
         navigate("/dashboard");
       }
     });

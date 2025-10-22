@@ -13,7 +13,7 @@ const Analytics = () => {
       <div className="container mx-auto pt-10 px-4">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <Link to="/">
+            <Link to="/dashboard">
               <Button variant="outline" size="sm" className="flex items-center gap-2">
                 <ArrowLeft size={16} />
                 Back to Portfolio

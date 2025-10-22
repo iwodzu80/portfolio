@@ -118,7 +118,7 @@ useEffect(() => {
         onChange={handleChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className={`w-full p-2 rounded border border-portfolio-blue bg-white ${className}`}
+        className={`w-full p-2 rounded border border-portfolio-blue bg-white !text-foreground ${className}`}
         placeholder={placeholder}
         rows={3}
       />
@@ -130,7 +130,7 @@ useEffect(() => {
         onChange={handleChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className={`w-full p-2 rounded border border-portfolio-blue bg-white ${className}`}
+        className={`w-full p-2 rounded border border-portfolio-blue bg-white !text-foreground ${className}`}
         placeholder={placeholder}
       />
     );

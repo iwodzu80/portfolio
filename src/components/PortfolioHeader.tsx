@@ -370,7 +370,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
   return (
     <header className="border-b bg-card sticky top-0 z-50 mb-6">
       <nav className="container mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/dashboard" className="flex items-center gap-2">
           <span className="text-3xl font-outfit font-bold bg-gradient-to-r from-portfolio-violet to-portfolio-celadon bg-clip-text text-transparent">
             clickly.it
           </span>

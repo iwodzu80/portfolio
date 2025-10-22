@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import EditableImage from "./EditableImage";
 import EditableField from "./EditableField";
+import { RichTextEditor } from "./RichTextEditor";
 import { supabase } from "../integrations/supabase/client";
 import { useAuth } from "../contexts/AuthContext";
+import { sanitizeHtml } from "@/utils/securityUtils";
 import { Button } from "./ui/button";
 import { SocialLink } from "@/types/portfolio";
 import { 
@@ -241,7 +243,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Loading state
   if (isLoading) {
     return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 px-6">
         <Skeleton className="w-32 h-32 md:w-40 md:h-40 rounded-full" />
         <div className="mt-6 w-full text-center space-y-3">
           <Skeleton className="h-8 w-48 mx-auto" />
@@ -257,7 +259,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   // Read-only mode
   if (!isEditingMode) {
     return (
-      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+      <section className="flex flex-col items-center max-w-xl mx-auto mb-6 px-6">
         {localState.photo && (
           <img
             src={localState.photo}
@@ -309,7 +311,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           )}
           
           {localState.description && (
-            <p className="text-muted-foreground mt-4 max-w-prose mx-auto text-justify">{localState.description}</p>
+            <div 
+              className="text-muted-foreground mt-4 max-w-prose mx-auto prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(localState.description) }}
+            />
           )}
         </div>
       </section>
@@ -318,7 +323,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   // Edit mode
   return (
-    <section className="flex flex-col items-center max-w-xl mx-auto mb-6 p-6">
+    <section className="flex flex-col items-center max-w-xl mx-auto mb-6 px-6">
 
       <EditableImage
         src={localState.photo}
@@ -471,13 +476,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           )}
         </div>
         
-        <EditableField
-          value={localState.description}
+        <RichTextEditor
+          content={localState.description}
           onChange={(value) => handleProfileUpdate("description", value)}
-          tag="p"
-          className="text-muted-foreground mt-4 max-w-prose mx-auto text-justify"
           placeholder="Add a brief description about yourself..."
-          multiline
+          className="mt-4 max-w-prose mx-auto"
         />
       </div>
     </section>
