@@ -265,44 +265,58 @@ const SharePortfolioDialog = () => {
                 />
               </div>
               
-              {shareId && (
-                <div className="space-y-2">
-                  <Label htmlFor="share-link">Current Share Link</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="share-link"
-                      value={shareLink}
-                      readOnly
-                      className="flex-1"
-                    />
+              <div className="space-y-4">
+                {shareId ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="share-link">Your Active Share Link</Label>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          id="share-link"
+                          value={shareLink}
+                          readOnly
+                          className="flex-1"
+                        />
+                        <Button 
+                          size="icon" 
+                          variant="outline" 
+                          onClick={copyToClipboard} 
+                          title="Copy to clipboard"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
                     <Button 
-                      size="icon" 
-                      variant="outline" 
-                      onClick={copyToClipboard} 
-                      title="Copy to clipboard"
+                      variant="secondary" 
+                      onClick={generateNewShareId} 
+                      disabled={isLoading}
+                      className="w-full flex items-center justify-center"
                     >
-                      <Copy className="h-4 w-4" />
+                      <RotateCw size={16} className="mr-2" />
+                      Generate New Link
                     </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    This is your active portfolio share link. Generating a new link will replace this one.
-                  </p>
-                </div>
-              )}
-              
-              <div className="pt-2">
-                <Button 
-                  variant="secondary" 
-                  onClick={generateNewShareId} 
-                  disabled={isLoading}
-                  className="w-full flex items-center justify-center"
-                >
-                  <RotateCw size={16} className="mr-2" />
-                  {shareId ? "Generate New Link" : "Create Share Link"}
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2 text-center">
-                  This will invalidate any previous share links.
-                </p>
+                    <p className="text-xs text-muted-foreground text-center -mt-2">
+                      Creating a new link will replace your current link and invalidate the old one.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground text-center py-2">
+                      You don't have a share link yet. Create one to share your portfolio publicly.
+                    </p>
+                    <Button 
+                      variant="secondary" 
+                      onClick={generateNewShareId} 
+                      disabled={isLoading}
+                      className="w-full flex items-center justify-center"
+                    >
+                      <RotateCw size={16} className="mr-2" />
+                      Create Share Link
+                    </Button>
+                  </>
+                )}
               </div>
             </>
           )}
