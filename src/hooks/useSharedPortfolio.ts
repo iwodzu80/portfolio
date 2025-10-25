@@ -45,17 +45,17 @@ export const useSharedPortfolio = (shareId: string | undefined) => {
         
         // Sanitize shareId
         const sanitizedShareId = sanitizeText(shareId.replace(/[^a-zA-Z0-9-]/g, ''));
-        console.log("Sanitized shareId:", sanitizedShareId);
-        console.log("Original shareId:", shareId);
+        console.log("[useSharedPortfolio] Starting fetch for shareId:", sanitizedShareId);
+        console.log("[useSharedPortfolio] User authenticated:", !!(await supabase.auth.getSession()).data.session);
         
         // Use the secure SECURITY DEFINER function to get user_id without exposing enumeration
         const { data: userId, error: userError } = await supabase
           .rpc('get_user_from_share', { share_id_param: sanitizedShareId });
           
-        console.log("User from share result:", { userId, userError });
+        console.log("[useSharedPortfolio] get_user_from_share result:", { userId, userError });
           
         if (userError || !userId) {
-          console.log("Share not found or not active:", { userError, userId });
+          console.error("[useSharedPortfolio] Share not found or not active:", { userError, userId });
           setNotFound(true);
           setIsLoading(false);
           return;
