@@ -21,19 +21,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Helper to check if current path is a public route
+    const isPublicRoute = (pathname: string) => {
+      return pathname.startsWith('/shared/') || 
+             pathname === '/cookie-policy' ||
+             pathname === '/';
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log('Auth state change:', { event, hasSession: !!currentSession, path: window.location.pathname });
+        
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
         
-        // Check if on public routes - don't redirect
-        const isPublicRoute = window.location.pathname.startsWith('/shared/') || 
-                              window.location.pathname === '/cookie-policy' ||
-                              window.location.pathname === '/';
-        
         // Skip all navigation logic for public routes
-        if (isPublicRoute) {
+        if (isPublicRoute(window.location.pathname)) {
+          console.log('Public route detected, skipping navigation');
           return;
         }
         
@@ -42,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           navigate("/dashboard");
         }
         
-        // Handle sign out event - redirect to auth (but not from public routes)
+        // Handle sign out event - redirect to auth (only for non-public routes)
         if (event === 'SIGNED_OUT') {
           setSession(null);
           setUser(null);
@@ -52,17 +57,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log('Initial session check:', { hasSession: !!currentSession, path: window.location.pathname });
+      
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setIsLoading(false);
       
-      // Check if on public routes - don't redirect
-      const isPublicRoute = window.location.pathname.startsWith('/shared/') || 
-                            window.location.pathname === '/cookie-policy' ||
-                            window.location.pathname === '/';
-      
       // Skip navigation for public routes
-      if (isPublicRoute) {
+      if (isPublicRoute(window.location.pathname)) {
+        console.log('Public route detected on initial load, skipping navigation');
         return;
       }
       
