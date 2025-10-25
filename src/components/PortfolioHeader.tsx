@@ -137,11 +137,9 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
   };
 
   const getBaseUrl = () => {
-    const hostname = window.location.hostname;
-    if (hostname === 'clickly.it' || hostname === 'www.clickly.it') {
-      return 'https://clickly.it';
-    }
-    return window.location.origin;
+    // Always use the custom domain for share links to ensure public access
+    // Lovable preview URLs (*.lovableproject.com) require platform authentication
+    return 'https://clickly.it';
   };
 
   const loadShareData = async () => {

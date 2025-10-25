@@ -35,17 +35,11 @@ const SharePortfolioDialog = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Dynamic base URL detection
+  // Dynamic base URL detection - always use custom domain for public sharing
   const getBaseUrl = () => {
-    const hostname = window.location.hostname;
-    
-    // Check if we're on the custom domain
-    if (hostname === 'clickly.it' || hostname === 'www.clickly.it') {
-      return 'https://clickly.it';
-    }
-    
-    // Default to current origin for preview/dev environments
-    return window.location.origin;
+    // Always use the custom domain for share links to ensure public access
+    // Lovable preview URLs (*.lovableproject.com) require platform authentication
+    return 'https://clickly.it';
   };
   
   const loadShareData = async () => {
