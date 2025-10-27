@@ -12,6 +12,7 @@ import SharedPortfolio from "./pages/SharedPortfolio";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import CookiePolicy from "./pages/CookiePolicy";
+import Recruiter from "./pages/Recruiter";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/dashboard" element={<Index />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/analytics" element={<Analytics />} />
+              <Route path="/recruiter" element={<Recruiter />} />
             </Route>
             
             <Route path="*" element={<NotFound />} />

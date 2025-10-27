@@ -375,14 +375,8 @@ export type Database = {
       }
     }
     Functions: {
-      delete_user: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      get_user_from_share: {
-        Args: { share_id_param: string }
-        Returns: string
-      }
+      delete_user: { Args: never; Returns: undefined }
+      get_user_from_share: { Args: { share_id_param: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -392,7 +386,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "recruiter"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -520,7 +514,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "recruiter"],
     },
   },
 } as const

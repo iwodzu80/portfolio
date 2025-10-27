@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff, Share2, Copy, RotateCw, Monitor } from "lucide-react";
+import { Eye, Pencil, LogOut, Settings as SettingsIcon, UserRound, BarChart3, EyeOff, Share2, Copy, RotateCw, Monitor, Briefcase } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -69,6 +69,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [currentSlug, setCurrentSlug] = useState("");
   const [isUpdatingSlug, setIsUpdatingSlug] = useState(false);
+  const [hasRecruiterRole, setHasRecruiterRole] = useState(false);
 
   const slugForm = useForm<z.infer<typeof shareSlugSchema>>({
     resolver: zodResolver(shareSlugSchema),
@@ -98,6 +99,22 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
       }
     } catch (error: any) {
       console.error("Error fetching privacy settings:", error);
+    }
+  };
+
+  const checkRecruiterRole = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+
+      const isRecruiter = roles?.some(r => r.role === 'recruiter');
+      setHasRecruiterRole(isRecruiter || false);
+    } catch (error: any) {
+      console.error("Error checking recruiter role:", error);
     }
   };
 
@@ -369,6 +386,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
   useEffect(() => {
     loadPrivacySettings();
     loadShareData();
+    checkRecruiterRole();
   }, [user]);
 
   return (
@@ -601,6 +619,12 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
                 <BarChart3 size={16} className="mr-2" />
                 View Analytics
               </DropdownMenuItem>
+              {hasRecruiterRole && (
+                <DropdownMenuItem onClick={() => navigate("/recruiter")}>
+                  <Briefcase size={16} className="mr-2" />
+                  Recruiter Assistant
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut}>
                 <LogOut size={16} className="mr-2" />
