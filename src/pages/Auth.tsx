@@ -37,30 +37,18 @@ const Auth = () => {
     e.preventDefault();
     setSignUpLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({ 
+      const { error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            role: userRole
+          }
         }
       });
       
       if (error) throw error;
-      
-      // Assign the selected role to the user
-      if (data.user) {
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: data.user.id,
-            role: userRole
-          });
-        
-        if (roleError) {
-          console.error('Failed to assign role:', roleError);
-        }
-      }
-      
       toast.success("Sign-up successful! Please check your email for verification.");
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign-up");
