@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -23,6 +24,7 @@ const Auth = () => {
   const [resetLoading, setResetLoading] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [userRole, setUserRole] = useState<'user' | 'recruiter'>('user');
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -35,7 +37,7 @@ const Auth = () => {
     e.preventDefault();
     setSignUpLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({ 
+      const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
@@ -44,6 +46,21 @@ const Auth = () => {
       });
       
       if (error) throw error;
+      
+      // Assign the selected role to the user
+      if (data.user) {
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: data.user.id,
+            role: userRole
+          });
+        
+        if (roleError) {
+          console.error('Failed to assign role:', roleError);
+        }
+      }
+      
       toast.success("Sign-up successful! Please check your email for verification.");
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign-up");
@@ -260,6 +277,22 @@ const Auth = () => {
                         )}
                       </Button>
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="user-role">Account Type</Label>
+                    <Select 
+                      value={userRole} 
+                      onValueChange={(value: 'user' | 'recruiter') => setUserRole(value)}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger id="user-role">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">Portfolio Creator</SelectItem>
+                        <SelectItem value="recruiter">Recruiter</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <LoadingButton 
                     type="submit" 
