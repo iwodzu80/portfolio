@@ -131,6 +131,11 @@
   .card-transition {
     @apply transition-all duration-300 ease-in-out;
   }
+
+  /* HR styling for rich text content */
+  .prose hr {
+    @apply my-4 border-t border-border;
+  }
 }
 
 /* Container width adjustments */
