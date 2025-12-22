@@ -79,7 +79,7 @@ export const sanitizeHtml = (html: string): string => {
   });
   
   const sanitized = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr'],
     ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'],
     ALLOW_DATA_ATTR: false,
   });
